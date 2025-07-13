@@ -1,0 +1,3 @@
+[submodule "ether-parent"]
+	path = ether-parent
+	url = git@github.com:rafex/ether-parent.git

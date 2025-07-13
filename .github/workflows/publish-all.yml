@@ -10,4 +10,4 @@ jobs:
   publish-ether-parent:
     uses: ./.github/workflows/maven-central-publish-template.yml
     with:
-      module-path: ether-parent
+      module-path: ether-parent/ether-parent
