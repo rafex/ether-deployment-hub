@@ -1,0 +1,18 @@
+---
+name: Publish All Java Modules
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  publish-ether-parent:
+    uses: ./.github/workflows/maven-central-publish-template.yml
+    with:
+      module-path: ether-parent
+    secrets:
+      OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+      OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+      GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+      GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}

@@ -1,0 +1,50 @@
+---
+name: "Java Publish Template"
+
+on:
+  workflow_call:
+    inputs:
+      module-path:
+        description: "Ruta del módulo Java a compilar y desplegar"
+        required: true
+        type: string
+      skip-tests:
+        description: "Omitir tests"
+        required: false
+        type: boolean
+        default: true
+    secrets:
+      OSSRH_USERNAME:
+        required: true
+      OSSRH_PASSWORD:
+        required: true
+      GPG_PRIVATE_KEY:
+        required: true
+      GPG_PASSPHRASE:
+        required: true
+
+jobs:
+  publish:
+    name: Publish ${{ inputs.module-path }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Java & GPG
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          server-id: central
+          server-username: ${{ secrets.OSSRH_USERNAME }}
+          server-password: ${{ secrets.OSSRH_PASSWORD }}
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          gpg-passphrase: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Deploy module
+        working-directory: ${{ inputs.module-path }}
+        run: mvn --batch-mode clean deploy -DskipTests=${{ inputs.skip-tests }}
