@@ -38,4 +38,5 @@ jobs:
 
       - name: Deploy module
         working-directory: ${{ inputs.module-path }}
-        run: mvn --batch-mode clean deploy -DskipTests=${{ inputs.skip-tests }}
+        run: mvn --batch-mode clean deploy -DskipTests=${{ inputs.skip-tests }} \
+            -Dgpg.passphrase="${{ secrets.GPG_PASSPHRASE }}"
