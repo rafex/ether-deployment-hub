@@ -47,17 +47,15 @@ jobs:
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: ${{ secrets.GPG_PASSPHRASE }}
 
-      - name: Configure Git user
-        run: |
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-
       - name: Deploy module
         working-directory: ${{ inputs.module-path }}
         # En realidad, esas llaves ({{ }} y {project.version}) no son sintaxis de shell, sino de GitHub Actions/YAML. Por eso:
         # Es un falso positivo de ShellCheck, porque su parser no entiende la sintaxis de GHA.
         # Para evitar ver ese warning, puedes deshabilitarlo en esa sección con: shellcheck disable=SC1083
         run: |
+          # Configure Git user for the release process
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
           # shellcheck disable=SC1083
           mvn --batch-mode release:prepare \
             -DreleaseVersion=${{ inputs.release-version }} \
