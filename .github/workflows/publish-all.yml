@@ -12,3 +12,4 @@ jobs:
     uses: ./.github/workflows/maven-central-publish-template.yml
     with:
       module-path: ether-parent/ether-parent
+      release-version: "0.1.0-SNAPSHOT"

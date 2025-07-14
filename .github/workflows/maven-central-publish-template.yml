@@ -13,6 +13,11 @@ on:
         required: false
         type: boolean
         default: true
+      release-version:
+        description: "Versión de lanzamiento del módulo"
+        required: false
+        type: string
+        default: "0.1.0-SNAPSHOT"
 
 jobs:
   publish:
@@ -39,4 +44,5 @@ jobs:
       - name: Deploy module
         working-directory: ${{ inputs.module-path }}
         run: mvn --batch-mode clean deploy -DskipTests=${{ inputs.skip-tests }} \
-            -Dgpg.passphrase="${{ secrets.GPG_PASSPHRASE }}"
+            -Dgpg.passphrase="${{ secrets.GPG_PASSPHRASE }}" \
+            -Drevision=${{ inputs.release-version }} \
