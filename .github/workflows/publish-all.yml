@@ -5,12 +5,12 @@ on:
   workflow_dispatch:
   push:
     tags:
-      - 'v*.*.*'
+      - 'v*.*' # Matches tags like v1.0, v1.0.1, etc.
 
 jobs:
   publish-ether-parent:
     uses: ./.github/workflows/maven-central-publish-template.yml
     with:
       module-path: ether-parent/ether-parent
-      release-version: "0.1.0"
-      development-version: "0.2.0-SNAPSHOT"
+      release-version: ${{ github.ref_name }}
+      development-version: "${{ github.ref_name }}.1-SNAPSHOT"
