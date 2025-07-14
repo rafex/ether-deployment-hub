@@ -58,7 +58,7 @@ jobs:
             -DreleaseVersion=${{ inputs.release-version }} \
             -DdevelopmentVersion=${{ inputs.development-version }} \
             -DtagNameFormat=v@{project.version} \
-            -DpushChanges=true
+            -DpushChanges=false
           mvn --batch-mode release:perform \
             -Dgoals="clean deploy" \
             -Darguments="-DskipTests=${{ inputs.skip-tests }} -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }}"
