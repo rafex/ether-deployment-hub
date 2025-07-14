@@ -49,6 +49,9 @@ jobs:
 
       - name: Deploy module
         working-directory: ${{ inputs.module-path }}
+        # En realidad, esas llaves ({{ }} y {project.version}) no son sintaxis de shell, sino de GitHub Actions/YAML. Por eso:
+        # Es un falso positivo de ShellCheck, porque su parser no entiende la sintaxis de GHA.
+        # Para evitar ver ese warning, puedes deshabilitarlo en esa sección con: shellcheck disable=SC1083
         run: |
           # shellcheck disable=SC1083
           mvn --batch-mode release:prepare \
