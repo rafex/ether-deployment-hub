@@ -14,10 +14,16 @@ on:
         type: boolean
         default: true
       release-version:
-        description: "Versión de lanzamiento del módulo"
-        required: false
+        description: 'Versión de release (ej: 1.3.2)'
+        required: true
         type: string
-        default: "0.1.0-SNAPSHOT"
+      development-version:
+        # Default to the next minor version of the release version
+        # This assumes the release version is in the format X.Y.Z or X.Y.Z-SNAPSHOT
+        # If the release version is 1.3.2, the development version will be 1.4.0-SNAPSHOT
+        description: 'Versión de desarrollo tras release (ej: 1.4.0-SNAPSHOT)'
+        required: true
+        type: string
 
 jobs:
   publish:
@@ -43,6 +49,13 @@ jobs:
 
       - name: Deploy module
         working-directory: ${{ inputs.module-path }}
-        run: mvn --batch-mode clean deploy -DskipTests=${{ inputs.skip-tests }} \
-            -Dgpg.passphrase="${{ secrets.GPG_PASSPHRASE }}" \
-            -Drevision=${{ inputs.release-version }} \
+        run: |
+          # shellcheck disable=SC1083
+          mvn --batch-mode release:prepare \
+            -DreleaseVersion=${{ inputs.release-version }} \
+            -DdevelopmentVersion=${{ inputs.development-version }} \
+            -DtagNameFormat=v@{project.version} \
+            -DpushChanges=true
+          mvn --batch-mode release:perform \
+            -Dgoals="clean deploy" \
+            -Darguments="-DskipTests=${{ inputs.skip-tests }} -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }}"
