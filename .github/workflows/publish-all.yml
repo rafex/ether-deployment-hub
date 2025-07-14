@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
   push:
     tags:
-      - 'v*.*' # Matches tags like v1.0, v1.0.1, etc.
+      - 'v*.*'
 
 jobs:
   publish-ether-parent:
