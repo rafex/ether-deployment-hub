@@ -45,6 +45,10 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Change directory to module path
+        run: |
+          cd ${{ inputs.module-path }}
+          ls -la
 
       - name: Generate .env for Makefile
         run: |
@@ -76,9 +80,6 @@ jobs:
 
       - name: Deploy via Makefile
         run: |
-          ls -la
-          cd ${{ inputs.module-path }}
-          ls -la
           make deploy
 
       - name: Set project version from Git tag
