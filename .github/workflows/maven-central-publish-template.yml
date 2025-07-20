@@ -45,9 +45,9 @@ jobs:
 
       - name: Import GPG private key
         env:
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
         run: |
-          echo "$GPG_PRIVATE_KEY" | gpg --batch --import
+          echo "$GPG_PRIVATE_KEY_B64" | base64 --decode | gpg --batch --import
           gpg --list-secret-keys
 
       - name: Deploy via Makefile
