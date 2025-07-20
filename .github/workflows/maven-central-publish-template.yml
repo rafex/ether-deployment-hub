@@ -77,5 +77,4 @@ jobs:
       - name: Deploy via Makefile
         run: |
           cd ${{ inputs.module-path }}
-          cat Makefile
           make deploy
