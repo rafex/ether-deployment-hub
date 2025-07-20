@@ -45,11 +45,6 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Change directory to module path
-        run: |
-          cd ${{ inputs.module-path }}
-          ls -la
-
       - name: Generate .env for Makefile
         run: |
           # Read secrets into variables
@@ -67,6 +62,7 @@ jobs:
           fi
 
           # Generate .env
+          cd ${{ inputs.module-path }}
           echo "OSSRH_USERNAME=$OSSRH_USERNAME" > .env
           echo "OSSRH_PASSWORD=$OSSRH_PASSWORD" >> .env
           echo "GPG_PASSPHRASE=$GPG_PASSPHRASE" >> .env
@@ -80,5 +76,6 @@ jobs:
 
       - name: Deploy via Makefile
         run: |
+          cd ${{ inputs.module-path }}
           cat Makefile
           make deploy
