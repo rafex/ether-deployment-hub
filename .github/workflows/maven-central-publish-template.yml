@@ -75,7 +75,11 @@ jobs:
           gpg --list-secret-keys
 
       - name: Deploy via Makefile
-        run: make deploy
+        run: |
+          ls -la
+          cd ${{ inputs.module-path }}
+          ls -la
+          make deploy
 
       - name: Set project version from Git tag
         working-directory: ${{ inputs.module-path }}
