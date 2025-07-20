@@ -39,10 +39,24 @@ jobs:
 
       - name: Generate .env for Makefile
         run: |
-          echo "OSSRH_USERNAME=${{ secrets.OSSRH_USERNAME }}" | tee .env
-          echo "OSSRH_PASSWORD=${{ secrets.OSSRH_PASSWORD }}" | tee -a .env
-          echo "GPG_PASSPHRASE=${{ secrets.GPG_PASSPHRASE }}" | tee -a .env
-          cat .env
+          # Read secrets into variables
+          OSSRH_USERNAME="${{ secrets.OSSRH_USERNAME }}"
+          OSSRH_PASSWORD="${{ secrets.OSSRH_PASSWORD }}"
+          GPG_PASSPHRASE="${{ secrets.GPG_PASSPHRASE }}"
+
+          # Validate
+          if [ -z "$OSSRH_USERNAME" ] || [ -z "$OSSRH_PASSWORD" ] || [ -z "$GPG_PASSPHRASE" ]; then
+            echo "⚠️ One or more required secrets are empty:"
+            echo "  OSSRH_USERNAME length: ${#OSSRH_USERNAME}"
+            echo "  OSSRH_PASSWORD length: ${#OSSRH_PASSWORD}"
+            echo "  GPG_PASSPHRASE length: ${#GPG_PASSPHRASE}"
+            exit 1
+          fi
+
+          # Generate .env
+          echo "OSSRH_USERNAME=$OSSRH_USERNAME" > .env
+          echo "OSSRH_PASSWORD=$OSSRH_PASSWORD" >> .env
+          echo "GPG_PASSPHRASE=$GPG_PASSPHRASE" >> .env
 
       - name: Import GPG private key
         env:
