@@ -14,3 +14,8 @@ jobs:
       module-path: ether-parent/ether-parent
       release-version: ${{ github.ref_name }}
       development-version: "${{ github.ref_name }}.1-SNAPSHOT"
+    secrets:
+      OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+      OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+      GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
+      GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}

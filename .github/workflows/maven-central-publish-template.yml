@@ -24,6 +24,15 @@ on:
         description: 'Versión de desarrollo tras release (ej: 1.4.0-SNAPSHOT)'
         required: true
         type: string
+    secrets:
+      OSSRH_USERNAME:
+        required: true
+      OSSRH_PASSWORD:
+        required: true
+      GPG_PRIVATE_KEY_B64:
+        required: true
+      GPG_PASSPHRASE:
+        required: true
 
 jobs:
   publish:
