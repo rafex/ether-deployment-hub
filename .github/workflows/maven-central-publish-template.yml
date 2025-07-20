@@ -78,10 +78,6 @@ jobs:
           echo "$GPG_PRIVATE_KEY_B64" | base64 --decode | gpg --batch --import
           gpg --list-secret-keys
 
-      - name: Deploy via Makefile
-        run: |
-          make deploy
-
       - name: Set project version from Git tag
         working-directory: ${{ inputs.module-path }}
         run: |
