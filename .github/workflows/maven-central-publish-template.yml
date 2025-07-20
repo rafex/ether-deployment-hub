@@ -78,14 +78,7 @@ jobs:
           echo "$GPG_PRIVATE_KEY_B64" | base64 --decode | gpg --batch --import
           gpg --list-secret-keys
 
-      - name: Set project version from Git tag
-        working-directory: ${{ inputs.module-path }}
+      - name: Deploy via Makefile
         run: |
-          mvn versions:set -DnewVersion=${{ github.ref_name }} -DgenerateBackupPoms=false
-
-      - name: Deploy module
-        working-directory: ${{ inputs.module-path }}
-        run: |
-          mvn --batch-mode clean deploy \
-            -DskipTests=${{ inputs.skip-tests }} \
-            -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }}
+          cat Makefile
+          make deploy
