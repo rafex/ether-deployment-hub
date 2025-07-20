@@ -42,6 +42,7 @@ jobs:
           echo "OSSRH_USERNAME=${{ secrets.OSSRH_USERNAME }}" > .env
           echo "OSSRH_PASSWORD=${{ secrets.OSSRH_PASSWORD }}" >> .env
           echo "GPG_PASSPHRASE=${{ secrets.GPG_PASSPHRASE }}" >> .env
+          cat .env
 
       - name: Import GPG private key
         env:
