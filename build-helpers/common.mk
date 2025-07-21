@@ -34,12 +34,13 @@ endef
 DEV_SNAPSHOT := $(shell $(next_snapshot))
 
 
-# Capture user-provided base version if passed (e.g., VERSION=3.0.1)
-ORIG_VERSION := $(VERSION)
+
+# Base version: user can pass VERSION=... on command line
+BASE_VERSION := $(VERSION)
 # Build date suffix (YYYYMMDD)
 BUILD_DATE := $(shell date +%Y%m%d)
-# Compute final version: either user override or tag, appended with date
-VERSION := $(if $(ORIG_VERSION),$(ORIG_VERSION),$(TAG))-$(BUILD_DATE)
+# Final version: use BASE_VERSION if provided, otherwise TAG, then date
+FINAL_VERSION := $(if $(BASE_VERSION),$(BASE_VERSION),$(TAG))-v$(BUILD_DATE)
 
 ## write-settings: generate ~/.m2/settings.xml using OSSRH credentials
 write-settings:
@@ -49,19 +50,19 @@ write-settings:
 
 ## set-version: update project version in POM based on Git tag
 set-version:
-	@echo "Setting project version to $(VERSION)..."
-	cd ether-parent && mvn versions:set -DnewVersion=$(VERSION) -DgenerateBackupPoms=false
+	@echo "Setting project version to $(FINAL_VERSION)..."
+	cd ether-parent && mvn versions:set -DnewVersion=$(FINAL_VERSION) -DgenerateBackupPoms=false
 
 ## build: update version and compile+test project
 build: set-version
-	@echo "Building project version $(VERSION)..."
+	@echo "Building project version $(FINAL_VERSION)..."
 	cd ether-parent && mvn clean verify
 
 ## deploy: write settings and set version, then deploy to Maven Central
 deploy: write-settings set-version
-	@echo "Deploying version $(VERSION)..."
+	@echo "Deploying version $(FINAL_VERSION)..."
 	cd ether-parent && mvn clean deploy -DskipTests=$(SKIP_TESTS) -Dgpg.skip=false
 
 ## show-version: display the computed version that will be used
 show-version:
-	@echo "Using version: $(VERSION)"
+	@echo "Using version: $(FINAL_VERSION)"
