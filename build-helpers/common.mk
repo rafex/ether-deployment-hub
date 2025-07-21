@@ -12,7 +12,7 @@ show-env:
 	@echo "OSSRH_PASSWORD length='$(shell printf '%s' "$(OSSRH_PASSWORD)" | wc -c)'"
 	@echo "MAVEN_GPG_PASSPHRASE length='$(shell printf '%s' "$(MAVEN_GPG_PASSPHRASE)" | wc -c)'"
 
-.PHONY: show-env write-settings set-version build deploy
+.PHONY: show-env write-settings set-version build deploy show-version
 
 #
 # Raw Git tag, or default "0.0.0"
@@ -54,3 +54,7 @@ build: set-version
 deploy: write-settings set-version
 	@echo "Deploying version $(VERSION)..."
 	cd ether-parent && mvn clean deploy -DskipTests -Dgpg.skip=false
+
+## show-version: display the computed version that will be used
+show-version:
+	@echo "Using version: $(VERSION)"
