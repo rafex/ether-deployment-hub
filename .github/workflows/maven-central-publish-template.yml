@@ -31,7 +31,7 @@ on:
         required: true
       GPG_PRIVATE_KEY_B64:
         required: true
-      GPG_PASSPHRASE:
+      MAVEN_GPG_PASSPHRASE:
         required: true
 
 jobs:
@@ -50,14 +50,14 @@ jobs:
           # Read secrets into variables
           OSSRH_USERNAME="${{ secrets.OSSRH_USERNAME }}"
           OSSRH_PASSWORD="${{ secrets.OSSRH_PASSWORD }}"
-          GPG_PASSPHRASE="${{ secrets.GPG_PASSPHRASE }}"
+          MAVEN_GPG_PASSPHRASE="${{ secrets.MAVEN_GPG_PASSPHRASE }}"
 
           # Validate
-          if [ -z "$OSSRH_USERNAME" ] || [ -z "$OSSRH_PASSWORD" ] || [ -z "$GPG_PASSPHRASE" ]; then
+          if [ -z "$OSSRH_USERNAME" ] || [ -z "$OSSRH_PASSWORD" ] || [ -z "$MAVEN_GPG_PASSPHRASE" ]; then
             echo "⚠️ One or more required secrets are empty:"
             echo "  OSSRH_USERNAME length: ${#OSSRH_USERNAME}"
             echo "  OSSRH_PASSWORD length: ${#OSSRH_PASSWORD}"
-            echo "  GPG_PASSPHRASE length: ${#GPG_PASSPHRASE}"
+            echo "  MAVEN_GPG_PASSPHRASE length: ${#MAVEN_GPG_PASSPHRASE}"
             exit 1
           fi
 
@@ -65,7 +65,7 @@ jobs:
           cd ${{ inputs.module-path }}
           echo "OSSRH_USERNAME=$OSSRH_USERNAME" > .env
           echo "OSSRH_PASSWORD=$OSSRH_PASSWORD" >> .env
-          echo "GPG_PASSPHRASE=$GPG_PASSPHRASE" >> .env
+          echo "MAVEN_GPG_PASSPHRASE=$MAVEN_GPG_PASSPHRASE" >> .env
 
       - name: Import GPG private key
         env:
