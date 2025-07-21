@@ -10,7 +10,7 @@ endif
 show-env:
 	@echo "OSSRH_USERNAME='$(OSSRH_USERNAME)'"
 	@echo "OSSRH_PASSWORD length='$(shell printf '%s' "$(OSSRH_PASSWORD)" | wc -c)'"
-	@echo "GPG_PASSPHRASE length='$(shell printf '%s' "$(GPG_PASSPHRASE)" | wc -c)'"
+	@echo "MAVEN_GPG_PASSPHRASE length='$(shell printf '%s' "$(MAVEN_GPG_PASSPHRASE)" | wc -c)'"
 
 .PHONY: show-env write-settings set-version build deploy
 
@@ -31,7 +31,7 @@ DEV_SNAPSHOT := $(shell $(next_snapshot))
 
 # Build date for version suffix
 BUILD_DATE := $(shell date +%Y%m%d)
-# Version with date suffix (e.g., 4.0.0-v2025-07-21)
+# Version with date suffix (e.g., 4.0.0-v20250721)
 VERSION := $(TAG)-v$(BUILD_DATE)
 
 ## write-settings: generate ~/.m2/settings.xml using OSSRH credentials
