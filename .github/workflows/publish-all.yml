@@ -5,15 +5,15 @@ on:
   workflow_dispatch:
   push:
     tags:
-      - '*.*'
+      - '*.*.*'
+      - 'v*.*.*'
 
 jobs:
   publish-ether-parent:
     uses: ./.github/workflows/maven-central-publish-template.yml
     with:
       module-path: ether-parent
-      release-version: ${{ github.ref_name }}
-      development-version: "${{ github.ref_name }}.1-SNAPSHOT"
+      version: ${{ github.ref_name }}
     secrets:
       OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
       OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}

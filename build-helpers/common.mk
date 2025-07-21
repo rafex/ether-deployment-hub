@@ -1,10 +1,14 @@
 # Makefile
 
 # Load .env into Make variables if present
+
 ifneq (,$(wildcard .env))
   include .env
   export OSSRH_USERNAME OSSRH_PASSWORD MAVEN_GPG_PASSPHRASE
 endif
+
+# Control whether to skip tests: true or false
+SKIP_TESTS ?= false
 
 ## show-env: display loaded environment variables
 show-env:
@@ -29,10 +33,13 @@ endef
 
 DEV_SNAPSHOT := $(shell $(next_snapshot))
 
-# Build date for version suffix
+
+# Capture user-provided base version if passed (e.g., VERSION=3.0.1)
+ORIG_VERSION := $(VERSION)
+# Build date suffix (YYYYMMDD)
 BUILD_DATE := $(shell date +%Y%m%d)
-# Version with date suffix (e.g., 4.0.0-v20250721)
-VERSION := $(TAG)-v$(BUILD_DATE)
+# Compute final version: either user override or tag, appended with date
+VERSION := $(if $(ORIG_VERSION),$(ORIG_VERSION),$(TAG))-$(BUILD_DATE)
 
 ## write-settings: generate ~/.m2/settings.xml using OSSRH credentials
 write-settings:
@@ -53,7 +60,7 @@ build: set-version
 ## deploy: write settings and set version, then deploy to Maven Central
 deploy: write-settings set-version
 	@echo "Deploying version $(VERSION)..."
-	cd ether-parent && mvn clean deploy -DskipTests -Dgpg.skip=false
+	cd ether-parent && mvn clean deploy -DskipTests=$(SKIP_TESTS) -Dgpg.skip=false
 
 ## show-version: display the computed version that will be used
 show-version:

@@ -12,17 +12,10 @@ on:
         description: "Omitir tests"
         required: false
         type: boolean
-        default: true
-      release-version:
-        description: 'Versión de release (ej: 1.3.2)'
-        required: true
-        type: string
-      development-version:
-        # Default to the next minor version of the release version
-        # This assumes the release version is in the format X.Y.Z or X.Y.Z-SNAPSHOT
-        # If the release version is 1.3.2, the development version will be 1.4.0-SNAPSHOT
-        description: 'Versión de desarrollo tras release (ej: 1.4.0-SNAPSHOT)'
-        required: true
+        default: false
+      version:
+        description: "Versión del módulo"
+        required: false
         type: string
     secrets:
       OSSRH_USERNAME:
@@ -77,4 +70,4 @@ jobs:
       - name: Deploy via Makefile
         run: |
           cd ${{ inputs.module-path }}
-          make deploy
+          make deploy VERSION=${{ inputs.version }} SKIP_TESTS=${{ inputs.skip-tests }}
