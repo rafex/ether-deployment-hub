@@ -55,6 +55,11 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Validate version does not exist
+        run: |
+          cd ${{ inputs.module-path }}
+          make valid-version VERSION=${{ inputs.version }}
+
       - name: Generate .env for Makefile
         run: |
           # Read secrets into variables

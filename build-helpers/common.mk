@@ -14,13 +14,18 @@ SKIP_TESTS ?= false
 # Directory containing the Maven module to build/deploy
 PROJECT_DIR ?= ether-parent
 
+# Coordinates for Maven Central existence check
+PROJECT_GROUP_ID    ?= dev.rafex.ether.parent
+PROJECT_ARTIFACT_ID ?= ether-parent
+REPO_URL            ?= https://repo1.maven.org/maven2
+
 ## show-env: display loaded environment variables
 show-env:
 	@echo "OSSRH_USERNAME='$(OSSRH_USERNAME)'"
 	@echo "OSSRH_PASSWORD length='$(shell printf '%s' "$(OSSRH_PASSWORD)" | wc -c)'"
 	@echo "MAVEN_GPG_PASSPHRASE length='$(shell printf '%s' "$(MAVEN_GPG_PASSPHRASE)" | wc -c)'"
 
-.PHONY: show-env write-settings set-version build deploy show-version
+.PHONY: show-env write-settings set-version build deploy show-version valid-version
 
 #
 # Raw Git tag, or default "0.0.0"
@@ -70,3 +75,17 @@ deploy: write-settings set-version
 ## show-version: display the computed version that will be used
 show-version:
 	@echo "Using version: $(FINAL_VERSION)"
+
+## valid-version: check that FINAL_VERSION does not already exist in Maven Central
+valid-version:
+	@echo "Checking Maven Central for existing version $(FINAL_VERSION)..."
+	@GROUP_PATH=$$(echo $(PROJECT_GROUP_ID) | tr '.' '/'); \
+	URL=$(REPO_URL)/$$GROUP_PATH/$(PROJECT_ARTIFACT_ID)/$(FINAL_VERSION)/$(PROJECT_ARTIFACT_ID)-$(FINAL_VERSION).pom; \
+	HTTP_CODE=$$(curl -o /dev/null -s -w "%{http_code}" $$URL); \
+	if [ "$$HTTP_CODE" -eq "404" ]; then \
+	  echo "✅ Version $(FINAL_VERSION) not found; OK to deploy."; \
+	  exit 0; \
+	else \
+	  echo "❌ Version $(FINAL_VERSION) already exists (HTTP $$HTTP_CODE); abort."; \
+	  exit 1; \
+	fi
