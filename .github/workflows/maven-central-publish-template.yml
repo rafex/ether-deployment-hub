@@ -22,6 +22,16 @@ on:
         description: "Versión del módulo"
         required: false
         type: string
+      java-distribution:
+        description: "Java distribution to use (default: temurin)"
+        required: false
+        type: string
+        default: 'temurin'
+      java-version:
+        description: "Java version to use (default: 21)"
+        required: false
+        type: string
+        default: '21'
     secrets:
       OSSRH_USERNAME:
         required: true
@@ -73,6 +83,13 @@ jobs:
         run: |
           echo "$GPG_PRIVATE_KEY_B64" | base64 --decode | gpg --batch --import
           gpg --list-secret-keys
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: ${{ inputs.java-distribution }}
+          java-version: ${{ inputs.java-version }}
+          cache: 'maven'
 
       - name: Deploy via Makefile
         run: |

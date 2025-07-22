@@ -55,17 +55,17 @@ write-settings:
 ## set-version: update project version in POM based on Git tag (in $(PROJECT_DIR))
 set-version:
 	@echo "Setting project version to $(FINAL_VERSION)..."
-	cd $(PROJECT_DIR) && mvn versions:set -DnewVersion=$(FINAL_VERSION) -DgenerateBackupPoms=false
+	cd $(PROJECT_DIR) && ./mvnw versions:set -DnewVersion=$(FINAL_VERSION) -DgenerateBackupPoms=false
 
 ## build: update version and compile+test project (in $(PROJECT_DIR))
 build: set-version
 	@echo "Building project version $(FINAL_VERSION)..."
-	cd $(PROJECT_DIR) && mvn clean verify
+	cd $(PROJECT_DIR) && ./mvnw clean verify
 
 ## deploy: write settings and set version, then deploy to Maven Central (in $(PROJECT_DIR))
 deploy: write-settings set-version
 	@echo "Deploying version $(FINAL_VERSION)..."
-	cd $(PROJECT_DIR) && mvn clean deploy -DskipTests=$(SKIP_TESTS) -Dgpg.skip=false
+	cd $(PROJECT_DIR) && ./mvnw clean deploy -DskipTests=$(SKIP_TESTS) -Dgpg.skip=false
 
 ## show-version: display the computed version that will be used
 show-version:
