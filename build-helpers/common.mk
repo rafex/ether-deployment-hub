@@ -60,7 +60,7 @@ write-settings:
 ## set-version: update project version in POM based on Git tag (in $(PROJECT_DIR))
 set-version:
 	@echo "Setting project version to $(FINAL_VERSION)..."
-	cd $(PROJECT_DIR) && ./mvnw versions:set -DnewVersion=$(FINAL_VERSION) -DgenerateBackupPoms=false
+	cd $(PROJECT_DIR) && ./mvnw versions:set -DnewVersion=$(FINAL_VERSION) -DgenerateBackupPoms=true
 
 ## build: update version and compile+test project (in $(PROJECT_DIR))
 build: set-version
@@ -72,7 +72,7 @@ deploy: write-settings set-version
 	@echo "Deploying version $(FINAL_VERSION)..."
 	cd $(PROJECT_DIR) && ./mvnw clean deploy -DskipTests=$(SKIP_TESTS) -Dgpg.skip=false
 	@echo "Reverting POM changes after deploy..."
-	@git checkout -- $(PROJECT_DIR)/pom.xml
+	@cd $(PROJECT_DIR) && ./mvnw versions:revert
 
 ## show-version: display the computed version that will be used
 show-version:
