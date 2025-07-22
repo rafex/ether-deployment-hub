@@ -7,8 +7,12 @@ ifneq (,$(wildcard .env))
   export OSSRH_USERNAME OSSRH_PASSWORD MAVEN_GPG_PASSPHRASE
 endif
 
+
 # Control whether to skip tests: true or false
 SKIP_TESTS ?= false
+
+# Directory containing the Maven module to build/deploy
+PROJECT_DIR ?= ether-parent
 
 ## show-env: display loaded environment variables
 show-env:
@@ -48,20 +52,20 @@ write-settings:
 	@mkdir -p ~/.m2
 	@printf '<settings>\n  <servers>\n    <server>\n      <id>central</id>\n      <!-- usa tu Portal User Token -->\n      <username>%s</username>\n      <password>%s</password>\n    </server>\n  </servers>\n</settings>\n' "$(OSSRH_USERNAME)" "$(OSSRH_PASSWORD)" > ~/.m2/settings.xml
 
-## set-version: update project version in POM based on Git tag
+## set-version: update project version in POM based on Git tag (in $(PROJECT_DIR))
 set-version:
 	@echo "Setting project version to $(FINAL_VERSION)..."
-	cd ether-parent && mvn versions:set -DnewVersion=$(FINAL_VERSION) -DgenerateBackupPoms=false
+	cd $(PROJECT_DIR) && mvn versions:set -DnewVersion=$(FINAL_VERSION) -DgenerateBackupPoms=false
 
-## build: update version and compile+test project
+## build: update version and compile+test project (in $(PROJECT_DIR))
 build: set-version
 	@echo "Building project version $(FINAL_VERSION)..."
-	cd ether-parent && mvn clean verify
+	cd $(PROJECT_DIR) && mvn clean verify
 
-## deploy: write settings and set version, then deploy to Maven Central
+## deploy: write settings and set version, then deploy to Maven Central (in $(PROJECT_DIR))
 deploy: write-settings set-version
 	@echo "Deploying version $(FINAL_VERSION)..."
-	cd ether-parent && mvn clean deploy -DskipTests=$(SKIP_TESTS) -Dgpg.skip=false
+	cd $(PROJECT_DIR) && mvn clean deploy -DskipTests=$(SKIP_TESTS) -Dgpg.skip=false
 
 ## show-version: display the computed version that will be used
 show-version:

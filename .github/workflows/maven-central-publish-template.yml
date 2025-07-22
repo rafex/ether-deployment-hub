@@ -13,6 +13,11 @@ on:
         required: false
         type: boolean
         default: false
+      run-deploy:
+        description: "Flag to control whether the deploy step runs"
+        required: false
+        type: boolean
+        default: true
       version:
         description: "Versión del módulo"
         required: false
@@ -29,6 +34,7 @@ on:
 
 jobs:
   publish:
+    if: ${{ inputs.run-deploy }}
     name: Publish ${{ inputs.module-path }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
