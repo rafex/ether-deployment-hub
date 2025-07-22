@@ -14,6 +14,7 @@ jobs:
     with:
       module-path: ether-parent
       version: ${{ github.ref_name }}
+      run-deploy: true
     secrets:
       OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
       OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
@@ -24,6 +25,7 @@ jobs:
     with:
       module-path: ether-json
       version: ${{ github.ref_name }}
+      run-deploy: false
     secrets:
       OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
       OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
