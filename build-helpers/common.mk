@@ -71,6 +71,8 @@ build: set-version
 deploy: write-settings set-version
 	@echo "Deploying version $(FINAL_VERSION)..."
 	cd $(PROJECT_DIR) && ./mvnw clean deploy -DskipTests=$(SKIP_TESTS) -Dgpg.skip=false
+	@echo "Reverting POM changes after deploy..."
+	@git checkout -- $(PROJECT_DIR)/pom.xml
 
 ## show-version: display the computed version that will be used
 show-version:
