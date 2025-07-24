@@ -1,6 +1,7 @@
 # Ether Central Publishing Hub
 
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/rafex/ether-deployment-hub/actions/workflows/publish-all.yml?branch=main)
+![GitHub Workflow Status](![Publish Status (v4.0.0)](https://img.shields.io/github/actions/workflow/status/rafex/ether-deployment-hub/actions/workflows/publish-all.yml?ref=3.0.6))
 
 ## Objetivo del Repositorio
 
