@@ -4,21 +4,13 @@
 
 ## Estado en Maven Central
 
-### Opcion 1: Badges por modulo
-
-![ether-parent](https://img.shields.io/maven-central/v/dev.rafex.ether.parent/ether-parent)
-![ether-json](https://img.shields.io/maven-central/v/dev.rafex.ether.json/ether-json)
-![ether-jwt](https://img.shields.io/maven-central/v/dev.rafex.ether.jwt/ether-jwt)
-![ether-http-core](https://img.shields.io/maven-central/v/dev.rafex.ether.http/ether-http-core)
-![ether-http-jetty12](https://img.shields.io/maven-central/v/dev.rafex.ether.http/ether-http-jetty12)
-
-### Opcion 2: Tabla generada automaticamente
+### Tabla de estado (con badge por modulo)
 
 {{CENTRAL_STATUS_TABLE}}
 
-### Opcion 3: JSON de estado
+### JSON de estado
 
-Consulta el archivo [docs/maven-central-status.json](/Users/rafex/repository/github/rafex/ether/ether-deployment-hub/docs/maven-central-status.json).
+Consulta el archivo [docs/maven-central-status.json](docs/maven-central-status.json).
 
 ## Objetivo del Repositorio
 

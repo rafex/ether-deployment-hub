@@ -68,11 +68,11 @@ done
 mv "$TMP_JSON" "$JSON_FILE"
 
 {
-  echo "| Modulo | GroupId | ArtifactId | Desplegado | Ultima version | Ultima actualizacion (UTC) |"
-  echo "|---|---|---|---|---|---|"
+  echo "| Modulo | Badge | GroupId | ArtifactId | Desplegado | Ultima version | Ultima actualizacion (UTC) |"
+  echo "|---|---|---|---|---|---|---|"
   jq -r '
     .[] |
-    "| \(.module) | \(.groupId) | \(.artifactId) | " +
+    "| \(.module) | ![\(.module)](https://img.shields.io/maven-central/v/\(.groupId)/\(.artifactId)) | \(.groupId) | \(.artifactId) | " +
     (if .deployed then "si" else "no" end) + " | " +
     (if (.latestVersion|length)>0 then .latestVersion else "-" end) + " | " +
     (if (.lastUpdatedUtc|length)>0 then .lastUpdatedUtc else "-" end) + " |"

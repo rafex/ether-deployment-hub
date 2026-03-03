@@ -4,27 +4,19 @@
 
 ## Estado en Maven Central
 
-### Opcion 1: Badges por modulo
+### Tabla de estado (con badge por modulo)
 
-![ether-parent](https://img.shields.io/maven-central/v/dev.rafex.ether.parent/ether-parent)
-![ether-json](https://img.shields.io/maven-central/v/dev.rafex.ether.json/ether-json)
-![ether-jwt](https://img.shields.io/maven-central/v/dev.rafex.ether.jwt/ether-jwt)
-![ether-http-core](https://img.shields.io/maven-central/v/dev.rafex.ether.http/ether-http-core)
-![ether-http-jetty12](https://img.shields.io/maven-central/v/dev.rafex.ether.http/ether-http-jetty12)
+| Modulo | Badge | GroupId | ArtifactId | Desplegado | Ultima version | Ultima actualizacion (UTC) |
+|---|---|---|---|---|---|---|
+| ether-parent | ![ether-parent](https://img.shields.io/maven-central/v/dev.rafex.ether.parent/ether-parent) | dev.rafex.ether.parent | ether-parent | si | 2.0.0-v20210916 | 2021-09-17T02:42:26Z |
+| ether-json | ![ether-json](https://img.shields.io/maven-central/v/dev.rafex.ether.json/ether-json) | dev.rafex.ether.json | ether-json | si | 2.0-v20210916 | 2021-09-17T02:42:36Z |
+| ether-jwt | ![ether-jwt](https://img.shields.io/maven-central/v/dev.rafex.ether.jwt/ether-jwt) | dev.rafex.ether.jwt | ether-jwt | si | 2.0-v20210916 | 2021-09-17T02:42:31Z |
+| ether-http-core | ![ether-http-core](https://img.shields.io/maven-central/v/dev.rafex.ether.http/ether-http-core) | dev.rafex.ether.http | ether-http-core | no | - | - |
+| ether-http-jetty12 | ![ether-http-jetty12](https://img.shields.io/maven-central/v/dev.rafex.ether.http/ether-http-jetty12) | dev.rafex.ether.http | ether-http-jetty12 | no | - | - |
 
-### Opcion 2: Tabla generada automaticamente
+### JSON de estado
 
-| Modulo | GroupId | ArtifactId | Desplegado | Ultima version | Ultima actualizacion (UTC) |
-|---|---|---|---|---|---|
-| ether-parent | dev.rafex.ether.parent | ether-parent | si | 2.0.0-v20210916 | - |
-| ether-json | dev.rafex.ether.json | ether-json | si | 2.0-v20210916 | - |
-| ether-jwt | dev.rafex.ether.jwt | ether-jwt | si | 2.0-v20210916 | - |
-| ether-http-core | dev.rafex.ether.http | ether-http-core | no | - | - |
-| ether-http-jetty12 | dev.rafex.ether.http | ether-http-jetty12 | no | - | - |
-
-### Opcion 3: JSON de estado
-
-Consulta el archivo [docs/maven-central-status.json](/Users/rafex/repository/github/rafex/ether/ether-deployment-hub/docs/maven-central-status.json).
+Consulta el archivo [docs/maven-central-status.json](docs/maven-central-status.json).
 
 ## Objetivo del Repositorio
 
