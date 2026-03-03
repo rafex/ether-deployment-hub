@@ -48,6 +48,28 @@ jobs:
         run: |
           set -euo pipefail
 
+          resolve_module_build_dir() {
+            local module_path="$1"
+            if [ -x "$module_path/mvnw" ] && [ -f "$module_path/pom.xml" ]; then
+              echo "$module_path"
+              return 0
+            fi
+            if [ -x "$module_path/$module_path/mvnw" ] && [ -f "$module_path/$module_path/pom.xml" ]; then
+              echo "$module_path/$module_path"
+              return 0
+            fi
+
+            local candidate
+            candidate="$(find "$module_path" -mindepth 1 -maxdepth 2 -type f -name pom.xml | head -n1 | xargs dirname || true)"
+            if [ -n "$candidate" ] && [ -x "$candidate/mvnw" ]; then
+              echo "$candidate"
+              return 0
+            fi
+
+            echo "Could not resolve Maven build directory for module: $module_path"
+            exit 1
+          }
+
           DEPS="${{ inputs.dependency-module-paths }}"
           if [ -n "$DEPS" ]; then
             IFS=',' read -ra MODULES <<< "$DEPS"
@@ -56,13 +78,15 @@ jobs:
               if [ -z "$module" ]; then
                 continue
               fi
-              echo "Installing local dependency module: $module"
-              cd "$module"
+              build_dir="$(resolve_module_build_dir "$module")"
+              echo "Installing local dependency module: $module (dir: $build_dir)"
+              cd "$build_dir"
               ./mvnw -B -ntp -DskipTests=true clean install
               cd - >/dev/null
             done
           fi
 
-          echo "Compiling target module: ${{ inputs.module-path }}"
-          cd "${{ inputs.module-path }}"
+          target_build_dir="$(resolve_module_build_dir "${{ inputs.module-path }}")"
+          echo "Compiling target module: ${{ inputs.module-path }} (dir: $target_build_dir)"
+          cd "$target_build_dir"
           ./mvnw -B -ntp -DskipTests=true clean compile
