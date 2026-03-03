@@ -22,24 +22,25 @@ echo "[]" > "$TMP_JSON"
 for row in "${MODULES[@]}"; do
   IFS="|" read -r module group artifact <<< "$row"
 
-  response="$(
-    curl -fsS --get \
-      --data-urlencode "q=g:\"$group\" AND a:\"$artifact\"" \
-      --data-urlencode "rows=1" \
-      --data-urlencode "wt=json" \
-      "https://search.maven.org/solrsearch/select"
-  )"
+  group_path="$(echo "$group" | tr '.' '/')"
+  metadata_url="https://repo1.maven.org/maven2/$group_path/$artifact/maven-metadata.xml"
 
-  num_found="$(echo "$response" | jq -r '.response.numFound // 0')"
-  latest_version="$(echo "$response" | jq -r '.response.docs[0].latestVersion // ""')"
-  timestamp_ms="$(echo "$response" | jq -r '.response.docs[0].timestamp // 0')"
+  if metadata_xml="$(curl -fsS "$metadata_url" 2>/dev/null)"; then
+    metadata_line="$(printf '%s' "$metadata_xml" | tr -d '\n')"
+    latest_version="$(printf '%s' "$metadata_line" | sed -n 's:.*<release>\([^<]*\)</release>.*:\1:p')"
+    if [ -z "$latest_version" ]; then
+      latest_version="$(printf '%s' "$metadata_line" | sed -n 's:.*<latest>\([^<]*\)</latest>.*:\1:p')"
+    fi
+    if [ -z "$latest_version" ]; then
+      latest_version="$(printf '%s' "$metadata_line" | sed -n 's:.*<version>\([^<]*\)</version>.*:\1:p')"
+    fi
 
-  if [ "$num_found" -gt 0 ]; then
     deployed=true
-    last_updated="$(date -u -r "$((timestamp_ms / 1000))" +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null || echo "")"
+    last_updated=""
     artifact_url="https://central.sonatype.com/artifact/$group/$artifact"
   else
     deployed=false
+    latest_version=""
     last_updated=""
     artifact_url="https://central.sonatype.com/search?q=$artifact"
   fi
@@ -68,14 +69,12 @@ done
 mv "$TMP_JSON" "$JSON_FILE"
 
 {
-  echo "| Modulo | Badge | GroupId | ArtifactId | Desplegado | Ultima version | Ultima actualizacion (UTC) |"
-  echo "|---|---|---|---|---|---|---|"
+  echo "| Modulo | Badge | GroupId | ArtifactId | Desplegado |"
+  echo "|---|---|---|---|---|"
   jq -r '
     .[] |
     "| \(.module) | ![\(.module)](https://img.shields.io/maven-central/v/\(.groupId)/\(.artifactId)) | \(.groupId) | \(.artifactId) | " +
-    (if .deployed then "si" else "no" end) + " | " +
-    (if (.latestVersion|length)>0 then .latestVersion else "-" end) + " | " +
-    (if (.lastUpdatedUtc|length)>0 then .lastUpdatedUtc else "-" end) + " |"
+    (if .deployed then "si" else "no" end) + " |"
   ' "$JSON_FILE"
 } > "$TABLE_FILE"
 

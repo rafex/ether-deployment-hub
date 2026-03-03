@@ -4,7 +4,7 @@
     "groupId": "dev.rafex.ether.parent",
     "artifactId": "ether-parent",
     "deployed": true,
-    "latestVersion": "2.0.0-v20210916",
+    "latestVersion": "4.0.0",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.parent/ether-parent"
   },
@@ -13,7 +13,7 @@
     "groupId": "dev.rafex.ether.json",
     "artifactId": "ether-json",
     "deployed": true,
-    "latestVersion": "2.0-v20210916",
+    "latestVersion": "3.0.6-v20250724",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.json/ether-json"
   },
@@ -22,7 +22,7 @@
     "groupId": "dev.rafex.ether.jwt",
     "artifactId": "ether-jwt",
     "deployed": true,
-    "latestVersion": "2.0-v20210916",
+    "latestVersion": "3.0.6-v20260303",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.jwt/ether-jwt"
   },
@@ -30,18 +30,18 @@
     "module": "ether-http-core",
     "groupId": "dev.rafex.ether.http",
     "artifactId": "ether-http-core",
-    "deployed": false,
-    "latestVersion": "",
+    "deployed": true,
+    "latestVersion": "3.0.8-v20260303",
     "lastUpdatedUtc": "",
-    "artifactUrl": "https://central.sonatype.com/search?q=ether-http-core"
+    "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.http/ether-http-core"
   },
   {
     "module": "ether-http-jetty12",
     "groupId": "dev.rafex.ether.http",
     "artifactId": "ether-http-jetty12",
-    "deployed": false,
-    "latestVersion": "",
+    "deployed": true,
+    "latestVersion": "3.0.8-v20260303",
     "lastUpdatedUtc": "",
-    "artifactUrl": "https://central.sonatype.com/search?q=ether-http-jetty12"
+    "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.http/ether-http-jetty12"
   }
 ]
