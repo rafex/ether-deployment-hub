@@ -46,10 +46,12 @@ DEV_SNAPSHOT := $(shell $(next_snapshot))
 
 # Base version: user can pass VERSION=... on command line
 BASE_VERSION := $(VERSION)
+# Normalize user-provided version: accepts vX.Y.Z or X.Y.Z
+BASE_VERSION_NORMALIZED := $(shell echo "$(BASE_VERSION)" | sed -E 's/^[vV]//')
 # Build date suffix (YYYYMMDD)
 BUILD_DATE := $(shell date +%Y%m%d)
 # Final version: use BASE_VERSION if provided, otherwise TAG, then date
-FINAL_VERSION := $(if $(BASE_VERSION),$(BASE_VERSION),$(TAG))-v$(BUILD_DATE)
+FINAL_VERSION := $(if $(BASE_VERSION_NORMALIZED),$(BASE_VERSION_NORMALIZED),$(TAG))-v$(BUILD_DATE)
 
 ## write-settings: generate ~/.m2/settings.xml using OSSRH credentials
 write-settings:

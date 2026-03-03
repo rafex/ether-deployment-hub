@@ -1,9 +1,20 @@
 [submodule "ether-parent"]
 	path = ether-parent
 	url = git@github.com:rafex/ether-parent.git
+	branch = main
 [submodule "ether-jwt"]
 	path = ether-jwt
 	url = git@github.com:rafex/ether-jwt.git
+	branch = main
 [submodule "ether-json"]
 	path = ether-json
 	url = git@github.com:rafex/ether-json.git
+	branch = main
+[submodule "ether-http-jetty12"]
+	path = ether-http-jetty12
+	url = git@github.com:rafex/ether-http-jetty12.git
+	branch = main
+[submodule "ether-http-core"]
+	path = ether-http-core
+	url = git@github.com:rafex/ether-http-core.git
+	branch = main

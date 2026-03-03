@@ -23,6 +23,8 @@ Este repositorio orquesta el despliegue de **Ether**, una colección de módulos
 - **ether-email**: Envío y gestión de correos.
 - **ether-jdbc**: Conexión y manejo de bases de datos via JDBC.
 - **ether-json**: Validación y manipulación de JSON.
+- **ether-http-core**: Abstracciones y contratos HTTP base.
+- **ether-http-jetty12**: Integración HTTP usando Jetty 12.
 - **ether-jwt**: Autenticación basada en JSON Web Tokens.
 - **ether-object**: Mapeo y conversión de objetos.
 - **ether-parent**: POM padre con configuración común.
