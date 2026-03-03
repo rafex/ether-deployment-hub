@@ -2,6 +2,7 @@
 
 ![GitHub Workflow Status (main)](https://img.shields.io/github/actions/workflow/status/rafex/ether-deployment-hub/publish-all.yml?branch=main)
 ![GitHub Workflow Status (tag 3.0.8)](https://img.shields.io/github/actions/workflow/status/rafex/ether-deployment-hub/publish-all.yml?ref=3.0.8)
+![GitHub Workflow Status (build main)](https://img.shields.io/github/actions/workflow/status/rafex/ether-deployment-hub/validate-build-on-main.yml?branch=main)
 
 ## Objetivo del Repositorio
 

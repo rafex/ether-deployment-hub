@@ -81,7 +81,7 @@ jobs:
               build_dir="$(resolve_module_build_dir "$module")"
               echo "Installing local dependency module: $module (dir: $build_dir)"
               cd "$build_dir"
-              ./mvnw -B -ntp -DskipTests=true clean install
+              ./mvnw -B -ntp -DskipTests=true -Dgpg.skip=true clean install
               cd - >/dev/null
             done
           fi

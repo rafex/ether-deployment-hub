@@ -8,31 +8,22 @@ on:
   workflow_dispatch:
 
 jobs:
-  compile-ether-parent:
-    uses: ./.github/workflows/maven-compile-template.yml
-    with:
-      module-path: ether-parent
+  validate-main-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
 
-  compile-ether-json:
-    uses: ./.github/workflows/maven-compile-template.yml
-    with:
-      module-path: ether-json
-      dependency-module-paths: ether-parent
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
-  compile-ether-jwt:
-    uses: ./.github/workflows/maven-compile-template.yml
-    with:
-      module-path: ether-jwt
-      dependency-module-paths: ether-parent,ether-json
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
 
-  compile-ether-http-core:
-    uses: ./.github/workflows/maven-compile-template.yml
-    with:
-      module-path: ether-http-core
-      dependency-module-paths: ether-parent
-
-  compile-ether-http-jetty12:
-    uses: ./.github/workflows/maven-compile-template.yml
-    with:
-      module-path: ether-http-jetty12
-      dependency-module-paths: ether-parent,ether-http-core
+      - name: Run local-equivalent build validation
+        run: make validate-main-build
