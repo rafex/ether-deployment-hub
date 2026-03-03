@@ -1,0 +1,47 @@
+[
+  {
+    "module": "ether-parent",
+    "groupId": "dev.rafex.ether.parent",
+    "artifactId": "ether-parent",
+    "deployed": true,
+    "latestVersion": "2.0.0-v20210916",
+    "lastUpdatedUtc": "2021-09-17T02:42:26Z",
+    "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.parent/ether-parent"
+  },
+  {
+    "module": "ether-json",
+    "groupId": "dev.rafex.ether.json",
+    "artifactId": "ether-json",
+    "deployed": true,
+    "latestVersion": "2.0-v20210916",
+    "lastUpdatedUtc": "2021-09-17T02:42:36Z",
+    "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.json/ether-json"
+  },
+  {
+    "module": "ether-jwt",
+    "groupId": "dev.rafex.ether.jwt",
+    "artifactId": "ether-jwt",
+    "deployed": true,
+    "latestVersion": "2.0-v20210916",
+    "lastUpdatedUtc": "2021-09-17T02:42:31Z",
+    "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.jwt/ether-jwt"
+  },
+  {
+    "module": "ether-http-core",
+    "groupId": "dev.rafex.ether.http",
+    "artifactId": "ether-http-core",
+    "deployed": false,
+    "latestVersion": "",
+    "lastUpdatedUtc": "",
+    "artifactUrl": "https://central.sonatype.com/search?q=ether-http-core"
+  },
+  {
+    "module": "ether-http-jetty12",
+    "groupId": "dev.rafex.ether.http",
+    "artifactId": "ether-http-jetty12",
+    "deployed": false,
+    "latestVersion": "",
+    "lastUpdatedUtc": "",
+    "artifactUrl": "https://central.sonatype.com/search?q=ether-http-jetty12"
+  }
+]

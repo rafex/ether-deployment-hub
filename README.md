@@ -1,12 +1,34 @@
 # Ether Central Publishing Hub
 
-![GitHub Workflow Status (main)](https://img.shields.io/github/actions/workflow/status/rafex/ether-deployment-hub/publish-all.yml?branch=main)
-![GitHub Workflow Status (tag 3.0.8)](https://img.shields.io/github/actions/workflow/status/rafex/ether-deployment-hub/publish-all.yml?ref=3.0.8)
 ![GitHub Workflow Status (build main)](https://img.shields.io/github/actions/workflow/status/rafex/ether-deployment-hub/validate-build-on-main.yml?branch=main)
+
+## Estado en Maven Central
+
+### Opcion 1: Badges por modulo
+
+![ether-parent](https://img.shields.io/maven-central/v/dev.rafex.ether.parent/ether-parent)
+![ether-json](https://img.shields.io/maven-central/v/dev.rafex.ether.json/ether-json)
+![ether-jwt](https://img.shields.io/maven-central/v/dev.rafex.ether.jwt/ether-jwt)
+![ether-http-core](https://img.shields.io/maven-central/v/dev.rafex.ether.http/ether-http-core)
+![ether-http-jetty12](https://img.shields.io/maven-central/v/dev.rafex.ether.http/ether-http-jetty12)
+
+### Opcion 2: Tabla generada automaticamente
+
+| Modulo | GroupId | ArtifactId | Desplegado | Ultima version | Ultima actualizacion (UTC) |
+|---|---|---|---|---|---|
+| ether-parent | dev.rafex.ether.parent | ether-parent | si | 2.0.0-v20210916 | 2021-09-17T02:42:26Z |
+| ether-json | dev.rafex.ether.json | ether-json | si | 2.0-v20210916 | 2021-09-17T02:42:36Z |
+| ether-jwt | dev.rafex.ether.jwt | ether-jwt | si | 2.0-v20210916 | 2021-09-17T02:42:31Z |
+| ether-http-core | dev.rafex.ether.http | ether-http-core | no | - | - |
+| ether-http-jetty12 | dev.rafex.ether.http | ether-http-jetty12 | no | - | - |
+
+### Opcion 3: JSON de estado
+
+Consulta el archivo [docs/maven-central-status.json](/Users/rafex/repository/github/rafex/ether/ether-deployment-hub/docs/maven-central-status.json).
 
 ## Objetivo del Repositorio
 
-Este repositorio actúa como un hub orquestador para la publicación y despliegue automáticos de todos los módulos de la biblioteca **Ether** en **Maven Central**. Incluye:
+Este repositorio actúa como un hub orquestador para la publicación y despliegue automáticos de los módulos de **Ether** actualmente integrados en **Maven Central**. Incluye:
 - Scripts y plantillas de configuración para generación de artefactos (Javadoc, fuentes, firmas GPG).
 - Workflows de GitHub Actions preconfigurados para ejecutar `mvn deploy` usando el plugin `central-publishing-maven-plugin`.
 - Gestión centralizada de credenciales y versiones de cada módulo.
@@ -16,43 +38,41 @@ Este repositorio actúa como un hub orquestador para la publicación y despliegu
 
 ## Acerca de la biblioteca Ether
 
-Este repositorio orquesta el despliegue de **Ether**, una colección de módulos Java para crear servicios REST ligeros sin depender de frameworks pesados como Spring Boot. Ether está comprobado en producción y ofrece componentes modulares y autónomos.
+Este repositorio orquesta el despliegue de módulos de **Ether**, una colección de componentes Java ligeros para construir servicios sin depender de frameworks pesados.
 
 ### Componentes principales
 
-- **ether-cli**: Utilidades de línea de comandos.
-- **ether-email**: Envío y gestión de correos.
-- **ether-jdbc**: Conexión y manejo de bases de datos via JDBC.
+- **ether-parent**: POM padre con configuración común.
 - **ether-json**: Validación y manipulación de JSON.
+- **ether-jwt**: Autenticación basada en JSON Web Tokens.
 - **ether-http-core**: Abstracciones y contratos HTTP base.
 - **ether-http-jetty12**: Integración HTTP usando Jetty 12.
-- **ether-jwt**: Autenticación basada en JSON Web Tokens.
-- **ether-object**: Mapeo y conversión de objetos.
-- **ether-parent**: POM padre con configuración común.
-- **ether-properties**: Lectura y gestión de archivos de propiedades.
-- **ether-rest**: Cliente y servidor REST minimalista.
 
 ### Cómo compilar y publicar
 
-1. Compila con Maven:
+1. Valida compilación local equivalente a CI:
    ```bash
-   mvn clean compile
+   make validate-main-build
    ```
-2. Publica cada módulo con Maven Central desde este hub, usando GitHub Actions.
-3. Para usar Ether en tu proyecto, agrega en tu POM:
+2. Compila un módulo puntual:
+   ```bash
+   make compile-ether-http-core
+   ```
+3. Publica módulos desde este hub con GitHub Actions (workflow `Publish All Java Modules` por tag).
+4. Para usar en tu proyecto:
    ```xml
    <parent>
      <groupId>dev.rafex.ether.parent</groupId>
      <artifactId>ether-parent</artifactId>
-     <version>2.0.0</version>
+     <version><!-- version publicada en Maven Central --></version>
      <relativePath/>
    </parent>
    ```
-   Y luego añade el módulo deseado:
+   Y luego añade el módulo deseado, por ejemplo:
    ```xml
    <dependency>
-     <groupId>dev.rafex.ether.rest</groupId>
-     <artifactId>ether-rest</artifactId>
-     <version>2.0.0</version>
+     <groupId>dev.rafex.ether.http</groupId>
+     <artifactId>ether-http-core</artifactId>
+     <version><!-- version publicada en Maven Central --></version>
    </dependency>
    ```

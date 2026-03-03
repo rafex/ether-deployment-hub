@@ -1,0 +1,51 @@
+---
+name: Update Maven Central Status
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: '0 9 * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  update-status:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Generate Maven Central status (JSON + table)
+        run: ./scripts/generate-maven-central-status.sh
+
+      - name: Resolve release tag for README render
+        id: release
+        shell: bash
+        run: |
+          RELEASE_TAG="$(git describe --tags --abbrev=0 2>/dev/null || echo unreleased)"
+          echo "value=$RELEASE_TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Render README from template
+        run: ./scripts/render-readme.sh "${{ steps.release.outputs.value }}"
+
+      - name: Commit and push if changed
+        shell: bash
+        run: |
+          if git diff --quiet README.md docs/maven-central-status.json docs/maven-central-status-table.md; then
+            echo "No status changes detected"
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md docs/maven-central-status.json docs/maven-central-status-table.md
+          git commit -m "docs: update Maven Central deployment status"
+          git push origin main

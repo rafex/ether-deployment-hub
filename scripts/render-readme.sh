@@ -11,11 +11,36 @@ TAG="$1"
 
 TEMPLATE="$ROOT_DIR/README.template.md"
 OUTPUT="$ROOT_DIR/README.md"
+TABLE_FILE="$ROOT_DIR/docs/maven-central-status-table.md"
 
 if [ ! -f "$TEMPLATE" ]; then
   echo "Template not found: $TEMPLATE"
   exit 1
 fi
 
-sed "s/{{RELEASE_TAG}}/$TAG/g" "$TEMPLATE" > "$OUTPUT"
+if [ ! -f "$TABLE_FILE" ]; then
+  mkdir -p "$ROOT_DIR/docs"
+  cat > "$TABLE_FILE" <<'EOF'
+Status table not generated yet.
+EOF
+fi
+
+awk -v release_tag="$TAG" -v table_file="$TABLE_FILE" '
+BEGIN {
+  table = ""
+  while ((getline line < table_file) > 0) {
+    table = table line "\n"
+  }
+  close(table_file)
+}
+{
+  gsub("{{RELEASE_TAG}}", release_tag)
+  if (index($0, "{{CENTRAL_STATUS_TABLE}}") > 0) {
+    printf "%s", table
+    next
+  }
+  print
+}
+' "$TEMPLATE" > "$OUTPUT"
+
 echo "Rendered README.md with RELEASE_TAG=$TAG"
