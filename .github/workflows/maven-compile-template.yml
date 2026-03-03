@@ -1,0 +1,68 @@
+---
+name: "Java Compile Template"
+
+on:
+  workflow_call:
+    inputs:
+      module-path:
+        description: "Ruta del módulo Java a compilar"
+        required: true
+        type: string
+      dependency-module-paths:
+        description: "Optional comma-separated local module paths to build/install before target compile"
+        required: false
+        type: string
+        default: ''
+      java-distribution:
+        description: "Java distribution to use (default: temurin)"
+        required: false
+        type: string
+        default: 'temurin'
+      java-version:
+        description: "Java version to use (default: 21)"
+        required: false
+        type: string
+        default: '21'
+
+jobs:
+  compile:
+    name: Compile ${{ inputs.module-path }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: ${{ inputs.java-distribution }}
+          java-version: ${{ inputs.java-version }}
+          cache: 'maven'
+
+      - name: Compile module with local dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          DEPS="${{ inputs.dependency-module-paths }}"
+          if [ -n "$DEPS" ]; then
+            IFS=',' read -ra MODULES <<< "$DEPS"
+            for module in "${MODULES[@]}"; do
+              module="$(echo "$module" | xargs)"
+              if [ -z "$module" ]; then
+                continue
+              fi
+              echo "Installing local dependency module: $module"
+              cd "$module"
+              ./mvnw -B -ntp -DskipTests=true clean install
+              cd - >/dev/null
+            done
+          fi
+
+          echo "Compiling target module: ${{ inputs.module-path }}"
+          cd "${{ inputs.module-path }}"
+          ./mvnw -B -ntp -DskipTests=true clean compile

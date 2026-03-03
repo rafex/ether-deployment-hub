@@ -1,0 +1,38 @@
+---
+name: Validate Java Build On Main
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  compile-ether-parent:
+    uses: ./.github/workflows/maven-compile-template.yml
+    with:
+      module-path: ether-parent
+
+  compile-ether-json:
+    uses: ./.github/workflows/maven-compile-template.yml
+    with:
+      module-path: ether-json
+      dependency-module-paths: ether-parent
+
+  compile-ether-jwt:
+    uses: ./.github/workflows/maven-compile-template.yml
+    with:
+      module-path: ether-jwt
+      dependency-module-paths: ether-parent,ether-json
+
+  compile-ether-http-core:
+    uses: ./.github/workflows/maven-compile-template.yml
+    with:
+      module-path: ether-http-core
+      dependency-module-paths: ether-parent
+
+  compile-ether-http-jetty12:
+    uses: ./.github/workflows/maven-compile-template.yml
+    with:
+      module-path: ether-http-jetty12
+      dependency-module-paths: ether-parent,ether-http-core

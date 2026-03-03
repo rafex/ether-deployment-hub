@@ -22,11 +22,6 @@ on:
         description: "Versión del módulo"
         required: false
         type: string
-      dependency-module-paths:
-        description: "Optional comma-separated local module paths to build/install before validating target module"
-        required: false
-        type: string
-        default: ''
       java-distribution:
         description: "Java distribution to use (default: temurin)"
         required: false
@@ -100,30 +95,6 @@ jobs:
           distribution: ${{ inputs.java-distribution }}
           java-version: ${{ inputs.java-version }}
           cache: 'maven'
-
-      - name: Validate module compiles with local dependencies
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          DEPS="${{ inputs.dependency-module-paths }}"
-          if [ -n "$DEPS" ]; then
-            IFS=',' read -ra MODULES <<< "$DEPS"
-            for module in "${MODULES[@]}"; do
-              module="$(echo "$module" | xargs)"
-              if [ -z "$module" ]; then
-                continue
-              fi
-              echo "Installing local dependency module: $module"
-              cd "$module"
-              ./mvnw -B -ntp -DskipTests=true clean install
-              cd - >/dev/null
-            done
-          fi
-
-          echo "Compiling target module: ${{ inputs.module-path }}"
-          cd "${{ inputs.module-path }}"
-          ./mvnw -B -ntp -DskipTests=true clean compile
 
       - name: Deploy via Makefile
         run: |
