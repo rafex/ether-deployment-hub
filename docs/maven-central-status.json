@@ -5,7 +5,7 @@
     "artifactId": "ether-parent",
     "deployed": true,
     "latestVersion": "2.0.0-v20210916",
-    "lastUpdatedUtc": "2021-09-17T02:42:26Z",
+    "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.parent/ether-parent"
   },
   {
@@ -14,7 +14,7 @@
     "artifactId": "ether-json",
     "deployed": true,
     "latestVersion": "2.0-v20210916",
-    "lastUpdatedUtc": "2021-09-17T02:42:36Z",
+    "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.json/ether-json"
   },
   {
@@ -23,7 +23,7 @@
     "artifactId": "ether-jwt",
     "deployed": true,
     "latestVersion": "2.0-v20210916",
-    "lastUpdatedUtc": "2021-09-17T02:42:31Z",
+    "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.jwt/ether-jwt"
   },
   {
