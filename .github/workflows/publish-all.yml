@@ -59,6 +59,10 @@ jobs:
       module-path: ether-http-jetty12
       version: ${{ github.ref_name }}
       run-deploy: true
+      wait-for-group-id: dev.rafex.ether.http
+      wait-for-artifact-id: ether-http-core
+      wait-for-attempts: 30
+      wait-for-interval-seconds: 20
     secrets:
       OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
       OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
