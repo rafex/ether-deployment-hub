@@ -10,6 +10,8 @@ endif
 # Maven deploy profile used by publish jobs
 DEPLOY_PROFILE ?= deploy
 DEPLOY_PROFILE_ARG := $(if $(DEPLOY_PROFILE),-P$(DEPLOY_PROFILE),)
+# Skip default maven-deploy-plugin when no deploy profile is active
+MAVEN_DEPLOY_SKIP ?= $(if $(DEPLOY_PROFILE),false,true)
 # Server id expected in distributionManagement/repository definitions
 MAVEN_SERVER_ID ?= artifactory
 # Reuse existing secret names from GitHub Actions by default
@@ -48,6 +50,7 @@ DEPENDENCY_COORDS   ?=
 ## show-env: display loaded environment variables
 show-env:
 	@echo "DEPLOY_PROFILE='$(DEPLOY_PROFILE)'"
+	@echo "MAVEN_DEPLOY_SKIP='$(MAVEN_DEPLOY_SKIP)'"
 	@echo "MAVEN_SERVER_ID='$(MAVEN_SERVER_ID)'"
 	@echo "MAVEN_REPO_USERNAME='$(MAVEN_REPO_USERNAME)'"
 	@echo "MAVEN_REPO_PASSWORD length='$(shell printf '%s' "$(MAVEN_REPO_PASSWORD)" | wc -c)'"
@@ -138,7 +141,7 @@ build: sync-pom-versions set-version
 ## deploy: write settings and set version, then deploy using profile $(DEPLOY_PROFILE) (in $(PROJECT_DIR))
 deploy: write-settings sync-pom-versions set-version
 	@echo "Deploying version $(FINAL_VERSION)..."
-	cd $(PROJECT_DIR) && ./mvnw clean $(PRE_DEPLOY_GOALS) deploy $(DEPLOY_PROFILE_ARG) $(ARTIFACTORY_BASE_URL_ARG) -DskipTests=$(SKIP_TESTS) -Dgpg.skip=false
+	cd $(PROJECT_DIR) && ./mvnw clean $(PRE_DEPLOY_GOALS) deploy $(DEPLOY_PROFILE_ARG) $(ARTIFACTORY_BASE_URL_ARG) -DskipTests=$(SKIP_TESTS) -Dgpg.skip=false -Dmaven.deploy.skip=$(MAVEN_DEPLOY_SKIP)
 	@echo "Reverting POM changes after deploy..."
 	@cd $(PROJECT_DIR) && ./mvnw versions:revert
 
