@@ -25,6 +25,8 @@ ARTIFACTORY_BASE_URL_ARG := $(if $(ARTIFACTORY_BASE_URL),-Dartifactory.base-url=
 
 # Control whether to skip tests: true or false
 SKIP_TESTS ?= false
+# Extra goals required by Central (sources + javadocs)
+PRE_DEPLOY_GOALS ?= source:jar javadoc:jar
 
 # Directory containing the Maven module to build/deploy
 PROJECT_DIR ?= ether-parent
@@ -136,7 +138,7 @@ build: sync-pom-versions set-version
 ## deploy: write settings and set version, then deploy using profile $(DEPLOY_PROFILE) (in $(PROJECT_DIR))
 deploy: write-settings sync-pom-versions set-version
 	@echo "Deploying version $(FINAL_VERSION)..."
-	cd $(PROJECT_DIR) && ./mvnw clean deploy $(DEPLOY_PROFILE_ARG) $(ARTIFACTORY_BASE_URL_ARG) -DskipTests=$(SKIP_TESTS) -Dgpg.skip=false
+	cd $(PROJECT_DIR) && ./mvnw clean $(PRE_DEPLOY_GOALS) deploy $(DEPLOY_PROFILE_ARG) $(ARTIFACTORY_BASE_URL_ARG) -DskipTests=$(SKIP_TESTS) -Dgpg.skip=false
 	@echo "Reverting POM changes after deploy..."
 	@cd $(PROJECT_DIR) && ./mvnw versions:revert
 
