@@ -4,7 +4,7 @@
     "groupId": "dev.rafex.ether.parent",
     "artifactId": "ether-parent",
     "deployed": true,
-    "latestVersion": "4.0.0",
+    "latestVersion": "5.0.0-v20260303",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.parent/ether-parent"
   },
