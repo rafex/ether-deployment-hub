@@ -94,4 +94,4 @@ jobs:
       - name: Deploy via Makefile
         run: |
           cd ${{ inputs.module-path }}
-          make deploy VERSION=${{ inputs.version }} SKIP_TESTS=${{ inputs.skip-tests }} DEPLOY_PROFILE=
+          make deploy VERSION=${{ inputs.version }} SKIP_TESTS=${{ inputs.skip-tests }}
