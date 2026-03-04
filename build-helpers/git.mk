@@ -2,7 +2,7 @@
 #   make new TAG=<version> MESSAGE="Your tag message"
 #   make retag TAG=<version> MESSAGE="Your tag message"
 
-.PHONY: new retag
+.PHONY: new retag submodules-pull
 
 ## new: create a new Git tag and push it to origin (does not overwrite existing tags)
 new:
@@ -47,3 +47,8 @@ retag:
 	@echo "Recreating tag '$(TAG)' and pushing to origin..."
 	git tag -a "$(TAG)" -m "$(MESSAGE)"
 	git push origin "$(TAG)" --force
+
+submodules-pull:
+	git submodule foreach --recursive 'git pull origin main'
+	git add .
+	git commit -m "Update submodules" || true
