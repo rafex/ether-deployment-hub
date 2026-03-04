@@ -7,6 +7,16 @@ ifneq (,$(wildcard .env))
   export OSSRH_USERNAME OSSRH_PASSWORD MAVEN_GPG_PASSPHRASE
 endif
 
+# Maven deploy profile used by publish jobs
+DEPLOY_PROFILE ?= deploy
+# Server id expected in distributionManagement/repository definitions
+MAVEN_SERVER_ID ?= artifactory
+# Reuse existing secret names from GitHub Actions by default
+MAVEN_REPO_USERNAME ?= $(OSSRH_USERNAME)
+MAVEN_REPO_PASSWORD ?= $(OSSRH_PASSWORD)
+# Optional: override Artifactory base URL from CI/.env
+ARTIFACTORY_BASE_URL ?=
+ARTIFACTORY_BASE_URL_ARG := $(if $(ARTIFACTORY_BASE_URL),-Dartifactory.base-url=$(ARTIFACTORY_BASE_URL),)
 
 # Control whether to skip tests: true or false
 SKIP_TESTS ?= false
@@ -21,8 +31,11 @@ REPO_URL            ?= https://repo1.maven.org/maven2
 
 ## show-env: display loaded environment variables
 show-env:
-	@echo "OSSRH_USERNAME='$(OSSRH_USERNAME)'"
-	@echo "OSSRH_PASSWORD length='$(shell printf '%s' "$(OSSRH_PASSWORD)" | wc -c)'"
+	@echo "DEPLOY_PROFILE='$(DEPLOY_PROFILE)'"
+	@echo "MAVEN_SERVER_ID='$(MAVEN_SERVER_ID)'"
+	@echo "MAVEN_REPO_USERNAME='$(MAVEN_REPO_USERNAME)'"
+	@echo "MAVEN_REPO_PASSWORD length='$(shell printf '%s' "$(MAVEN_REPO_PASSWORD)" | wc -c)'"
+	@echo "ARTIFACTORY_BASE_URL='$(ARTIFACTORY_BASE_URL)'"
 	@echo "MAVEN_GPG_PASSPHRASE length='$(shell printf '%s' "$(MAVEN_GPG_PASSPHRASE)" | wc -c)'"
 
 .PHONY: show-env write-settings set-version build deploy show-version valid-version
@@ -53,11 +66,11 @@ BUILD_DATE := $(shell date +%Y%m%d)
 # Final version: use BASE_VERSION if provided, otherwise TAG, then date
 FINAL_VERSION := $(if $(BASE_VERSION_NORMALIZED),$(BASE_VERSION_NORMALIZED),$(TAG))-v$(BUILD_DATE)
 
-## write-settings: generate ~/.m2/settings.xml using OSSRH credentials
+## write-settings: generate ~/.m2/settings.xml using configured repository credentials
 write-settings:
 	@echo "Writing settings.xml..."
 	@mkdir -p ~/.m2
-	@printf '<settings>\n  <servers>\n    <server>\n      <id>central</id>\n      <!-- usa tu Portal User Token -->\n      <username>%s</username>\n      <password>%s</password>\n    </server>\n  </servers>\n</settings>\n' "$(OSSRH_USERNAME)" "$(OSSRH_PASSWORD)" > ~/.m2/settings.xml
+	@printf '<settings>\n  <servers>\n    <server>\n      <id>%s</id>\n      <username>%s</username>\n      <password>%s</password>\n    </server>\n  </servers>\n</settings>\n' "$(MAVEN_SERVER_ID)" "$(MAVEN_REPO_USERNAME)" "$(MAVEN_REPO_PASSWORD)" > ~/.m2/settings.xml
 
 ## set-version: update project version in POM based on Git tag (in $(PROJECT_DIR))
 set-version:
@@ -69,10 +82,10 @@ build: set-version
 	@echo "Building project version $(FINAL_VERSION)..."
 	cd $(PROJECT_DIR) && ./mvnw clean verify
 
-## deploy: write settings and set version, then deploy to Maven Central (in $(PROJECT_DIR))
+## deploy: write settings and set version, then deploy using profile $(DEPLOY_PROFILE) (in $(PROJECT_DIR))
 deploy: write-settings set-version
 	@echo "Deploying version $(FINAL_VERSION)..."
-	cd $(PROJECT_DIR) && ./mvnw clean deploy -DskipTests=$(SKIP_TESTS) -Dgpg.skip=false
+	cd $(PROJECT_DIR) && ./mvnw clean deploy -P$(DEPLOY_PROFILE) $(ARTIFACTORY_BASE_URL_ARG) -DskipTests=$(SKIP_TESTS) -Dgpg.skip=false
 	@echo "Reverting POM changes after deploy..."
 	@cd $(PROJECT_DIR) && ./mvnw versions:revert
 
