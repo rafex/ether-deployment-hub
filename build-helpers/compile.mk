@@ -1,4 +1,4 @@
-.PHONY: validate-main-build compile-ether-parent compile-ether-json compile-ether-jwt compile-ether-http-core compile-ether-http-jetty12
+.PHONY: compile validate-main-build compile-ether-parent compile-ether-json compile-ether-jwt compile-ether-http-core compile-ether-http-jetty12
 
 define resolve_module_dir
   module_path="$(1)"; \
@@ -47,8 +47,13 @@ compile-ether-http-core:
 ## compile-ether-http-jetty12: install parent+http-core and compile jetty12
 compile-ether-http-jetty12:
 	@$(call install_local_module,ether-parent)
+	@$(call install_local_module,ether-json)
 	@$(call install_local_module,ether-http-core)
 	@$(call compile_local_module,ether-http-jetty12)
+
+## compile: compile all current modules in dependency order
+compile: compile-ether-parent compile-ether-json compile-ether-jwt compile-ether-http-core compile-ether-http-jetty12
+	@echo "Compiled all modules in dependency order."
 
 ## validate-main-build: replicate CI local compile validations for main
 validate-main-build: compile-ether-parent compile-ether-json compile-ether-jwt compile-ether-http-core compile-ether-http-jetty12
