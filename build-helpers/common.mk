@@ -27,6 +27,8 @@ ARTIFACTORY_BASE_URL_ARG := $(if $(ARTIFACTORY_BASE_URL),-Dartifactory.base-url=
 
 # Control whether to skip tests: true or false
 SKIP_TESTS ?= false
+# Auto-fix missing Java license headers before deploy
+AUTO_UPDATE_LICENSE_HEADERS ?= false
 # Extra goals required by Central (sources + javadocs)
 PRE_DEPLOY_GOALS ?= source:jar javadoc:jar
 
@@ -60,7 +62,7 @@ show-env:
 	@echo "ARTIFACTORY_BASE_URL='$(ARTIFACTORY_BASE_URL)'"
 	@echo "MAVEN_GPG_PASSPHRASE length='$(shell printf '%s' "$(MAVEN_GPG_PASSPHRASE)" | wc -c)'"
 
-.PHONY: show-env write-settings sync-pom-versions set-version build deploy show-version valid-version
+.PHONY: show-env write-settings sync-pom-versions set-version update-license-headers build deploy show-version valid-version
 
 #
 # Raw Git tag, or default "0.0.0"
@@ -98,6 +100,15 @@ write-settings:
 set-version:
 	@echo "Setting project version to $(FINAL_VERSION)..."
 	cd $(PROJECT_DIR) && ./mvnw versions:set -DnewVersion=$(FINAL_VERSION) -DgenerateBackupPoms=true
+
+## update-license-headers: add missing license headers in Java sources/tests when enabled
+update-license-headers:
+	@if [ "$(AUTO_UPDATE_LICENSE_HEADERS)" = "true" ]; then \
+		echo "Updating missing license headers..."; \
+		cd $(PROJECT_DIR) && ./mvnw -B -ntp license:update-file-header; \
+	else \
+		echo "Skipping license header update (AUTO_UPDATE_LICENSE_HEADERS=$(AUTO_UPDATE_LICENSE_HEADERS))"; \
+	fi
 
 ## sync-pom-versions: update parent and dependency properties using latest versions from repository
 sync-pom-versions:
@@ -139,7 +150,7 @@ build: sync-pom-versions set-version
 	cd $(PROJECT_DIR) && ./mvnw clean verify
 
 ## deploy: write settings and set version, then deploy using profile $(DEPLOY_PROFILE) (in $(PROJECT_DIR))
-deploy: write-settings sync-pom-versions set-version
+deploy: write-settings sync-pom-versions set-version update-license-headers
 	@echo "Deploying version $(FINAL_VERSION)..."
 	cd $(PROJECT_DIR) && ./mvnw clean $(PRE_DEPLOY_GOALS) deploy $(DEPLOY_PROFILE_ARG) $(ARTIFACTORY_BASE_URL_ARG) -DskipTests=$(SKIP_TESTS) -Dgpg.skip=false -Dmaven.deploy.skip=$(MAVEN_DEPLOY_SKIP)
 	@echo "Reverting POM changes after deploy..."
