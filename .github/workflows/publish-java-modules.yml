@@ -1,5 +1,5 @@
 ---
-name: Publish All Java Modules
+name: Publish Java Modules
 
 on:
   workflow_dispatch:
