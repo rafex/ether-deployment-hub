@@ -18,3 +18,11 @@
 	path = ether-http-core
 	url = git@github.com:rafex/ether-http-core.git
 	branch = main
+[submodule "ether-websocket-jetty12"]
+	path = ether-websocket-jetty12
+	url = git@github.com:rafex/ether-websocket-jetty12.git
+	branch = main
+[submodule "ether-websocket-core"]
+	path = ether-websocket-core
+	url = git@github.com:rafex/ether-websocket-core.git
+	branch = main

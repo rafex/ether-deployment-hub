@@ -1,4 +1,4 @@
-.PHONY: compile validate-main-build compile-ether-parent compile-ether-json compile-ether-jwt compile-ether-http-core compile-ether-http-jetty12
+.PHONY: compile validate-main-build compile-ether-parent compile-ether-json compile-ether-jwt compile-ether-http-core compile-ether-http-jetty12 compile-ether-websocket-core compile-ether-websocket-jetty12
 
 define resolve_module_dir
   module_path="$(1)"; \
@@ -51,10 +51,21 @@ compile-ether-http-jetty12:
 	@$(call install_local_module,ether-http-core)
 	@$(call compile_local_module,ether-http-jetty12)
 
+## compile-ether-websocket-core: install parent and compile websocket-core
+compile-ether-websocket-core:
+	@$(call install_local_module,ether-parent)
+	@$(call compile_local_module,ether-websocket-core)
+
+## compile-ether-websocket-jetty12: install parent+websocket-core and compile websocket jetty12
+compile-ether-websocket-jetty12:
+	@$(call install_local_module,ether-parent)
+	@$(call install_local_module,ether-websocket-core)
+	@$(call compile_local_module,ether-websocket-jetty12)
+
 ## compile: compile all current modules in dependency order
-compile: compile-ether-parent compile-ether-json compile-ether-jwt compile-ether-http-core compile-ether-http-jetty12
+compile: compile-ether-parent compile-ether-json compile-ether-jwt compile-ether-http-core compile-ether-http-jetty12 compile-ether-websocket-core compile-ether-websocket-jetty12
 	@echo "Compiled all modules in dependency order."
 
 ## validate-main-build: replicate CI local compile validations for main
-validate-main-build: compile-ether-parent compile-ether-json compile-ether-jwt compile-ether-http-core compile-ether-http-jetty12
+validate-main-build: compile-ether-parent compile-ether-json compile-ether-jwt compile-ether-http-core compile-ether-http-jetty12 compile-ether-websocket-core compile-ether-websocket-jetty12
 	@echo "Local compile validation completed."
