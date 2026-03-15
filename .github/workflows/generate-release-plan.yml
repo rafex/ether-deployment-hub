@@ -1,0 +1,88 @@
+---
+name: Generate Release Plan
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      base_ref:
+        description: 'Git ref to compare from'
+        required: false
+        type: string
+      head_ref:
+        description: 'Git ref to compare to'
+        required: false
+        type: string
+
+jobs:
+  release-plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Resolve comparison refs
+        id: refs
+        shell: bash
+        run: |
+          BASE_INPUT="${{ inputs.base_ref }}"
+          HEAD_INPUT="${{ inputs.head_ref }}"
+          EVENT_BEFORE="${{ github.event.before }}"
+          EVENT_SHA="${{ github.sha }}"
+
+          fallback_base() {
+            if [ -n "$EVENT_BEFORE" ] && [ "$EVENT_BEFORE" != "0000000000000000000000000000000000000000" ]; then
+              printf '%s\n' "$EVENT_BEFORE"
+            else
+              printf 'HEAD^\n'
+            fi
+          }
+
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "base=${{ github.event.pull_request.base.sha }}" >> "$GITHUB_OUTPUT"
+            echo "head=${{ github.event.pull_request.head.sha }}" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            if [ -n "$BASE_INPUT" ]; then
+              echo "base=$BASE_INPUT" >> "$GITHUB_OUTPUT"
+            else
+              echo "base=$(fallback_base)" >> "$GITHUB_OUTPUT"
+            fi
+            if [ -n "$HEAD_INPUT" ]; then
+              echo "head=$HEAD_INPUT" >> "$GITHUB_OUTPUT"
+            else
+              echo "head=$EVENT_SHA" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            echo "base=$(fallback_base)" >> "$GITHUB_OUTPUT"
+            echo "head=$EVENT_SHA" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Generate release plan
+        shell: bash
+        run: |
+          chmod +x ./scripts/release-common.sh ./scripts/detect-changed-modules.sh ./scripts/generate-release-plan.sh
+          ./scripts/generate-release-plan.sh "${{ steps.refs.outputs.base }}" "${{ steps.refs.outputs.head }}"
+
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-plan
+          path: |
+            release-artifacts/release-plan.json
+            release-artifacts/release-plan.md
+            release-artifacts/changelogs/

@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "defaultBranch": "main",
+  "versioningStrategy": "independent",
+  "releasePolicy": {
+    "conventionalCommits": true,
+    "dependencyPropagation": "patch",
+    "docsOnly": "none",
+    "testsOnly": "none",
+    "buildOnly": "patch"
+  },
+  "modules": [
+    {
+      "name": "ether-parent",
+      "path": "ether-parent",
+      "groupId": "dev.rafex.ether.parent",
+      "artifactId": "ether-parent",
+      "currentVersion": "5.0.1",
+      "published": true,
+      "dependencies": [],
+      "dependencyReleaseImpact": "patch"
+    },
+    {
+      "name": "ether-json",
+      "path": "ether-json",
+      "groupId": "dev.rafex.ether.json",
+      "artifactId": "ether-json",
+      "currentVersion": "4.0.0",
+      "published": true,
+      "dependencies": [
+        "ether-parent"
+      ],
+      "dependencyReleaseImpact": "patch"
+    },
+    {
+      "name": "ether-jwt",
+      "path": "ether-jwt",
+      "groupId": "dev.rafex.ether.jwt",
+      "artifactId": "ether-jwt",
+      "currentVersion": "4.0.0",
+      "published": true,
+      "dependencies": [
+        "ether-parent",
+        "ether-json"
+      ],
+      "dependencyReleaseImpact": "patch"
+    },
+    {
+      "name": "ether-http-core",
+      "path": "ether-http-core",
+      "groupId": "dev.rafex.ether.http",
+      "artifactId": "ether-http-core",
+      "currentVersion": "4.0.0",
+      "published": true,
+      "dependencies": [
+        "ether-parent"
+      ],
+      "dependencyReleaseImpact": "patch"
+    },
+    {
+      "name": "ether-http-jetty12",
+      "path": "ether-http-jetty12",
+      "groupId": "dev.rafex.ether.http",
+      "artifactId": "ether-http-jetty12",
+      "currentVersion": "4.0.0",
+      "published": true,
+      "dependencies": [
+        "ether-parent",
+        "ether-json",
+        "ether-http-core"
+      ],
+      "dependencyReleaseImpact": "patch"
+    },
+    {
+      "name": "ether-websocket-core",
+      "path": "ether-websocket-core",
+      "groupId": "dev.rafex.ether.websocket",
+      "artifactId": "ether-websocket-core",
+      "currentVersion": "1.0.0",
+      "published": false,
+      "dependencies": [
+        "ether-parent"
+      ],
+      "dependencyReleaseImpact": "patch"
+    },
+    {
+      "name": "ether-websocket-jetty12",
+      "path": "ether-websocket-jetty12",
+      "groupId": "dev.rafex.ether.websocket",
+      "artifactId": "ether-websocket-jetty12",
+      "currentVersion": "1.0.0",
+      "published": false,
+      "dependencies": [
+        "ether-parent",
+        "ether-websocket-core"
+      ],
+      "dependencyReleaseImpact": "patch"
+    }
+  ]
+}

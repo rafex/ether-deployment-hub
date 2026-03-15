@@ -14,6 +14,8 @@ MODULES=(
   "ether-jwt|dev.rafex.ether.jwt|ether-jwt"
   "ether-http-core|dev.rafex.ether.http|ether-http-core"
   "ether-http-jetty12|dev.rafex.ether.http|ether-http-jetty12"
+  "ether-websocket-core|dev.rafex.ether.websocket|ether-websocket-core"
+  "ether-websocket-jetty12|dev.rafex.ether.websocket|ether-websocket-jetty12"
 )
 
 TMP_JSON="$(mktemp)"

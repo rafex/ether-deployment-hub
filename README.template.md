@@ -33,6 +33,8 @@ Este repositorio orquesta el despliegue de módulos de **Ether**, una colección
 - **ether-jwt**: Autenticación basada en JSON Web Tokens.
 - **ether-http-core**: Abstracciones y contratos HTTP base.
 - **ether-http-jetty12**: Integración HTTP usando Jetty 12.
+- **ether-websocket-core**: Contratos y primitivas WebSocket agnósticas al transporte.
+- **ether-websocket-jetty12**: Integración WebSocket usando Jetty 12.
 
 ### Cómo compilar y publicar
 
