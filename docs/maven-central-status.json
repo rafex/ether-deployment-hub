@@ -4,7 +4,7 @@
     "groupId": "dev.rafex.ether.parent",
     "artifactId": "ether-parent",
     "deployed": true,
-    "latestVersion": "5.0.1-v20260304",
+    "latestVersion": "5.0.2",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.parent/ether-parent"
   },
@@ -31,7 +31,7 @@
     "groupId": "dev.rafex.ether.http",
     "artifactId": "ether-http-core",
     "deployed": true,
-    "latestVersion": "4.0.0-v20260304",
+    "latestVersion": "4.0.1",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.http/ether-http-core"
   },
