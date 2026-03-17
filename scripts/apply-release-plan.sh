@@ -35,7 +35,7 @@ set_project_version() {
     echo "[dry-run] set project version in $pom ($artifact -> $new_version)"
     return 0
   fi
-  perl -0777 -i -pe "s{(<artifactId>\\Q$artifact\\E</artifactId>\\s*<version>)[^<]+(</version>)}{\$1$new_version\$2}s" "$pom"
+  perl -0777 -i -pe "s{(<artifactId>\\Q$artifact\\E</artifactId>\\s*<version>)[^<]+(</version>)}{\${1}$new_version\${2}}s" "$pom"
 }
 
 set_parent_version() {
@@ -45,7 +45,7 @@ set_parent_version() {
     echo "[dry-run] set parent version in $pom (ether-parent -> $new_version)"
     return 0
   fi
-  perl -0777 -i -pe "s{(<parent>\\s*<groupId>dev\\.rafex\\.ether\\.parent</groupId>\\s*<artifactId>ether-parent</artifactId>\\s*<version>)[^<]+(</version>)}{\$1$new_version\$2}s" "$pom"
+  perl -0777 -i -pe "s{(<parent>\\s*<groupId>dev\\.rafex\\.ether\\.parent</groupId>\\s*<artifactId>ether-parent</artifactId>\\s*<version>)[^<]+(</version>)}{\${1}$new_version\${2}}s" "$pom"
 }
 
 set_property_version() {
@@ -56,7 +56,7 @@ set_property_version() {
     echo "[dry-run] set property in $pom ($property -> $new_version)"
     return 0
   fi
-  perl -0777 -i -pe "s{(<\\Q$property\\E>)[^<]+(</\\Q$property\\E>)}{\$1$new_version\$2}g" "$pom"
+  perl -0777 -i -pe "s{(<\\Q$property\\E>)[^<]+(</\\Q$property\\E>)}{\${1}$new_version\${2}}g" "$pom"
 }
 
 parent_version="$(planned_version "ether-parent")"
