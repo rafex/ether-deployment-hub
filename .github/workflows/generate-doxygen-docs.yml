@@ -31,11 +31,6 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
-        with:
-          enablement: true
-
       - name: Generate documentation (Docker wrapper)
         shell: bash
         run: make docs-ci DOXYGEN_USE_DOCKER=true
