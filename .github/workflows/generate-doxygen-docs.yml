@@ -22,15 +22,9 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install Doxygen and Graphviz
+      - name: Generate documentation (Docker wrapper)
         shell: bash
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y doxygen graphviz
-
-      - name: Generate documentation
-        shell: bash
-        run: make docs-ci
+        run: make docs-ci DOXYGEN_USE_DOCKER=true
 
       - name: Upload Doxygen artifact
         uses: actions/upload-artifact@v4

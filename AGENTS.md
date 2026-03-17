@@ -25,8 +25,11 @@
 ## Documentation stack (phase 1)
 - Added Doxygen + Graphviz generation for Java API docs.
 - Main config: `Doxyfile` (root).
+- Docker wrapper script: `scripts/doxygenw.sh` (default runner).
 - Local generation:
   - `make docs-gen`
+  - `make docs-gen-docker`
+  - `make docs-gen-local`
   - `make docs-ci`
   - `make docs-clean`
 - CI workflow:
