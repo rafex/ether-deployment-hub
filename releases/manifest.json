@@ -2,6 +2,15 @@
   "schemaVersion": 1,
   "defaultBranch": "main",
   "versioningStrategy": "independent",
+  "deployOrder": [
+    "ether-parent",
+    "ether-json",
+    "ether-jwt",
+    "ether-http-core",
+    "ether-websocket-core",
+    "ether-http-jetty12",
+    "ether-websocket-jetty12"
+  ],
   "releasePolicy": {
     "conventionalCommits": true,
     "dependencyPropagation": "patch",

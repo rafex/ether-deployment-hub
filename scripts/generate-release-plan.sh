@@ -152,6 +152,7 @@ done
 modules_json="$(jq -s 'sort_by(.name)' "$TMP_PLAN_DIR"/*.json)"
 selected_count="$(printf '%s' "$modules_json" | jq '[.[] | select(.releaseLevel != "none")] | length')"
 deploy_order='[]'
+preferred_deploy_order="$(jq -c '.deployOrder // [.modules[].name]' "$MANIFEST_PATH")"
 
 if [ "$selected_count" -gt 0 ]; then
   unresolved_names="$(printf '%s' "$modules_json" | jq -r '[.[] | select(.releaseLevel != "none") | .name]')"
@@ -175,6 +176,11 @@ if [ "$selected_count" -gt 0 ]; then
       echo "Remaining modules: $unresolved_names" >&2
       exit 1
     fi
+    ready_now="$(jq -cn \
+      --argjson ready "$ready_now" \
+      --argjson preferred "$preferred_deploy_order" \
+      '([ $preferred[] | select(($ready | index(.)) != null) ]
+        + [ $ready[] | select(($preferred | index(.)) == null) ])')"
 
     ordered_names="$(jq -cn --argjson left "$ordered_names" --argjson right "$ready_now" '$left + $right')"
     unresolved_names="$(jq -cn --argjson unresolved "$unresolved_names" --argjson ready "$ready_now" '
