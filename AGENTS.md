@@ -34,4 +34,5 @@
   - `make docs-clean`
 - CI workflow:
   - `.github/workflows/generate-doxygen-docs.yml`
-  - Publishes `doxygen-html` artifact from `docs/api/doxygen/html`.
+  - Builds docs on PR/push and publishes to GitHub Pages on `main`/manual runs.
+  - Upload path: `docs/api/doxygen/html`.
