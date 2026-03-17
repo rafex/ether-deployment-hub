@@ -48,7 +48,7 @@ jq -c '.modules[]' "$MANIFEST_PATH" | while IFS= read -r module_json; do
       level="patch"
       reasons+=("build_metadata_changed")
     else
-      commit_log="$(git -C "$ROOT_DIR" log --format='%s%n%b%x00' "$BASE_REF".."$HEAD_REF" -- "$path")"
+      commit_log="$(git -C "$ROOT_DIR" log --format='%s%n%b' "$BASE_REF".."$HEAD_REF" -- "$path")"
       level="$(release_commit_level_for_log "$commit_log")"
       reasons+=("direct_changes")
       if [ "$level" = "major" ]; then

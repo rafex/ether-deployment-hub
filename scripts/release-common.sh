@@ -113,11 +113,11 @@ release_is_build_file() {
 
 release_commit_level_for_log() {
   local log_text="${1:-}"
-  if printf '%s' "$log_text" | rg -q 'BREAKING CHANGE|^[a-z]+(\([^)]+\))?!:'; then
+  if printf '%s' "$log_text" | grep -Eq 'BREAKING CHANGE|^[a-z]+(\([^)]+\))?!:'; then
     printf 'major\n'
     return 0
   fi
-  if printf '%s' "$log_text" | rg -q '^feat(\([^)]+\))?:'; then
+  if printf '%s' "$log_text" | grep -Eq '^feat(\([^)]+\))?:'; then
     printf 'minor\n'
     return 0
   fi
