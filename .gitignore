@@ -11,3 +11,6 @@
 .factorypath
 .apt_generated
 .springBeans
+
+# Generated documentation
+docs/api/doxygen/

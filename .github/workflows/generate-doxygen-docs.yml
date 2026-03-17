@@ -1,0 +1,39 @@
+---
+name: Generate Doxygen Docs
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  doxygen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Doxygen and Graphviz
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y doxygen graphviz
+
+      - name: Generate documentation
+        shell: bash
+        run: make docs-ci
+
+      - name: Upload Doxygen artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: doxygen-html
+          path: docs/api/doxygen/html/
