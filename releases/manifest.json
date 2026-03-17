@@ -13,87 +13,122 @@
     {
       "name": "ether-parent",
       "path": "ether-parent",
+      "projectDir": "ether-parent/ether-parent",
+      "pomPath": "ether-parent/ether-parent/pom.xml",
       "groupId": "dev.rafex.ether.parent",
       "artifactId": "ether-parent",
       "currentVersion": "5.0.1",
       "published": true,
+      "usesParent": false,
       "dependencies": [],
+      "internalDependencyProperties": {},
       "dependencyReleaseImpact": "patch"
     },
     {
       "name": "ether-json",
       "path": "ether-json",
+      "projectDir": "ether-json/ether-json",
+      "pomPath": "ether-json/ether-json/pom.xml",
       "groupId": "dev.rafex.ether.json",
       "artifactId": "ether-json",
       "currentVersion": "4.0.0",
       "published": true,
+      "usesParent": true,
       "dependencies": [
         "ether-parent"
       ],
+      "internalDependencyProperties": {},
       "dependencyReleaseImpact": "patch"
     },
     {
       "name": "ether-jwt",
       "path": "ether-jwt",
+      "projectDir": "ether-jwt/ether-jwt",
+      "pomPath": "ether-jwt/ether-jwt/pom.xml",
       "groupId": "dev.rafex.ether.jwt",
       "artifactId": "ether-jwt",
       "currentVersion": "4.0.0",
       "published": true,
+      "usesParent": true,
       "dependencies": [
         "ether-parent",
         "ether-json"
       ],
+      "internalDependencyProperties": {
+        "ether-json": "ether-json.version"
+      },
       "dependencyReleaseImpact": "patch"
     },
     {
       "name": "ether-http-core",
       "path": "ether-http-core",
+      "projectDir": "ether-http-core/ether-http-core",
+      "pomPath": "ether-http-core/ether-http-core/pom.xml",
       "groupId": "dev.rafex.ether.http",
       "artifactId": "ether-http-core",
       "currentVersion": "4.0.0",
       "published": true,
+      "usesParent": true,
       "dependencies": [
         "ether-parent"
       ],
+      "internalDependencyProperties": {},
       "dependencyReleaseImpact": "patch"
     },
     {
       "name": "ether-http-jetty12",
       "path": "ether-http-jetty12",
+      "projectDir": "ether-http-jetty12/ether-http-jetty12",
+      "pomPath": "ether-http-jetty12/ether-http-jetty12/pom.xml",
       "groupId": "dev.rafex.ether.http",
       "artifactId": "ether-http-jetty12",
       "currentVersion": "4.0.0",
       "published": true,
+      "usesParent": true,
       "dependencies": [
         "ether-parent",
         "ether-json",
         "ether-http-core"
       ],
+      "internalDependencyProperties": {
+        "ether-json": "ether-json.version",
+        "ether-http-core": "ether-http-core.version"
+      },
       "dependencyReleaseImpact": "patch"
     },
     {
       "name": "ether-websocket-core",
       "path": "ether-websocket-core",
+      "projectDir": "ether-websocket-core/ether-websocket-core",
+      "pomPath": "ether-websocket-core/ether-websocket-core/pom.xml",
       "groupId": "dev.rafex.ether.websocket",
       "artifactId": "ether-websocket-core",
       "currentVersion": "1.0.0",
       "published": false,
+      "usesParent": true,
       "dependencies": [
         "ether-parent"
       ],
+      "internalDependencyProperties": {},
       "dependencyReleaseImpact": "patch"
     },
     {
       "name": "ether-websocket-jetty12",
       "path": "ether-websocket-jetty12",
+      "projectDir": "ether-websocket-jetty12/ether-websocket-jetty12",
+      "pomPath": "ether-websocket-jetty12/ether-websocket-jetty12/pom.xml",
       "groupId": "dev.rafex.ether.websocket",
       "artifactId": "ether-websocket-jetty12",
       "currentVersion": "1.0.0",
       "published": false,
+      "usesParent": true,
       "dependencies": [
         "ether-parent",
         "ether-websocket-core"
       ],
+      "internalDependencyProperties": {
+        "ether-websocket-core": "ether-websocket-core.version"
+      },
       "dependencyReleaseImpact": "patch"
     }
   ]

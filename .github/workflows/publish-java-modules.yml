@@ -3,88 +3,201 @@ name: Publish Java Modules
 
 on:
   workflow_dispatch:
+    inputs:
+      base_ref:
+        description: 'Git ref to compare from'
+        required: false
+        type: string
+      head_ref:
+        description: 'Git ref to compare to'
+        required: false
+        type: string
+      run_deploy:
+        description: 'Execute deploy to Maven Central'
+        required: false
+        type: boolean
+        default: true
   push:
     tags:
       - '*.*.*'
       - 'v*.*.*'
 
+permissions:
+  contents: write
+
 jobs:
-  publish-ether-parent:
-    uses: ./.github/workflows/maven-central-publish-template.yml
-    with:
-      module-path: ether-parent
-      version: ${{ github.ref_name }}
-      run-deploy: false
-    secrets:
-      OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-      OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-      GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
-      MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
-  publish-ether-json:
-    uses: ./.github/workflows/maven-central-publish-template.yml
-    with:
-      module-path: ether-json
-      version: ${{ github.ref_name }}
-      run-deploy: false
-    secrets:
-      OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-      OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-      GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
-      MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
-  publish-ether-jwt:
-    uses: ./.github/workflows/maven-central-publish-template.yml
-    with:
-      module-path: ether-jwt
-      version: ${{ github.ref_name }}
-      run-deploy: false
-    secrets:
-      OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-      OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-      GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
-      MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
-  publish-ether-http-core:
-    uses: ./.github/workflows/maven-central-publish-template.yml
-    with:
-      module-path: ether-http-core
-      version: ${{ github.ref_name }}
-      run-deploy: false
-    secrets:
-      OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-      OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-      GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
-      MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
-  publish-ether-http-jetty12:
-    uses: ./.github/workflows/maven-central-publish-template.yml
-    with:
-      module-path: ether-http-jetty12
-      version: ${{ github.ref_name }}
-      run-deploy: true
-    secrets:
-      OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-      OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-      GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
-      MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
-  publish-ether-websocket-core:
-    uses: ./.github/workflows/maven-central-publish-template.yml
-    with:
-      module-path: ether-websocket-core
-      version: ${{ github.ref_name }}
-      run-deploy: true
-    secrets:
-      OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-      OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-      GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
-      MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
-  publish-ether-websocket-jetty12:
+  release-plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    outputs:
+      selected_count: ${{ steps.plan.outputs.selected_count }}
+      base_ref: ${{ steps.refs.outputs.base_ref }}
+      head_ref: ${{ steps.refs.outputs.head_ref }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Resolve comparison refs
+        id: refs
+        shell: bash
+        run: |
+          BASE_INPUT="${{ inputs.base_ref }}"
+          HEAD_INPUT="${{ inputs.head_ref }}"
+          CURRENT_SHA="${{ github.sha }}"
+
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            if [ -n "$BASE_INPUT" ]; then
+              BASE_REF="$BASE_INPUT"
+            else
+              BASE_REF="$(git rev-parse "${CURRENT_SHA}^" 2>/dev/null || true)"
+            fi
+            if [ -n "$HEAD_INPUT" ]; then
+              HEAD_REF="$HEAD_INPUT"
+            else
+              HEAD_REF="$CURRENT_SHA"
+            fi
+          else
+            PREV_TAG="$(git describe --tags --abbrev=0 "${CURRENT_SHA}^" 2>/dev/null || true)"
+            if [ -n "$PREV_TAG" ]; then
+              BASE_REF="$PREV_TAG"
+            else
+              BASE_REF="$(git rev-parse "${CURRENT_SHA}^" 2>/dev/null || true)"
+            fi
+            HEAD_REF="$CURRENT_SHA"
+          fi
+
+          if [ -z "$BASE_REF" ]; then
+            BASE_REF="$(git rev-list --max-parents=0 HEAD | tail -n 1)"
+          fi
+
+          echo "base_ref=$BASE_REF" >> "$GITHUB_OUTPUT"
+          echo "head_ref=$HEAD_REF" >> "$GITHUB_OUTPUT"
+
+      - name: Generate release plan
+        id: plan
+        shell: bash
+        run: |
+          chmod +x ./scripts/release-common.sh ./scripts/detect-changed-modules.sh ./scripts/generate-release-plan.sh
+          ./scripts/generate-release-plan.sh "${{ steps.refs.outputs.base_ref }}" "${{ steps.refs.outputs.head_ref }}"
+          selected="$(jq -r '.selectedCount' ./release-artifacts/release-plan.json)"
+          echo "selected_count=$selected" >> "$GITHUB_OUTPUT"
+
+      - name: Upload release plan artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-plan
+          path: |
+            release-artifacts/release-plan.json
+            release-artifacts/release-plan.md
+            release-artifacts/changelogs/
+
+  deploy:
+    needs: release-plan
+    if: ${{ needs.release-plan.outputs.selected_count != '0' && (github.event_name != 'workflow_dispatch' || inputs.run_deploy == true) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Download release plan artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: release-plan
+          path: release-artifacts
+
+      - name: Apply release plan versions to pom files
+        shell: bash
+        run: |
+          chmod +x ./scripts/apply-release-plan.sh
+          ./scripts/apply-release-plan.sh ./release-artifacts/release-plan.json ./releases/manifest.json
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Import GPG private key
+        env:
+          GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
+        run: |
+          echo "$GPG_PRIVATE_KEY_B64" | base64 --decode | gpg --batch --import
+          gpg --list-secret-keys
+
+      - name: Deploy selected modules in dependency order
+        shell: bash
+        env:
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+        run: |
+          PLAN=./release-artifacts/release-plan.json
+          ORDER="$(jq -r '.deployOrder[]' "$PLAN")"
+          echo "Deploy order: $ORDER"
+
+          while IFS= read -r module; do
+            [ -n "$module" ] || continue
+            module_path="$(jq -r --arg module "$module" '.modules[] | select(.name == $module) | .path' "$PLAN")"
+            next_version="$(jq -r --arg module "$module" '.modules[] | select(.name == $module) | .nextVersion' "$PLAN")"
+            release_level="$(jq -r --arg module "$module" '.modules[] | select(.name == $module) | .releaseLevel' "$PLAN")"
+            if [ "$release_level" = "none" ]; then
+              continue
+            fi
+
+            echo "Deploying $module ($next_version) from $module_path"
+            cd "$module_path"
+            make deploy VERSION="$next_version" FORCE_EXACT_VERSION=true SYNC_FROM_REPO=false SKIP_TESTS=false AUTO_UPDATE_LICENSE_HEADERS=true
+            cd - >/dev/null
+          done <<< "$ORDER"
+
+  update-manifest:
     needs:
-      - publish-ether-websocket-core
-    uses: ./.github/workflows/maven-central-publish-template.yml
-    with:
-      module-path: ether-websocket-jetty12
-      version: ${{ github.ref_name }}
-      run-deploy: true
-    secrets:
-      OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-      OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-      GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
-      MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+      - release-plan
+      - deploy
+    if: ${{ needs.release-plan.outputs.selected_count != '0' && needs.deploy.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Download release plan artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: release-plan
+          path: release-artifacts
+
+      - name: Update release manifest from successful plan
+        shell: bash
+        run: |
+          chmod +x ./scripts/update-manifest-from-plan.sh
+          ./scripts/update-manifest-from-plan.sh ./release-artifacts/release-plan.json ./releases/manifest.json
+
+      - name: Commit and push manifest updates if changed
+        shell: bash
+        run: |
+          if git diff --quiet releases/manifest.json; then
+            echo "No manifest changes detected"
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add releases/manifest.json
+          git commit -m "release: update manifest after publish"
+          git push origin main

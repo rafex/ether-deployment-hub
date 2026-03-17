@@ -64,6 +64,7 @@ jq -c '.modules[]' "$MANIFEST_PATH" | while IFS= read -r module_json; do
       git -C "$ROOT_DIR" log --format='%H%x1f%s%x1f%b%x1e' "$BASE_REF".."$HEAD_REF" -- "$path" \
         | jq -R -s '
             split("\u001e")
+            | map(gsub("^\n+|\n+$"; ""))
             | map(select(length > 0))
             | map(split("\u001f"))
             | map({
@@ -72,6 +73,7 @@ jq -c '.modules[]' "$MANIFEST_PATH" | while IFS= read -r module_json; do
                 subject: (.[1] // ""),
                 body: (.[2] // "")
               })
+            | map(select(.sha | test("^[0-9a-f]{7,40}$")))
           '
     )"
   fi
@@ -149,16 +151,51 @@ done
 
 modules_json="$(jq -s 'sort_by(.name)' "$TMP_PLAN_DIR"/*.json)"
 selected_count="$(printf '%s' "$modules_json" | jq '[.[] | select(.releaseLevel != "none")] | length')"
+deploy_order='[]'
+
+if [ "$selected_count" -gt 0 ]; then
+  unresolved_names="$(printf '%s' "$modules_json" | jq -r '[.[] | select(.releaseLevel != "none") | .name]')"
+  ordered_names='[]'
+  while [ "$(printf '%s' "$unresolved_names" | jq 'length')" -gt 0 ]; do
+    ready_now="$(printf '%s' "$modules_json" | jq -r \
+      --argjson unresolved "$unresolved_names" \
+      --argjson ordered "$ordered_names" '
+      [
+        .[]
+        | select(.name as $n | ($unresolved | index($n)))
+        | select(
+            [.dependencies[]? as $d | select($unresolved | index($d)) | $d]
+            | map(select($ordered | index(.) == null))
+            | length == 0
+          )
+        | .name
+      ]')"
+
+    if [ "$(printf '%s' "$ready_now" | jq 'length')" -eq 0 ]; then
+      echo "Unable to compute dependency order for selected modules" >&2
+      echo "Remaining modules: $unresolved_names" >&2
+      exit 1
+    fi
+
+    ordered_names="$(jq -cn --argjson left "$ordered_names" --argjson right "$ready_now" '$left + $right')"
+    unresolved_names="$(jq -cn --argjson unresolved "$unresolved_names" --argjson ready "$ready_now" '
+      [ $unresolved[] as $u | select($ready | index($u) | not) | $u ]')"
+  done
+  deploy_order="$ordered_names"
+fi
+
 plan_json="$(jq -n \
   --arg baseRef "$BASE_REF" \
   --arg headRef "$HEAD_REF" \
   --argjson selectedCount "$selected_count" \
+  --argjson deployOrder "$deploy_order" \
   --argjson changes "$DETECTION_JSON" \
   --argjson modules "$modules_json" \
   '{
     baseRef: $baseRef,
     headRef: $headRef,
     selectedCount: $selectedCount,
+    deployOrder: $deployOrder,
     changes: $changes,
     modules: $modules
   }')"
@@ -171,6 +208,7 @@ printf '%s\n' "$plan_json" > "$OUTPUT_DIR/release-plan.json"
   echo "- Base ref: \`$BASE_REF\`"
   echo "- Head ref: \`$HEAD_REF\`"
   echo "- Modules selected: \`$selected_count\`"
+  echo "- Deploy order: \`$(printf '%s' "$plan_json" | jq -r '.deployOrder | join(", ")')\`"
   echo
   echo "| Module | Current | Next | Level | Reasons |"
   echo "|---|---|---|---|---|"

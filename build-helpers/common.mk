@@ -85,10 +85,24 @@ DEV_SNAPSHOT := $(shell $(next_snapshot))
 BASE_VERSION := $(VERSION)
 # Normalize user-provided version: accepts vX.Y.Z or X.Y.Z
 BASE_VERSION_NORMALIZED := $(shell echo "$(BASE_VERSION)" | sed -E 's/^[vV]//')
+# Force exact semver from VERSION without adding build date suffix
+FORCE_EXACT_VERSION ?= false
 # Build date suffix (YYYYMMDD)
 BUILD_DATE := $(shell date +%Y%m%d)
-# Final version: use BASE_VERSION if provided, otherwise TAG, then date
+# Final version:
+# - when FORCE_EXACT_VERSION=true, require VERSION and use it as-is (normalized)
+# - otherwise keep historical behavior (tag/date)
+ifeq ($(FORCE_EXACT_VERSION),true)
+FINAL_VERSION := $(BASE_VERSION_NORMALIZED)
+else
 FINAL_VERSION := $(if $(BASE_VERSION_NORMALIZED),$(BASE_VERSION_NORMALIZED),$(TAG))-v$(BUILD_DATE)
+endif
+
+ifneq ($(FORCE_EXACT_VERSION),false)
+ifeq ($(strip $(FINAL_VERSION)),)
+$(error FORCE_EXACT_VERSION=true requires VERSION to be provided)
+endif
+endif
 
 ## write-settings: generate ~/.m2/settings.xml using configured repository credentials
 write-settings:
