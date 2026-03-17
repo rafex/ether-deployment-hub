@@ -57,9 +57,9 @@
     "module": "ether-websocket-jetty12",
     "groupId": "dev.rafex.ether.websocket",
     "artifactId": "ether-websocket-jetty12",
-    "deployed": false,
-    "latestVersion": "",
+    "deployed": true,
+    "latestVersion": "1.0.1",
     "lastUpdatedUtc": "",
-    "artifactUrl": "https://central.sonatype.com/search?q=ether-websocket-jetty12"
+    "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.websocket/ether-websocket-jetty12"
   }
 ]
