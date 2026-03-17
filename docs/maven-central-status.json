@@ -31,7 +31,7 @@
     "groupId": "dev.rafex.ether.http",
     "artifactId": "ether-http-core",
     "deployed": true,
-    "latestVersion": "4.0.1",
+    "latestVersion": "4.0.2",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.http/ether-http-core"
   },
