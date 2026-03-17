@@ -4,6 +4,7 @@ DOXYGEN_CONFIG ?= Doxyfile
 DOXYGEN_OUT_DIR ?= docs/api/doxygen
 DOXYGEN_USE_DOCKER ?= true
 DOXYGEN_IMAGE ?= ghcr.io/doxygen/doxygen:latest
+DOXYGEN_PLATFORM ?=
 
 ## docs-check: verify required tooling for docs generation
 docs-check:
@@ -24,7 +25,7 @@ docs-clean:
 ## docs-gen: generate Doxygen documentation with Graphviz diagrams
 docs-gen: docs-check
 ifeq ($(DOXYGEN_USE_DOCKER),true)
-	@DOXYGEN_IMAGE="$(DOXYGEN_IMAGE)" ./scripts/doxygenw.sh "$(DOXYGEN_CONFIG)"
+	@DOXYGEN_IMAGE="$(DOXYGEN_IMAGE)" DOXYGEN_PLATFORM="$(DOXYGEN_PLATFORM)" ./scripts/doxygenw.sh "$(DOXYGEN_CONFIG)"
 else
 	@./scripts/generate-doxygen-docs.sh "$(DOXYGEN_CONFIG)"
 endif
