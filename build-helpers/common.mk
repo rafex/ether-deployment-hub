@@ -24,6 +24,9 @@ CENTRAL_REPO_PASSWORD ?= $(MAVEN_REPO_PASSWORD)
 # Optional: override Artifactory base URL from CI/.env
 ARTIFACTORY_BASE_URL ?=
 ARTIFACTORY_BASE_URL_ARG := $(if $(ARTIFACTORY_BASE_URL),-Dartifactory.base-url=$(ARTIFACTORY_BASE_URL),)
+# Optional override for Sonatype Central publish wait strategy (e.g. validated|published)
+CENTRAL_WAIT_UNTIL ?=
+CENTRAL_WAIT_UNTIL_ARG := $(if $(CENTRAL_WAIT_UNTIL),-Dcentral.waitUntil=$(CENTRAL_WAIT_UNTIL),)
 
 # Control whether to skip tests: true or false
 SKIP_TESTS ?= false
@@ -166,7 +169,7 @@ build: sync-pom-versions set-version
 ## deploy: write settings and set version, then deploy using profile $(DEPLOY_PROFILE) (in $(PROJECT_DIR))
 deploy: write-settings sync-pom-versions set-version update-license-headers
 	@echo "Deploying version $(FINAL_VERSION)..."
-	cd $(PROJECT_DIR) && ./mvnw clean $(PRE_DEPLOY_GOALS) deploy $(DEPLOY_PROFILE_ARG) $(ARTIFACTORY_BASE_URL_ARG) -DskipTests=$(SKIP_TESTS) -Dgpg.skip=false -Dmaven.deploy.skip=$(MAVEN_DEPLOY_SKIP)
+	cd $(PROJECT_DIR) && ./mvnw clean $(PRE_DEPLOY_GOALS) deploy $(DEPLOY_PROFILE_ARG) $(ARTIFACTORY_BASE_URL_ARG) $(CENTRAL_WAIT_UNTIL_ARG) -DskipTests=$(SKIP_TESTS) -Dgpg.skip=false -Dmaven.deploy.skip=$(MAVEN_DEPLOY_SKIP)
 	@echo "Reverting POM changes after deploy..."
 	@cd $(PROJECT_DIR) && ./mvnw versions:revert
 
