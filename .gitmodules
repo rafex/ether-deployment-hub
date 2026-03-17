@@ -26,3 +26,7 @@
 	path = ether-websocket-core
 	url = git@github.com:rafex/ether-websocket-core.git
 	branch = main
+[submodule "ether-glowroot-jetty12"]
+	path = ether-glowroot-jetty12
+	url = git@github.com:rafex/ether-glowroot-jetty12.git
+	branch = main
