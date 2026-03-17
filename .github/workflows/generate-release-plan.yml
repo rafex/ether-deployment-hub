@@ -75,7 +75,8 @@ jobs:
       - name: Generate release plan
         shell: bash
         run: |
-          chmod +x ./scripts/release-common.sh ./scripts/detect-changed-modules.sh ./scripts/generate-release-plan.sh
+          chmod +x ./scripts/release-common.sh ./scripts/detect-changed-modules.sh ./scripts/generate-release-plan.sh ./scripts/sync-manifest-from-central.sh
+          ./scripts/sync-manifest-from-central.sh ./releases/manifest.json
           ./scripts/generate-release-plan.sh "${{ steps.refs.outputs.base }}" "${{ steps.refs.outputs.head }}"
 
       - name: Upload release artifacts
