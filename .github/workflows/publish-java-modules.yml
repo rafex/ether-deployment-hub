@@ -81,8 +81,9 @@ jobs:
         id: plan
         shell: bash
         run: |
-          chmod +x ./scripts/release-common.sh ./scripts/detect-changed-modules.sh ./scripts/generate-release-plan.sh
+          chmod +x ./scripts/release-common.sh ./scripts/detect-changed-modules.sh ./scripts/generate-release-plan.sh ./scripts/validate-release-plan-against-central.sh
           ./scripts/generate-release-plan.sh "${{ steps.refs.outputs.base_ref }}" "${{ steps.refs.outputs.head_ref }}"
+          ./scripts/validate-release-plan-against-central.sh ./release-artifacts/release-plan.json ./release-artifacts/version-collision-report.json
           selected="$(jq -r '.selectedCount' ./release-artifacts/release-plan.json)"
           echo "selected_count=$selected" >> "$GITHUB_OUTPUT"
 
@@ -93,6 +94,7 @@ jobs:
           path: |
             release-artifacts/release-plan.json
             release-artifacts/release-plan.md
+            release-artifacts/version-collision-report.json
             release-artifacts/changelogs/
 
   deploy:
@@ -113,6 +115,12 @@ jobs:
         with:
           name: release-plan
           path: release-artifacts
+
+      - name: Re-validate collisions before deploy
+        shell: bash
+        run: |
+          chmod +x ./scripts/validate-release-plan-against-central.sh
+          ./scripts/validate-release-plan-against-central.sh ./release-artifacts/release-plan.json ./release-artifacts/version-collision-report-deploy.json
 
       - name: Apply release plan versions to pom files
         shell: bash
