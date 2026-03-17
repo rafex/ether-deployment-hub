@@ -162,10 +162,9 @@ if [ "$selected_count" -gt 0 ]; then
       --argjson ordered "$ordered_names" '
       [
         .[]
-        | select(.name as $n | ($unresolved | index($n)))
+        | select(.name as $n | (($unresolved | index($n)) != null))
         | select(
-            [.dependencies[]? as $d | select($unresolved | index($d)) | $d]
-            | map(select($ordered | index(.) == null))
+            [.dependencies[]? as $d | select(($unresolved | index($d)) != null) | $d]
             | length == 0
           )
         | .name
