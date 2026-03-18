@@ -1,4 +1,8 @@
-.PHONY: compile validate-main-build compile-ether-parent compile-ether-json compile-ether-jwt compile-ether-http-core compile-ether-http-jetty12 compile-ether-websocket-core compile-ether-websocket-jetty12
+.PHONY: compile validate-main-build install-all \
+        compile-ether-parent compile-ether-json compile-ether-jwt \
+        compile-ether-http-core compile-ether-http-jetty12 \
+        compile-ether-websocket-core compile-ether-websocket-jetty12 \
+        compile-ether-glowroot-jetty12
 
 define resolve_module_dir
   module_path="$(1)"; \
@@ -62,10 +66,50 @@ compile-ether-websocket-jetty12:
 	@$(call install_local_module,ether-websocket-core)
 	@$(call compile_local_module,ether-websocket-jetty12)
 
-## compile: compile all current modules in dependency order
-compile: compile-ether-parent compile-ether-json compile-ether-jwt compile-ether-http-core compile-ether-http-jetty12 compile-ether-websocket-core compile-ether-websocket-jetty12
+## compile-ether-glowroot-jetty12: install all upstream modules and compile glowroot-jetty12
+## NOTE: glowroot depends on http-core, http-jetty12, websocket-core, websocket-jetty12 and json,
+##       so it is placed last in the dependency chain.
+compile-ether-glowroot-jetty12:
+	@$(call install_local_module,ether-parent)
+	@$(call install_local_module,ether-json)
+	@$(call install_local_module,ether-http-core)
+	@$(call install_local_module,ether-websocket-core)
+	@$(call install_local_module,ether-http-jetty12)
+	@$(call install_local_module,ether-websocket-jetty12)
+	@$(call compile_local_module,ether-glowroot-jetty12)
+
+## compile: compile all modules in dependency order
+compile: compile-ether-parent compile-ether-json compile-ether-jwt \
+         compile-ether-http-core compile-ether-websocket-core \
+         compile-ether-http-jetty12 compile-ether-websocket-jetty12 \
+         compile-ether-glowroot-jetty12
 	@echo "Compiled all modules in dependency order."
 
 ## validate-main-build: replicate CI local compile validations for main
-validate-main-build: compile-ether-parent compile-ether-json compile-ether-jwt compile-ether-http-core compile-ether-http-jetty12 compile-ether-websocket-core compile-ether-websocket-jetty12
+validate-main-build: compile-ether-parent compile-ether-json compile-ether-jwt \
+                     compile-ether-http-core compile-ether-websocket-core \
+                     compile-ether-http-jetty12 compile-ether-websocket-jetty12 \
+                     compile-ether-glowroot-jetty12
 	@echo "Local compile validation completed."
+
+## install-all: mvn clean install for every module in strict dependency order
+## Order: parent → json → jwt → http-core → websocket-core
+##        → http-jetty12 → websocket-jetty12 → glowroot-jetty12
+install-all:
+	@echo "==> Installing ether-parent"
+	@$(call install_local_module,ether-parent)
+	@echo "==> Installing ether-json"
+	@$(call install_local_module,ether-json)
+	@echo "==> Installing ether-jwt"
+	@$(call install_local_module,ether-jwt)
+	@echo "==> Installing ether-http-core"
+	@$(call install_local_module,ether-http-core)
+	@echo "==> Installing ether-websocket-core"
+	@$(call install_local_module,ether-websocket-core)
+	@echo "==> Installing ether-http-jetty12"
+	@$(call install_local_module,ether-http-jetty12)
+	@echo "==> Installing ether-websocket-jetty12"
+	@$(call install_local_module,ether-websocket-jetty12)
+	@echo "==> Installing ether-glowroot-jetty12"
+	@$(call install_local_module,ether-glowroot-jetty12)
+	@echo "All modules installed to local Maven repository."

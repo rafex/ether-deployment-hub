@@ -9,7 +9,8 @@
     "ether-http-core",
     "ether-websocket-core",
     "ether-http-jetty12",
-    "ether-websocket-jetty12"
+    "ether-websocket-jetty12",
+    "ether-glowroot-jetty12"
   ],
   "releasePolicy": {
     "conventionalCommits": true,
@@ -137,6 +138,33 @@
       ],
       "internalDependencyProperties": {
         "ether-websocket-core": "ether-websocket-core.version"
+      },
+      "dependencyReleaseImpact": "patch"
+    },
+    {
+      "name": "ether-glowroot-jetty12",
+      "path": "ether-glowroot-jetty12",
+      "projectDir": "ether-glowroot-jetty12/ether-glowroot-jetty12",
+      "pomPath": "ether-glowroot-jetty12/ether-glowroot-jetty12/pom.xml",
+      "groupId": "dev.rafex.ether.glowroot",
+      "artifactId": "ether-glowroot-jetty12",
+      "currentVersion": "1.0.0",
+      "published": false,
+      "usesParent": true,
+      "dependencies": [
+        "ether-parent",
+        "ether-json",
+        "ether-http-core",
+        "ether-websocket-core",
+        "ether-http-jetty12",
+        "ether-websocket-jetty12"
+      ],
+      "internalDependencyProperties": {
+        "ether-json": "ether-json.version",
+        "ether-http-core": "ether-http-core.version",
+        "ether-http-jetty12": "ether-http-jetty12.version",
+        "ether-websocket-core": "ether-websocket-core.version",
+        "ether-websocket-jetty12": "ether-websocket-jetty12.version"
       },
       "dependencyReleaseImpact": "patch"
     }

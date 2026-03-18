@@ -22,14 +22,13 @@ HIDE_UNDOC_CLASSES     = NO
 INHERIT_DOCS           = YES
 BUILTIN_STL_SUPPORT    = YES
 
-INPUT                  = \
-  ether-parent/ether-parent/src/main/java \
-  ether-json/ether-json/src/main/java \
-  ether-jwt/ether-jwt/src/main/java \
-  ether-http-core/ether-http-core/src/main/java \
-  ether-http-jetty12/ether-http-jetty12/src/main/java \
-  ether-websocket-core/ether-websocket-core/src/main/java \
-  ether-websocket-jetty12/ether-websocket-jetty12/src/main/java
+# INPUT is intentionally omitted here.
+# The wrapper scripts (doxygenw.sh / generate-doxygen-docs.sh) derive the
+# source paths automatically from releases/manifest.json (.modules[].projectDir)
+# and append an INPUT block to a temporary Doxyfile at build time.
+# To add a new module to the docs, add it to releases/manifest.json — no
+# changes to this file are needed.
+INPUT                  =
 FILE_PATTERNS          = *.java *.md
 RECURSIVE              = YES
 EXCLUDE_SYMLINKS       = NO

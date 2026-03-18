@@ -25,6 +25,7 @@ build_input_paths() {
       "ether-http-jetty12/ether-http-jetty12/src/main/java"
       "ether-websocket-core/ether-websocket-core/src/main/java"
       "ether-websocket-jetty12/ether-websocket-jetty12/src/main/java"
+      "ether-glowroot-jetty12/ether-glowroot-jetty12/src/main/java"
     )
   fi
 
