@@ -51,3 +51,15 @@
 [submodule "ether-http-openapi"]
 	path = ether-http-openapi
 	url = git@github.com:rafex/ether-http-openapi.git
+[submodule "ether-database-core"]
+	path = ether-database-core
+	url = git@github.com:rafex/ether-database-core.git
+	branch = main
+[submodule "ether-jdbc"]
+	path = ether-jdbc
+	url = git@github.com:rafex/ether-jdbc.git
+	branch = main
+[submodule "ether-database-postgres"]
+	path = ether-database-postgres
+	url = git@github.com:rafex/ether-database-postgres.git
+	branch = main
