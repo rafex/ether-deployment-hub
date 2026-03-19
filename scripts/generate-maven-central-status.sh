@@ -10,12 +10,23 @@ mkdir -p "$OUT_DIR"
 
 MODULES=(
   "ether-parent|dev.rafex.ether.parent|ether-parent"
+  "ether-config|dev.rafex.ether.config|ether-config"
+  "ether-database-core|dev.rafex.ether.database|ether-database-core"
+  "ether-jdbc|dev.rafex.ether.jdbc|ether-jdbc"
+  "ether-database-postgres|dev.rafex.ether.database|ether-database-postgres"
   "ether-json|dev.rafex.ether.json|ether-json"
   "ether-jwt|dev.rafex.ether.jwt|ether-jwt"
+  "ether-observability-core|dev.rafex.ether.observability|ether-observability-core"
   "ether-http-core|dev.rafex.ether.http|ether-http-core"
+  "ether-http-security|dev.rafex.ether.http|ether-http-security"
+  "ether-http-problem|dev.rafex.ether.http|ether-http-problem"
+  "ether-http-openapi|dev.rafex.ether.http|ether-http-openapi"
+  "ether-http-client|dev.rafex.ether.http|ether-http-client"
   "ether-http-jetty12|dev.rafex.ether.http|ether-http-jetty12"
   "ether-websocket-core|dev.rafex.ether.websocket|ether-websocket-core"
   "ether-websocket-jetty12|dev.rafex.ether.websocket|ether-websocket-jetty12"
+  "ether-webhook|dev.rafex.ether.webhook|ether-webhook"
+  "ether-glowroot-jetty12|dev.rafex.ether.glowroot|ether-glowroot-jetty12"
 )
 
 TMP_JSON="$(mktemp)"

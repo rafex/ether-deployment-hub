@@ -4,12 +4,22 @@
   "versioningStrategy": "independent",
   "deployOrder": [
     "ether-parent",
+    "ether-config",
+    "ether-database-core",
+    "ether-jdbc",
+    "ether-database-postgres",
     "ether-json",
     "ether-jwt",
+    "ether-observability-core",
     "ether-http-core",
+    "ether-http-security",
+    "ether-http-problem",
+    "ether-http-openapi",
+    "ether-http-client",
     "ether-websocket-core",
     "ether-http-jetty12",
     "ether-websocket-jetty12",
+    "ether-webhook",
     "ether-glowroot-jetty12"
   ],
   "releasePolicy": {
@@ -32,6 +42,76 @@
       "usesParent": false,
       "dependencies": [],
       "internalDependencyProperties": {},
+      "dependencyReleaseImpact": "patch"
+    },
+    {
+      "name": "ether-config",
+      "path": "ether-config",
+      "projectDir": "ether-config/ether-config",
+      "pomPath": "ether-config/ether-config/pom.xml",
+      "groupId": "dev.rafex.ether.config",
+      "artifactId": "ether-config",
+      "currentVersion": "1.0.0",
+      "published": false,
+      "usesParent": true,
+      "dependencies": [
+        "ether-parent"
+      ],
+      "internalDependencyProperties": {},
+      "dependencyReleaseImpact": "patch"
+    },
+    {
+      "name": "ether-database-core",
+      "path": "ether-database-core",
+      "projectDir": "ether-database-core/ether-database-core",
+      "pomPath": "ether-database-core/ether-database-core/pom.xml",
+      "groupId": "dev.rafex.ether.database",
+      "artifactId": "ether-database-core",
+      "currentVersion": "1.0.0",
+      "published": false,
+      "usesParent": true,
+      "dependencies": [
+        "ether-parent"
+      ],
+      "internalDependencyProperties": {},
+      "dependencyReleaseImpact": "patch"
+    },
+    {
+      "name": "ether-jdbc",
+      "path": "ether-jdbc",
+      "projectDir": "ether-jdbc/ether-jdbc",
+      "pomPath": "ether-jdbc/ether-jdbc/pom.xml",
+      "groupId": "dev.rafex.ether.jdbc",
+      "artifactId": "ether-jdbc",
+      "currentVersion": "1.0.0",
+      "published": false,
+      "usesParent": true,
+      "dependencies": [
+        "ether-parent",
+        "ether-database-core"
+      ],
+      "internalDependencyProperties": {
+        "ether-database-core": "ether-database-core.version"
+      },
+      "dependencyReleaseImpact": "patch"
+    },
+    {
+      "name": "ether-database-postgres",
+      "path": "ether-database-postgres",
+      "projectDir": "ether-database-postgres/ether-database-postgres",
+      "pomPath": "ether-database-postgres/ether-database-postgres/pom.xml",
+      "groupId": "dev.rafex.ether.database",
+      "artifactId": "ether-database-postgres",
+      "currentVersion": "1.0.0",
+      "published": false,
+      "usesParent": true,
+      "dependencies": [
+        "ether-parent",
+        "ether-database-core"
+      ],
+      "internalDependencyProperties": {
+        "ether-database-core": "ether-database-core.version"
+      },
       "dependencyReleaseImpact": "patch"
     },
     {
@@ -70,6 +150,22 @@
       "dependencyReleaseImpact": "patch"
     },
     {
+      "name": "ether-observability-core",
+      "path": "ether-observability-core",
+      "projectDir": "ether-observability-core/ether-observability-core",
+      "pomPath": "ether-observability-core/ether-observability-core/pom.xml",
+      "groupId": "dev.rafex.ether.observability",
+      "artifactId": "ether-observability-core",
+      "currentVersion": "1.0.0",
+      "published": false,
+      "usesParent": true,
+      "dependencies": [
+        "ether-parent"
+      ],
+      "internalDependencyProperties": {},
+      "dependencyReleaseImpact": "patch"
+    },
+    {
       "name": "ether-http-core",
       "path": "ether-http-core",
       "projectDir": "ether-http-core/ether-http-core",
@@ -83,6 +179,81 @@
         "ether-parent"
       ],
       "internalDependencyProperties": {},
+      "dependencyReleaseImpact": "patch"
+    },
+    {
+      "name": "ether-http-security",
+      "path": "ether-http-security",
+      "projectDir": "ether-http-security/ether-http-security",
+      "pomPath": "ether-http-security/ether-http-security/pom.xml",
+      "groupId": "dev.rafex.ether.http",
+      "artifactId": "ether-http-security",
+      "currentVersion": "1.0.0",
+      "published": false,
+      "usesParent": true,
+      "dependencies": [
+        "ether-parent"
+      ],
+      "internalDependencyProperties": {},
+      "dependencyReleaseImpact": "patch"
+    },
+    {
+      "name": "ether-http-problem",
+      "path": "ether-http-problem",
+      "projectDir": "ether-http-problem/ether-http-problem",
+      "pomPath": "ether-http-problem/ether-http-problem/pom.xml",
+      "groupId": "dev.rafex.ether.http",
+      "artifactId": "ether-http-problem",
+      "currentVersion": "1.0.0",
+      "published": false,
+      "usesParent": true,
+      "dependencies": [
+        "ether-parent",
+        "ether-json",
+        "ether-http-core"
+      ],
+      "internalDependencyProperties": {
+        "ether-json": "ether-json.version",
+        "ether-http-core": "ether-http-core.version"
+      },
+      "dependencyReleaseImpact": "patch"
+    },
+    {
+      "name": "ether-http-openapi",
+      "path": "ether-http-openapi",
+      "projectDir": "ether-http-openapi/ether-http-openapi",
+      "pomPath": "ether-http-openapi/ether-http-openapi/pom.xml",
+      "groupId": "dev.rafex.ether.http",
+      "artifactId": "ether-http-openapi",
+      "currentVersion": "1.0.0",
+      "published": false,
+      "usesParent": true,
+      "dependencies": [
+        "ether-parent",
+        "ether-json"
+      ],
+      "internalDependencyProperties": {
+        "ether-json": "ether-json.version"
+      },
+      "dependencyReleaseImpact": "patch"
+    },
+    {
+      "name": "ether-http-client",
+      "path": "ether-http-client",
+      "projectDir": "ether-http-client/ether-http-client",
+      "pomPath": "ether-http-client/ether-http-client/pom.xml",
+      "groupId": "dev.rafex.ether.http",
+      "artifactId": "ether-http-client",
+      "currentVersion": "1.0.0",
+      "published": false,
+      "usesParent": true,
+      "dependencies": [
+        "ether-parent",
+        "ether-json"
+      ],
+      "internalDependencyProperties": {
+        "ether-json": "ether-json.version"
+      },
       "dependencyReleaseImpact": "patch"
     },
     {
@@ -138,6 +309,27 @@
       ],
       "internalDependencyProperties": {
         "ether-websocket-core": "ether-websocket-core.version"
+      },
+      "dependencyReleaseImpact": "patch"
+    },
+    {
+      "name": "ether-webhook",
+      "path": "ether-webhook",
+      "projectDir": "ether-webhook/ether-webhook",
+      "pomPath": "ether-webhook/ether-webhook/pom.xml",
+      "groupId": "dev.rafex.ether.webhook",
+      "artifactId": "ether-webhook",
+      "currentVersion": "1.0.0",
+      "published": false,
+      "usesParent": true,
+      "dependencies": [
+        "ether-parent",
+        "ether-json",
+        "ether-http-client"
+      ],
+      "internalDependencyProperties": {
+        "ether-json": "ether-json.version",
+        "ether-http-client": "ether-http-client.version"
       },
       "dependencyReleaseImpact": "patch"
     },

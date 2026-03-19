@@ -9,12 +9,23 @@
 | Modulo | Badge | GroupId | ArtifactId | Desplegado |
 |---|---|---|---|---|
 | ether-parent | ![ether-parent](https://img.shields.io/maven-central/v/dev.rafex.ether.parent/ether-parent) | dev.rafex.ether.parent | ether-parent | si |
+| ether-config | ![ether-config](https://img.shields.io/maven-central/v/dev.rafex.ether.config/ether-config) | dev.rafex.ether.config | ether-config | no |
+| ether-database-core | ![ether-database-core](https://img.shields.io/maven-central/v/dev.rafex.ether.database/ether-database-core) | dev.rafex.ether.database | ether-database-core | no |
+| ether-jdbc | ![ether-jdbc](https://img.shields.io/maven-central/v/dev.rafex.ether.jdbc/ether-jdbc) | dev.rafex.ether.jdbc | ether-jdbc | no |
+| ether-database-postgres | ![ether-database-postgres](https://img.shields.io/maven-central/v/dev.rafex.ether.database/ether-database-postgres) | dev.rafex.ether.database | ether-database-postgres | no |
 | ether-json | ![ether-json](https://img.shields.io/maven-central/v/dev.rafex.ether.json/ether-json) | dev.rafex.ether.json | ether-json | si |
 | ether-jwt | ![ether-jwt](https://img.shields.io/maven-central/v/dev.rafex.ether.jwt/ether-jwt) | dev.rafex.ether.jwt | ether-jwt | si |
+| ether-observability-core | ![ether-observability-core](https://img.shields.io/maven-central/v/dev.rafex.ether.observability/ether-observability-core) | dev.rafex.ether.observability | ether-observability-core | no |
 | ether-http-core | ![ether-http-core](https://img.shields.io/maven-central/v/dev.rafex.ether.http/ether-http-core) | dev.rafex.ether.http | ether-http-core | si |
+| ether-http-security | ![ether-http-security](https://img.shields.io/maven-central/v/dev.rafex.ether.http/ether-http-security) | dev.rafex.ether.http | ether-http-security | no |
+| ether-http-problem | ![ether-http-problem](https://img.shields.io/maven-central/v/dev.rafex.ether.http/ether-http-problem) | dev.rafex.ether.http | ether-http-problem | no |
+| ether-http-openapi | ![ether-http-openapi](https://img.shields.io/maven-central/v/dev.rafex.ether.http/ether-http-openapi) | dev.rafex.ether.http | ether-http-openapi | no |
+| ether-http-client | ![ether-http-client](https://img.shields.io/maven-central/v/dev.rafex.ether.http/ether-http-client) | dev.rafex.ether.http | ether-http-client | no |
 | ether-http-jetty12 | ![ether-http-jetty12](https://img.shields.io/maven-central/v/dev.rafex.ether.http/ether-http-jetty12) | dev.rafex.ether.http | ether-http-jetty12 | si |
 | ether-websocket-core | ![ether-websocket-core](https://img.shields.io/maven-central/v/dev.rafex.ether.websocket/ether-websocket-core) | dev.rafex.ether.websocket | ether-websocket-core | si |
 | ether-websocket-jetty12 | ![ether-websocket-jetty12](https://img.shields.io/maven-central/v/dev.rafex.ether.websocket/ether-websocket-jetty12) | dev.rafex.ether.websocket | ether-websocket-jetty12 | si |
+| ether-webhook | ![ether-webhook](https://img.shields.io/maven-central/v/dev.rafex.ether.webhook/ether-webhook) | dev.rafex.ether.webhook | ether-webhook | no |
+| ether-glowroot-jetty12 | ![ether-glowroot-jetty12](https://img.shields.io/maven-central/v/dev.rafex.ether.glowroot/ether-glowroot-jetty12) | dev.rafex.ether.glowroot | ether-glowroot-jetty12 | no |
 
 ### JSON de estado
 
@@ -37,12 +48,23 @@ Este repositorio orquesta el despliegue de módulos de **Ether**, una colección
 ### Componentes principales
 
 - **ether-parent**: POM padre con configuración común.
+- **ether-config**: Configuración tipada desde múltiples fuentes.
+- **ether-database-core**: Contratos y utilidades JDBC puras para consultas, parámetros y transacciones.
+- **ether-jdbc**: Implementación base de acceso a datos sobre `DataSource` y JDBC estándar.
+- **ether-database-postgres**: Extensiones ligeras para PostgreSQL como `jsonb`, arrays y clasificación de SQLState.
 - **ether-json**: Validación y manipulación de JSON.
 - **ether-jwt**: Autenticación basada en JSON Web Tokens.
+- **ether-observability-core**: Primitivas neutrales para request-id, timing y health/readiness.
 - **ether-http-core**: Abstracciones y contratos HTTP base.
+- **ether-http-security**: Políticas reutilizables para CORS, headers, límites y confianza de proxies.
+- **ether-http-problem**: Problem Details estilo RFC 9457 para errores HTTP consistentes.
+- **ether-http-openapi**: Modelo y builder para describir APIs y emitir especificaciones OpenAPI.
+- **ether-http-client**: Cliente HTTP ligero con soporte JSON sobre `java.net.http`.
 - **ether-http-jetty12**: Integración HTTP usando Jetty 12.
 - **ether-websocket-core**: Contratos y primitivas WebSocket agnósticas al transporte.
 - **ether-websocket-jetty12**: Integración WebSocket usando Jetty 12.
+- **ether-webhook**: Firma, verificación y envío de webhooks sobre `ether-http-client`.
+- **ether-glowroot-jetty12**: Integración de observabilidad Glowroot para la pila Jetty 12.
 
 ### Cómo compilar y publicar
 
