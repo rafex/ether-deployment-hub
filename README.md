@@ -18,13 +18,13 @@
 | ether-observability-core | ![ether-observability-core](https://img.shields.io/maven-central/v/dev.rafex.ether.observability/ether-observability-core) | dev.rafex.ether.observability | ether-observability-core | si |
 | ether-http-core | ![ether-http-core](https://img.shields.io/maven-central/v/dev.rafex.ether.http/ether-http-core) | dev.rafex.ether.http | ether-http-core | si |
 | ether-http-security | ![ether-http-security](https://img.shields.io/maven-central/v/dev.rafex.ether.http/ether-http-security) | dev.rafex.ether.http | ether-http-security | si |
-| ether-http-problem | ![ether-http-problem](https://img.shields.io/maven-central/v/dev.rafex.ether.http/ether-http-problem) | dev.rafex.ether.http | ether-http-problem | no |
-| ether-http-openapi | ![ether-http-openapi](https://img.shields.io/maven-central/v/dev.rafex.ether.http/ether-http-openapi) | dev.rafex.ether.http | ether-http-openapi | no |
-| ether-http-client | ![ether-http-client](https://img.shields.io/maven-central/v/dev.rafex.ether.http/ether-http-client) | dev.rafex.ether.http | ether-http-client | no |
+| ether-http-problem | ![ether-http-problem](https://img.shields.io/maven-central/v/dev.rafex.ether.http/ether-http-problem) | dev.rafex.ether.http | ether-http-problem | si |
+| ether-http-openapi | ![ether-http-openapi](https://img.shields.io/maven-central/v/dev.rafex.ether.http/ether-http-openapi) | dev.rafex.ether.http | ether-http-openapi | si |
+| ether-http-client | ![ether-http-client](https://img.shields.io/maven-central/v/dev.rafex.ether.http/ether-http-client) | dev.rafex.ether.http | ether-http-client | si |
 | ether-http-jetty12 | ![ether-http-jetty12](https://img.shields.io/maven-central/v/dev.rafex.ether.http/ether-http-jetty12) | dev.rafex.ether.http | ether-http-jetty12 | si |
 | ether-websocket-core | ![ether-websocket-core](https://img.shields.io/maven-central/v/dev.rafex.ether.websocket/ether-websocket-core) | dev.rafex.ether.websocket | ether-websocket-core | si |
 | ether-websocket-jetty12 | ![ether-websocket-jetty12](https://img.shields.io/maven-central/v/dev.rafex.ether.websocket/ether-websocket-jetty12) | dev.rafex.ether.websocket | ether-websocket-jetty12 | si |
-| ether-webhook | ![ether-webhook](https://img.shields.io/maven-central/v/dev.rafex.ether.webhook/ether-webhook) | dev.rafex.ether.webhook | ether-webhook | no |
+| ether-webhook | ![ether-webhook](https://img.shields.io/maven-central/v/dev.rafex.ether.webhook/ether-webhook) | dev.rafex.ether.webhook | ether-webhook | si |
 | ether-glowroot-jetty12 | ![ether-glowroot-jetty12](https://img.shields.io/maven-central/v/dev.rafex.ether.glowroot/ether-glowroot-jetty12) | dev.rafex.ether.glowroot | ether-glowroot-jetty12 | si |
 
 ### JSON de estado
