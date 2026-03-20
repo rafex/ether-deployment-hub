@@ -60,6 +60,17 @@ set_property_version() {
 }
 
 parent_version="$(planned_version "ether-parent")"
+parent_pom_path="$ROOT_DIR/ether-parent/ether-parent/pom.xml"
+
+while IFS= read -r module; do
+  name="$(printf '%s' "$module" | jq -r '.name')"
+  artifact_id="$(printf '%s' "$module" | jq -r '.artifactId')"
+  if [ "$name" = "ether-parent" ]; then
+    continue
+  fi
+  module_version="$(planned_version "$name")"
+  set_property_version "$parent_pom_path" "${artifact_id}.version" "$module_version"
+done < <(jq -c '.modules[]' "$MANIFEST_PATH")
 
 while IFS= read -r module; do
   name="$(printf '%s' "$module" | jq -r '.name')"
