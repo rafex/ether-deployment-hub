@@ -31,7 +31,7 @@
     "groupId": "dev.rafex.ether.jdbc",
     "artifactId": "ether-jdbc",
     "deployed": true,
-    "latestVersion": "2.0-v20210916",
+    "latestVersion": "8.0.1",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.jdbc/ether-jdbc"
   },
@@ -39,17 +39,17 @@
     "module": "ether-database-postgres",
     "groupId": "dev.rafex.ether.database",
     "artifactId": "ether-database-postgres",
-    "deployed": false,
-    "latestVersion": "",
+    "deployed": true,
+    "latestVersion": "8.0.1",
     "lastUpdatedUtc": "",
-    "artifactUrl": "https://central.sonatype.com/search?q=ether-database-postgres"
+    "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.database/ether-database-postgres"
   },
   {
     "module": "ether-json",
     "groupId": "dev.rafex.ether.json",
     "artifactId": "ether-json",
     "deployed": true,
-    "latestVersion": "4.0.1",
+    "latestVersion": "8.0.1",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.json/ether-json"
   },
@@ -58,7 +58,7 @@
     "groupId": "dev.rafex.ether.jwt",
     "artifactId": "ether-jwt",
     "deployed": true,
-    "latestVersion": "4.0.1",
+    "latestVersion": "8.0.1",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.jwt/ether-jwt"
   },
