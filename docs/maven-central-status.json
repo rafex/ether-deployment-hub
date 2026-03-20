@@ -4,7 +4,7 @@
     "groupId": "dev.rafex.ether.parent",
     "artifactId": "ether-parent",
     "deployed": true,
-    "latestVersion": "5.0.3",
+    "latestVersion": "8.0.1",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.parent/ether-parent"
   },
@@ -12,19 +12,19 @@
     "module": "ether-config",
     "groupId": "dev.rafex.ether.config",
     "artifactId": "ether-config",
-    "deployed": false,
-    "latestVersion": "",
+    "deployed": true,
+    "latestVersion": "8.0.1",
     "lastUpdatedUtc": "",
-    "artifactUrl": "https://central.sonatype.com/search?q=ether-config"
+    "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.config/ether-config"
   },
   {
     "module": "ether-database-core",
     "groupId": "dev.rafex.ether.database",
     "artifactId": "ether-database-core",
-    "deployed": false,
-    "latestVersion": "",
+    "deployed": true,
+    "latestVersion": "8.0.1",
     "lastUpdatedUtc": "",
-    "artifactUrl": "https://central.sonatype.com/search?q=ether-database-core"
+    "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.database/ether-database-core"
   },
   {
     "module": "ether-jdbc",
