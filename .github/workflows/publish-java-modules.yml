@@ -37,6 +37,11 @@ jobs:
       selected_count: ${{ steps.plan.outputs.selected_count }}
       base_ref: ${{ steps.refs.outputs.base_ref }}
       head_ref: ${{ steps.refs.outputs.head_ref }}
+      level0: ${{ steps.plan.outputs.level0 }}
+      level1: ${{ steps.plan.outputs.level1 }}
+      level2: ${{ steps.plan.outputs.level2 }}
+      level3: ${{ steps.plan.outputs.level3 }}
+      level4: ${{ steps.plan.outputs.level4 }}
 
     steps:
       - name: Checkout repo
@@ -91,6 +96,19 @@ jobs:
           ./scripts/validate-release-plan-against-central.sh ./release-artifacts/release-plan.json ./release-artifacts/version-collision-report.json
           selected="$(jq -r '.selectedCount' ./release-artifacts/release-plan.json)"
           echo "selected_count=$selected" >> "$GITHUB_OUTPUT"
+          # Compute dependency levels and output as JSON arrays for per-level jobs
+          LEVELS=$(./scripts/compute-deploy-levels.sh ./release-artifacts/release-plan.json)
+          echo "Deploy levels:"
+          echo "$LEVELS" | jq -r '.levels | to_entries[] | "  L\(.key): \(.value | join(", "))"'
+          level_count=$(echo "$LEVELS" | jq '.levels | length')
+          for i in 0 1 2 3 4; do
+            if [ "$i" -lt "$level_count" ]; then
+              arr=$(echo "$LEVELS" | jq -c ".levels[$i]")
+            else
+              arr="[]"
+            fi
+            echo "level${i}=${arr}" >> "$GITHUB_OUTPUT"
+          done
 
       - name: Upload release plan artifacts
         uses: actions/upload-artifact@v4
@@ -102,188 +120,75 @@ jobs:
             release-artifacts/version-collision-report.json
             release-artifacts/changelogs/
 
-  deploy:
+  # ── L0: ether-parent (BOM — no ether deps) ───────────────────────────────
+  deploy-level-0:
     needs: release-plan
-    if: ${{ needs.release-plan.outputs.selected_count != '0' && (github.event_name != 'workflow_dispatch' || inputs.run_deploy == true) }}
-    runs-on: ubuntu-latest
-    # 5 dependency levels × ~20 min/level (parallel) + buffer = 120 min max
-    timeout-minutes: 120
+    if: ${{ needs.release-plan.outputs.selected_count != '0' && needs.release-plan.outputs.level0 != '[]' && (github.event_name != 'workflow_dispatch' || inputs.run_deploy == true) }}
+    uses: ./.github/workflows/deploy-one-level.yml
+    with:
+      modules_json: ${{ needs.release-plan.outputs.level0 }}
+      level_index: 0
+    secrets:
+      OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+      OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+      MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+      GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
 
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          submodules: recursive
+  # ── L1: modules that only depend on ether-parent ─────────────────────────
+  deploy-level-1:
+    needs: [release-plan, deploy-level-0]
+    if: ${{ needs.release-plan.outputs.level1 != '[]' && (needs.deploy-level-0.result == 'success' || needs.deploy-level-0.result == 'skipped') && (github.event_name != 'workflow_dispatch' || inputs.run_deploy == true) }}
+    uses: ./.github/workflows/deploy-one-level.yml
+    with:
+      modules_json: ${{ needs.release-plan.outputs.level1 }}
+      level_index: 1
+    secrets:
+      OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+      OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+      MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+      GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
 
-      - name: Download release plan artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: release-plan
-          path: release-artifacts
+  # ── L2: modules that depend on L1 ────────────────────────────────────────
+  deploy-level-2:
+    needs: [release-plan, deploy-level-1]
+    if: ${{ needs.release-plan.outputs.level2 != '[]' && (needs.deploy-level-1.result == 'success' || needs.deploy-level-1.result == 'skipped') && (github.event_name != 'workflow_dispatch' || inputs.run_deploy == true) }}
+    uses: ./.github/workflows/deploy-one-level.yml
+    with:
+      modules_json: ${{ needs.release-plan.outputs.level2 }}
+      level_index: 2
+    secrets:
+      OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+      OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+      MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+      GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
 
-      - name: Re-validate collisions before deploy
-        shell: bash
-        env:
-          # Allow already-published versions so re-runs skip them gracefully.
-          # The deploy step handles "already exists" responses from Sonatype.
-          ALLOW_EXISTING: "true"
-        run: |
-          chmod +x ./scripts/validate-release-plan-against-central.sh
-          ./scripts/validate-release-plan-against-central.sh \
-            ./release-artifacts/release-plan.json \
-            ./release-artifacts/version-collision-report-deploy.json
+  # ── L3: modules that depend on L2 ────────────────────────────────────────
+  deploy-level-3:
+    needs: [release-plan, deploy-level-2]
+    if: ${{ needs.release-plan.outputs.level3 != '[]' && (needs.deploy-level-2.result == 'success' || needs.deploy-level-2.result == 'skipped') && (github.event_name != 'workflow_dispatch' || inputs.run_deploy == true) }}
+    uses: ./.github/workflows/deploy-one-level.yml
+    with:
+      modules_json: ${{ needs.release-plan.outputs.level3 }}
+      level_index: 3
+    secrets:
+      OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+      OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+      MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+      GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
 
-      - name: Apply release plan versions to pom files
-        shell: bash
-        run: |
-          chmod +x ./scripts/apply-release-plan.sh
-          ./scripts/apply-release-plan.sh \
-            ./release-artifacts/release-plan.json \
-            ./releases/manifest.json
-
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '21'
-          cache: maven
-
-      - name: Import GPG private key
-        env:
-          GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
-        run: |
-          echo "$GPG_PRIVATE_KEY_B64" | base64 --decode | gpg --batch --import
-          gpg --list-secret-keys
-
-      - name: Compute parallel deploy levels
-        id: levels
-        shell: bash
-        run: |
-          chmod +x ./scripts/compute-deploy-levels.sh
-          LEVELS_FILE="${RUNNER_TEMP}/deploy-levels.json"
-          ./scripts/compute-deploy-levels.sh ./release-artifacts/release-plan.json \
-            > "$LEVELS_FILE"
-          echo "Deploy levels:"
-          jq -r '.levels | to_entries[] | "  L\(.key): \(.value | join(", "))"' "$LEVELS_FILE"
-          echo "levels_file=$LEVELS_FILE" >> "$GITHUB_OUTPUT"
-
-      - name: Deploy modules in parallel dependency levels
-        shell: bash
-        env:
-          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
-          # Limit heap per Maven process to avoid OOM when many run in parallel
-          MAVEN_OPTS: "-Xmx768m -XX:+TieredCompilation"
-        run: |
-          set -euo pipefail
-          PLAN="./release-artifacts/release-plan.json"
-          LEVELS_FILE="${{ steps.levels.outputs.levels_file }}"
-          ROOT_DIR="$(pwd)"
-          LOG_DIR="${RUNNER_TEMP}/deploy-logs"
-          mkdir -p "$LOG_DIR"
-
-          level_count=$(jq '.levels | length' "$LEVELS_FILE")
-          total_ok=0; total_skip=0; total_fail=0
-          ok_modules=(); skip_modules=(); fail_modules=()
-
-          for level_idx in $(seq 0 $((level_count - 1))); do
-            # ── collect modules for this level ─────────────────────────────
-            mapfile -t level_modules < <(jq -r ".levels[$level_idx][]" "$LEVELS_FILE")
-            echo ""
-            echo "════════════════════════════════════════════════════════"
-            echo " Level $level_idx — ${#level_modules[@]} module(s) in parallel"
-            echo "════════════════════════════════════════════════════════"
-
-            pids=()
-            log_files=()
-            deployed_modules=()
-            deployed_versions=()
-
-            for module in "${level_modules[@]}"; do
-              release_level=$(jq -r --arg m "$module" \
-                '.modules[] | select(.name == $m) | .releaseLevel' "$PLAN")
-              if [ "$release_level" = "none" ]; then
-                echo "  [SKIP] $module (releaseLevel=none)"
-                skip_modules+=("$module (releaseLevel=none)")
-                (( total_skip++ )) || true
-                continue
-              fi
-
-              module_path=$(jq -r --arg m "$module" \
-                '.modules[] | select(.name == $m) | .path' "$PLAN")
-              next_version=$(jq -r --arg m "$module" \
-                '.modules[] | select(.name == $m) | .nextVersion' "$PLAN")
-              log_file="$LOG_DIR/deploy-${module}.log"
-
-              echo "  [START] $module ($next_version)"
-              (
-                cd "$ROOT_DIR/$module_path"
-                make deploy \
-                  VERSION="$next_version" \
-                  FORCE_EXACT_VERSION=true \
-                  SYNC_FROM_REPO=false \
-                  SKIP_TESTS=false \
-                  AUTO_UPDATE_LICENSE_HEADERS=true
-              ) >"$log_file" 2>&1 &
-
-              pids+=($!)
-              log_files+=("$log_file")
-              deployed_modules+=("$module")
-              deployed_versions+=("$next_version")
-            done
-
-            # ── wait for every background process in this level ───────────
-            level_failed=false
-            for i in "${!pids[@]}"; do
-              module="${deployed_modules[$i]}"
-              version="${deployed_versions[$i]}"
-              log_file="${log_files[$i]}"
-
-              if wait "${pids[$i]}"; then
-                echo "  [OK]   $module ($version)"
-                ok_modules+=("$module ($version)")
-                (( total_ok++ )) || true
-              else
-                if grep -Eq \
-                  "already exists|Component with package url:.*already exists" \
-                  "$log_file" 2>/dev/null; then
-                  echo "  [SKIP] $module ($version) — already published in Sonatype Central"
-                  skip_modules+=("$module ($version) — already in Central")
-                  (( total_skip++ )) || true
-                else
-                  echo "  [FAIL] $module ($version) — see log below"
-                  echo "──── $log_file ────"
-                  cat "$log_file"
-                  echo "────────────────────"
-                  fail_modules+=("$module ($version)")
-                  level_failed=true
-                  (( total_fail++ )) || true
-                fi
-              fi
-            done
-
-            if $level_failed; then
-              echo ""
-              echo "ERROR: One or more modules failed in level $level_idx. Aborting."
-              exit 1
-            fi
-
-            echo " Level $level_idx complete ✓"
-          done
-
-          echo ""
-          echo "════════════════════════════════════════════════════════"
-          echo " Maven Central — Deploy summary"
-          echo "════════════════════════════════════════════════════════"
-          echo " ✅ published : $total_ok"
-          for m in "${ok_modules[@]}";   do echo "      • $m"; done
-          echo " ⏭  skipped   : $total_skip"
-          for m in "${skip_modules[@]}"; do echo "      • $m"; done
-          echo " ❌ failed    : $total_fail"
-          for m in "${fail_modules[@]}"; do echo "      • $m"; done
-          echo "════════════════════════════════════════════════════════"
+  # ── L4: modules that depend on L3 ────────────────────────────────────────
+  deploy-level-4:
+    needs: [release-plan, deploy-level-3]
+    if: ${{ needs.release-plan.outputs.level4 != '[]' && (needs.deploy-level-3.result == 'success' || needs.deploy-level-3.result == 'skipped') && (github.event_name != 'workflow_dispatch' || inputs.run_deploy == true) }}
+    uses: ./.github/workflows/deploy-one-level.yml
+    with:
+      modules_json: ${{ needs.release-plan.outputs.level4 }}
+      level_index: 4
+    secrets:
+      OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+      OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+      MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+      GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
 
   # ────────────────────────────────────────────────────────────────────────────
   # GitHub Packages deploy — starts after Maven Central deploy succeeds.
@@ -295,8 +200,8 @@ jobs:
   deploy-github-packages:
     needs:
       - release-plan
-      - deploy
-    if: ${{ needs.release-plan.outputs.selected_count != '0' && needs.deploy.result == 'success' && (github.event_name != 'workflow_dispatch' || inputs.run_deploy == true) }}
+      - deploy-level-4
+    if: ${{ needs.release-plan.outputs.selected_count != '0' && (needs.deploy-level-4.result == 'success' || needs.deploy-level-4.result == 'skipped') && (github.event_name != 'workflow_dispatch' || inputs.run_deploy == true) }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
@@ -408,9 +313,9 @@ jobs:
   update-manifest:
     needs:
       - release-plan
-      - deploy
+      - deploy-level-4
       - deploy-github-packages
-    if: ${{ needs.release-plan.outputs.selected_count != '0' && needs.deploy.result == 'success' }}
+    if: ${{ needs.release-plan.outputs.selected_count != '0' && (needs.deploy-level-4.result == 'success' || needs.deploy-level-4.result == 'skipped') }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
