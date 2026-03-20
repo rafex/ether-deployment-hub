@@ -84,7 +84,7 @@ jobs:
         id: plan
         shell: bash
         run: |
-          chmod +x ./scripts/release-common.sh ./scripts/detect-changed-modules.sh ./scripts/generate-release-plan.sh ./scripts/validate-release-plan-against-central.sh ./scripts/sync-manifest-from-central.sh
+          chmod +x ./scripts/release-common.sh ./scripts/detect-changed-modules.sh ./scripts/generate-release-plan.sh ./scripts/validate-release-plan-against-central.sh ./scripts/sync-manifest-from-central.sh ./scripts/compute-deploy-levels.sh
           ./scripts/sync-manifest-from-central.sh ./releases/manifest.json
           ./scripts/generate-release-plan.sh "${{ steps.refs.outputs.base_ref }}" "${{ steps.refs.outputs.head_ref }}"
           ./scripts/validate-release-plan-against-central.sh ./release-artifacts/release-plan.json ./release-artifacts/version-collision-report.json
@@ -105,7 +105,8 @@ jobs:
     needs: release-plan
     if: ${{ needs.release-plan.outputs.selected_count != '0' && (github.event_name != 'workflow_dispatch' || inputs.run_deploy == true) }}
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    # 5 dependency levels × ~20 min/level (parallel) + buffer = 120 min max
+    timeout-minutes: 120
 
     steps:
       - name: Checkout repo
@@ -123,18 +124,22 @@ jobs:
       - name: Re-validate collisions before deploy
         shell: bash
         env:
-          # Allow already-published versions so re-runs skip them gracefully
-          # (the deploy step handles "already exists" errors from Sonatype Central)
+          # Allow already-published versions so re-runs skip them gracefully.
+          # The deploy step handles "already exists" responses from Sonatype.
           ALLOW_EXISTING: "true"
         run: |
           chmod +x ./scripts/validate-release-plan-against-central.sh
-          ./scripts/validate-release-plan-against-central.sh ./release-artifacts/release-plan.json ./release-artifacts/version-collision-report-deploy.json
+          ./scripts/validate-release-plan-against-central.sh \
+            ./release-artifacts/release-plan.json \
+            ./release-artifacts/version-collision-report-deploy.json
 
       - name: Apply release plan versions to pom files
         shell: bash
         run: |
           chmod +x ./scripts/apply-release-plan.sh
-          ./scripts/apply-release-plan.sh ./release-artifacts/release-plan.json ./releases/manifest.json
+          ./scripts/apply-release-plan.sh \
+            ./release-artifacts/release-plan.json \
+            ./releases/manifest.json
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -150,39 +155,123 @@ jobs:
           echo "$GPG_PRIVATE_KEY_B64" | base64 --decode | gpg --batch --import
           gpg --list-secret-keys
 
-      - name: Deploy selected modules in dependency order
+      - name: Compute parallel deploy levels
+        id: levels
+        shell: bash
+        run: |
+          chmod +x ./scripts/compute-deploy-levels.sh
+          LEVELS_FILE="${RUNNER_TEMP}/deploy-levels.json"
+          ./scripts/compute-deploy-levels.sh ./release-artifacts/release-plan.json \
+            > "$LEVELS_FILE"
+          echo "Deploy levels:"
+          jq -r '.levels | to_entries[] | "  L\(.key): \(.value | join(", "))"' "$LEVELS_FILE"
+          echo "levels_file=$LEVELS_FILE" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy modules in parallel dependency levels
         shell: bash
         env:
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+          # Limit heap per Maven process to avoid OOM when many run in parallel
+          MAVEN_OPTS: "-Xmx768m -XX:+TieredCompilation"
         run: |
-          PLAN=./release-artifacts/release-plan.json
-          ORDER="$(jq -r '.deployOrder[]' "$PLAN")"
-          echo "Deploy order: $ORDER"
+          set -euo pipefail
+          PLAN="./release-artifacts/release-plan.json"
+          LEVELS_FILE="${{ steps.levels.outputs.levels_file }}"
+          ROOT_DIR="$(pwd)"
+          LOG_DIR="${RUNNER_TEMP}/deploy-logs"
+          mkdir -p "$LOG_DIR"
 
-          while IFS= read -r module; do
-            [ -n "$module" ] || continue
-            module_path="$(jq -r --arg module "$module" '.modules[] | select(.name == $module) | .path' "$PLAN")"
-            next_version="$(jq -r --arg module "$module" '.modules[] | select(.name == $module) | .nextVersion' "$PLAN")"
-            release_level="$(jq -r --arg module "$module" '.modules[] | select(.name == $module) | .releaseLevel' "$PLAN")"
-            if [ "$release_level" = "none" ]; then
-              continue
-            fi
+          level_count=$(jq '.levels | length' "$LEVELS_FILE")
+          total_ok=0
+          total_skip=0
+          total_fail=0
 
-            echo "Deploying $module ($next_version) from $module_path"
-            cd "$module_path"
-            deploy_log="${RUNNER_TEMP:-/tmp}/deploy-${module}.log"
-            if ! make deploy VERSION="$next_version" FORCE_EXACT_VERSION=true SYNC_FROM_REPO=false SKIP_TESTS=false AUTO_UPDATE_LICENSE_HEADERS=true 2>&1 | tee "$deploy_log"; then
-              if grep -Eq "already exists|Component with package url:.*already exists" "$deploy_log"; then
-                echo "Module $module@$next_version already exists in Sonatype Central. Continuing with next module."
-              else
-                echo "Deploy failed for $module@$next_version. See log: $deploy_log"
-                exit 1
+          for level_idx in $(seq 0 $((level_count - 1))); do
+            # ── collect modules for this level ─────────────────────────────
+            mapfile -t level_modules < <(jq -r ".levels[$level_idx][]" "$LEVELS_FILE")
+            echo ""
+            echo "════════════════════════════════════════════════════════"
+            echo " Level $level_idx — ${#level_modules[@]} module(s) in parallel"
+            echo "════════════════════════════════════════════════════════"
+
+            pids=()
+            log_files=()
+            deployed_modules=()
+
+            for module in "${level_modules[@]}"; do
+              release_level=$(jq -r --arg m "$module" \
+                '.modules[] | select(.name == $m) | .releaseLevel' "$PLAN")
+              if [ "$release_level" = "none" ]; then
+                echo "  [SKIP] $module (releaseLevel=none)"
+                continue
               fi
+
+              module_path=$(jq -r --arg m "$module" \
+                '.modules[] | select(.name == $m) | .path' "$PLAN")
+              next_version=$(jq -r --arg m "$module" \
+                '.modules[] | select(.name == $m) | .nextVersion' "$PLAN")
+              log_file="$LOG_DIR/deploy-${module}.log"
+
+              echo "  [START] $module ($next_version)"
+              (
+                cd "$ROOT_DIR/$module_path"
+                make deploy \
+                  VERSION="$next_version" \
+                  FORCE_EXACT_VERSION=true \
+                  SYNC_FROM_REPO=false \
+                  SKIP_TESTS=false \
+                  AUTO_UPDATE_LICENSE_HEADERS=true
+              ) >"$log_file" 2>&1 &
+
+              pids+=($!)
+              log_files+=("$log_file")
+              deployed_modules+=("$module")
+            done
+
+            # ── wait for every background process in this level ───────────
+            level_failed=false
+            for i in "${!pids[@]}"; do
+              module="${deployed_modules[$i]}"
+              log_file="${log_files[$i]}"
+
+              if wait "${pids[$i]}"; then
+                echo "  [OK]   $module"
+                (( total_ok++ )) || true
+              else
+                if grep -Eq \
+                  "already exists|Component with package url:.*already exists" \
+                  "$log_file" 2>/dev/null; then
+                  echo "  [SKIP] $module — already published in Sonatype Central"
+                  (( total_skip++ )) || true
+                else
+                  echo "  [FAIL] $module — see log below"
+                  echo "──── $log_file ────"
+                  cat "$log_file"
+                  echo "────────────────────"
+                  level_failed=true
+                  (( total_fail++ )) || true
+                fi
+              fi
+            done
+
+            if $level_failed; then
+              echo ""
+              echo "ERROR: One or more modules failed in level $level_idx. Aborting."
+              exit 1
             fi
-            cd - >/dev/null
-          done <<< "$ORDER"
+
+            echo " Level $level_idx complete ✓"
+          done
+
+          echo ""
+          echo "══════════════════════════════════"
+          echo " Deploy summary"
+          echo "  published : $total_ok"
+          echo "  skipped   : $total_skip"
+          echo "  failed    : $total_fail"
+          echo "══════════════════════════════════"
 
   update-manifest:
     needs:
