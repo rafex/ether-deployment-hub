@@ -6,6 +6,9 @@ ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 PLAN_PATH="${1:-$ROOT_DIR/release-artifacts/release-plan.json}"
 REPORT_PATH="${2:-$ROOT_DIR/release-artifacts/version-collision-report.json}"
 REPO_URL="${MAVEN_CENTRAL_REPO_URL:-https://repo1.maven.org/maven2}"
+# Set ALLOW_EXISTING=true to treat already_published as a warning, not a collision.
+# This allows re-deployments to skip already-published modules gracefully.
+ALLOW_EXISTING="${ALLOW_EXISTING:-false}"
 
 if [ ! -f "$PLAN_PATH" ]; then
   echo "Release plan not found: $PLAN_PATH" >&2
@@ -59,7 +62,11 @@ while IFS= read -r module_json; do
   case "$code" in
     200)
       status="already_published"
-      collision=true
+      if [ "$ALLOW_EXISTING" = "true" ]; then
+        collision=false
+      else
+        collision=true
+      fi
       ;;
     404)
       status="available"

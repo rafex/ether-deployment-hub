@@ -105,7 +105,7 @@ jobs:
     needs: release-plan
     if: ${{ needs.release-plan.outputs.selected_count != '0' && (github.event_name != 'workflow_dispatch' || inputs.run_deploy == true) }}
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 180
 
     steps:
       - name: Checkout repo
@@ -122,6 +122,10 @@ jobs:
 
       - name: Re-validate collisions before deploy
         shell: bash
+        env:
+          # Allow already-published versions so re-runs skip them gracefully
+          # (the deploy step handles "already exists" errors from Sonatype Central)
+          ALLOW_EXISTING: "true"
         run: |
           chmod +x ./scripts/validate-release-plan-against-central.sh
           ./scripts/validate-release-plan-against-central.sh ./release-artifacts/release-plan.json ./release-artifacts/version-collision-report-deploy.json
