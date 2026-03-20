@@ -11,7 +11,7 @@
 | ether-parent | ![ether-parent](https://img.shields.io/maven-central/v/dev.rafex.ether.parent/ether-parent) | dev.rafex.ether.parent | ether-parent | si |
 | ether-config | ![ether-config](https://img.shields.io/maven-central/v/dev.rafex.ether.config/ether-config) | dev.rafex.ether.config | ether-config | no |
 | ether-database-core | ![ether-database-core](https://img.shields.io/maven-central/v/dev.rafex.ether.database/ether-database-core) | dev.rafex.ether.database | ether-database-core | no |
-| ether-jdbc | ![ether-jdbc](https://img.shields.io/maven-central/v/dev.rafex.ether.jdbc/ether-jdbc) | dev.rafex.ether.jdbc | ether-jdbc | no |
+| ether-jdbc | ![ether-jdbc](https://img.shields.io/maven-central/v/dev.rafex.ether.jdbc/ether-jdbc) | dev.rafex.ether.jdbc | ether-jdbc | si |
 | ether-database-postgres | ![ether-database-postgres](https://img.shields.io/maven-central/v/dev.rafex.ether.database/ether-database-postgres) | dev.rafex.ether.database | ether-database-postgres | no |
 | ether-json | ![ether-json](https://img.shields.io/maven-central/v/dev.rafex.ether.json/ether-json) | dev.rafex.ether.json | ether-json | si |
 | ether-jwt | ![ether-jwt](https://img.shields.io/maven-central/v/dev.rafex.ether.jwt/ether-jwt) | dev.rafex.ether.jwt | ether-jwt | si |
@@ -25,7 +25,7 @@
 | ether-websocket-core | ![ether-websocket-core](https://img.shields.io/maven-central/v/dev.rafex.ether.websocket/ether-websocket-core) | dev.rafex.ether.websocket | ether-websocket-core | si |
 | ether-websocket-jetty12 | ![ether-websocket-jetty12](https://img.shields.io/maven-central/v/dev.rafex.ether.websocket/ether-websocket-jetty12) | dev.rafex.ether.websocket | ether-websocket-jetty12 | si |
 | ether-webhook | ![ether-webhook](https://img.shields.io/maven-central/v/dev.rafex.ether.webhook/ether-webhook) | dev.rafex.ether.webhook | ether-webhook | no |
-| ether-glowroot-jetty12 | ![ether-glowroot-jetty12](https://img.shields.io/maven-central/v/dev.rafex.ether.glowroot/ether-glowroot-jetty12) | dev.rafex.ether.glowroot | ether-glowroot-jetty12 | no |
+| ether-glowroot-jetty12 | ![ether-glowroot-jetty12](https://img.shields.io/maven-central/v/dev.rafex.ether.glowroot/ether-glowroot-jetty12) | dev.rafex.ether.glowroot | ether-glowroot-jetty12 | si |
 
 ### JSON de estado
 
@@ -33,7 +33,7 @@ Consulta el archivo [docs/maven-central-status.json](docs/maven-central-status.j
 
 ## Objetivo del Repositorio
 
-Este repositorio actúa como un hub orquestador para la publicación y despliegue automáticos de los módulos de **Ether**. Incluye:
+Este repositorio actúa como un hub orquestador para la publicación y despliegue automáticos de los módulos de **Ether** actualmente integrados en **Maven Central**. Incluye:
 - Scripts y plantillas de configuración para generación de artefactos (Javadoc, fuentes, firmas GPG).
 - Workflows de GitHub Actions preconfigurados para ejecutar `mvn deploy` usando el plugin `central-publishing-maven-plugin`.
 - Gestión centralizada de credenciales y versiones de cada módulo.
@@ -48,42 +48,12 @@ Este repositorio orquesta el despliegue de módulos de **Ether**, una colección
 ### Componentes principales
 
 - **ether-parent**: POM padre con configuración común.
-- **ether-config**: Configuración tipada desde múltiples fuentes.
-- **ether-database-core**: Contratos y utilidades JDBC puras para consultas, parámetros y transacciones.
-- **ether-jdbc**: Implementación base de acceso a datos sobre `DataSource` y JDBC estándar.
-- **ether-database-postgres**: Extensiones ligeras para PostgreSQL como `jsonb`, arrays y clasificación de SQLState.
 - **ether-json**: Validación y manipulación de JSON.
 - **ether-jwt**: Autenticación basada en JSON Web Tokens.
-- **ether-observability-core**: Primitivas neutrales para request-id, timing y health/readiness.
 - **ether-http-core**: Abstracciones y contratos HTTP base.
-- **ether-http-security**: Políticas reutilizables para CORS, headers, límites y confianza de proxies.
-- **ether-http-problem**: Problem Details estilo RFC 9457 para errores HTTP consistentes.
-- **ether-http-openapi**: Modelo y builder para describir APIs y emitir especificaciones OpenAPI.
-- **ether-http-client**: Cliente HTTP ligero con soporte JSON sobre `java.net.http`.
 - **ether-http-jetty12**: Integración HTTP usando Jetty 12.
-  Actualmente integra `ether-config`, `ether-http-security`, `ether-http-problem` y `ether-observability-core`.
 - **ether-websocket-core**: Contratos y primitivas WebSocket agnósticas al transporte.
 - **ether-websocket-jetty12**: Integración WebSocket usando Jetty 12.
-- **ether-webhook**: Firma, verificación y envío de webhooks sobre `ether-http-client`.
-- **ether-glowroot-jetty12**: Integración de observabilidad Glowroot para la pila Jetty 12.
-
-## Línea de versiones
-
-- El árbol de desarrollo trabaja sobre versiones `*-SNAPSHOT`.
-- Las versiones finales sin `SNAPSHOT` son las que se publican en Maven Central.
-- La línea actual de desarrollo está siendo preparada para `8.0.0-SNAPSHOT`.
-- La estrategia de versionado del hub sigue siendo `independent`: cada módulo puede liberarse por separado, aunque el hub puede iniciar una nueva línea homogénea si se decide.
-
-## Estado actual de integración
-
-- `ether-jwt` depende de `ether-json`.
-- `ether-http-problem` depende de `ether-http-core` y `ether-json`.
-- `ether-http-client` depende de `ether-json`.
-- `ether-webhook` depende de `ether-http-client` y `ether-json`.
-- `ether-jdbc` depende de `ether-database-core`.
-- `ether-database-postgres` depende de `ether-database-core`.
-- `ether-http-jetty12` depende de `ether-config`, `ether-json`, `ether-observability-core`, `ether-http-core`, `ether-http-security` y `ether-http-problem`.
-- `ether-glowroot-jetty12` depende de la pila Jetty HTTP y WebSocket.
 
 ### Cómo compilar y publicar
 
@@ -101,7 +71,7 @@ Este repositorio orquesta el despliegue de módulos de **Ether**, una colección
    <parent>
      <groupId>dev.rafex.ether.parent</groupId>
      <artifactId>ether-parent</artifactId>
-     <version><!-- usa *-SNAPSHOT en desarrollo o una version final publicada --></version>
+     <version><!-- version publicada en Maven Central --></version>
      <relativePath/>
    </parent>
    ```
@@ -110,6 +80,6 @@ Este repositorio orquesta el despliegue de módulos de **Ether**, una colección
    <dependency>
      <groupId>dev.rafex.ether.http</groupId>
      <artifactId>ether-http-core</artifactId>
-     <version><!-- usa *-SNAPSHOT en desarrollo o una version final publicada --></version>
+     <version><!-- version publicada en Maven Central --></version>
    </dependency>
    ```

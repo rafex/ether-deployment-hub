@@ -9,6 +9,42 @@
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.parent/ether-parent"
   },
   {
+    "module": "ether-config",
+    "groupId": "dev.rafex.ether.config",
+    "artifactId": "ether-config",
+    "deployed": false,
+    "latestVersion": "",
+    "lastUpdatedUtc": "",
+    "artifactUrl": "https://central.sonatype.com/search?q=ether-config"
+  },
+  {
+    "module": "ether-database-core",
+    "groupId": "dev.rafex.ether.database",
+    "artifactId": "ether-database-core",
+    "deployed": false,
+    "latestVersion": "",
+    "lastUpdatedUtc": "",
+    "artifactUrl": "https://central.sonatype.com/search?q=ether-database-core"
+  },
+  {
+    "module": "ether-jdbc",
+    "groupId": "dev.rafex.ether.jdbc",
+    "artifactId": "ether-jdbc",
+    "deployed": true,
+    "latestVersion": "2.0-v20210916",
+    "lastUpdatedUtc": "",
+    "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.jdbc/ether-jdbc"
+  },
+  {
+    "module": "ether-database-postgres",
+    "groupId": "dev.rafex.ether.database",
+    "artifactId": "ether-database-postgres",
+    "deployed": false,
+    "latestVersion": "",
+    "lastUpdatedUtc": "",
+    "artifactUrl": "https://central.sonatype.com/search?q=ether-database-postgres"
+  },
+  {
     "module": "ether-json",
     "groupId": "dev.rafex.ether.json",
     "artifactId": "ether-json",
@@ -27,6 +63,15 @@
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.jwt/ether-jwt"
   },
   {
+    "module": "ether-observability-core",
+    "groupId": "dev.rafex.ether.observability",
+    "artifactId": "ether-observability-core",
+    "deployed": false,
+    "latestVersion": "",
+    "lastUpdatedUtc": "",
+    "artifactUrl": "https://central.sonatype.com/search?q=ether-observability-core"
+  },
+  {
     "module": "ether-http-core",
     "groupId": "dev.rafex.ether.http",
     "artifactId": "ether-http-core",
@@ -34,6 +79,42 @@
     "latestVersion": "4.0.2",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.http/ether-http-core"
+  },
+  {
+    "module": "ether-http-security",
+    "groupId": "dev.rafex.ether.http",
+    "artifactId": "ether-http-security",
+    "deployed": false,
+    "latestVersion": "",
+    "lastUpdatedUtc": "",
+    "artifactUrl": "https://central.sonatype.com/search?q=ether-http-security"
+  },
+  {
+    "module": "ether-http-problem",
+    "groupId": "dev.rafex.ether.http",
+    "artifactId": "ether-http-problem",
+    "deployed": false,
+    "latestVersion": "",
+    "lastUpdatedUtc": "",
+    "artifactUrl": "https://central.sonatype.com/search?q=ether-http-problem"
+  },
+  {
+    "module": "ether-http-openapi",
+    "groupId": "dev.rafex.ether.http",
+    "artifactId": "ether-http-openapi",
+    "deployed": false,
+    "latestVersion": "",
+    "lastUpdatedUtc": "",
+    "artifactUrl": "https://central.sonatype.com/search?q=ether-http-openapi"
+  },
+  {
+    "module": "ether-http-client",
+    "groupId": "dev.rafex.ether.http",
+    "artifactId": "ether-http-client",
+    "deployed": false,
+    "latestVersion": "",
+    "lastUpdatedUtc": "",
+    "artifactUrl": "https://central.sonatype.com/search?q=ether-http-client"
   },
   {
     "module": "ether-http-jetty12",
@@ -61,5 +142,23 @@
     "latestVersion": "1.0.1",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.websocket/ether-websocket-jetty12"
+  },
+  {
+    "module": "ether-webhook",
+    "groupId": "dev.rafex.ether.webhook",
+    "artifactId": "ether-webhook",
+    "deployed": false,
+    "latestVersion": "",
+    "lastUpdatedUtc": "",
+    "artifactUrl": "https://central.sonatype.com/search?q=ether-webhook"
+  },
+  {
+    "module": "ether-glowroot-jetty12",
+    "groupId": "dev.rafex.ether.glowroot",
+    "artifactId": "ether-glowroot-jetty12",
+    "deployed": true,
+    "latestVersion": "1.0.1",
+    "lastUpdatedUtc": "",
+    "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.glowroot/ether-glowroot-jetty12"
   }
 ]
