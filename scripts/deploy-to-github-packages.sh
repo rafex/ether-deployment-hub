@@ -3,8 +3,13 @@
 #
 # Reads artifact coordinates from manifest.json and the version from
 # release-plan.json, then uploads the artifacts already installed in the
-# local Maven cache (~/.m2/repository) to GitHub Packages using
-# mvn deploy:deploy-file.
+# local Maven cache (~/.m2/repository) to GitHub Packages.
+#
+# Artifacts are copied to a staging directory outside ~/.m2 before upload
+# (Maven refuses to deploy files that live inside the local repository path).
+# Each artifact (.jar, -sources.jar, -javadoc.jar, .pom) is signed with GPG
+# using mvn gpg:sign-and-deploy-file, which creates detached .asc signatures
+# and uploads them alongside the artifacts.
 #
 # No recompilation is required; artifacts are reused from the Maven Central
 # deploy step that ran earlier in the same CI job.
@@ -16,12 +21,13 @@
 #       <github-packages-url>
 #
 # Environment variables:
-#   GH_PACKAGES_TOKEN   — GitHub token with write:packages permission
-#   GITHUB_ACTOR        — GitHub username (set automatically in Actions)
-#   GH_SETTINGS_FILE    — path to write temp settings.xml (default: /tmp/gh-settings.xml)
+#   GH_PACKAGES_TOKEN     — GitHub token with write:packages permission
+#   GITHUB_ACTOR          — GitHub username (set automatically in Actions)
+#   MAVEN_GPG_PASSPHRASE  — GPG passphrase for signing artifacts
+#   GH_SETTINGS_FILE      — path to write temp settings.xml (default: /tmp/gh-settings.xml)
 #
 # Exit codes:
-#   0 — all modules uploaded successfully
+#   0 — all modules uploaded successfully (or skipped)
 #   1 — one or more modules failed
 
 set -euo pipefail
@@ -42,6 +48,9 @@ if [ ! -f "$MANIFEST_PATH" ]; then
 fi
 if [ -z "${GH_PACKAGES_TOKEN:-}" ]; then
   echo "ERROR: GH_PACKAGES_TOKEN is not set" >&2; exit 1
+fi
+if [ -z "${MAVEN_GPG_PASSPHRASE:-}" ]; then
+  echo "ERROR: MAVEN_GPG_PASSPHRASE is not set — GPG signing is required" >&2; exit 1
 fi
 
 # ── write GitHub-specific settings.xml ───────────────────────────────────────
@@ -118,22 +127,27 @@ deploy_module() {
   [ -f "$staged_sources" ] && extra_args+=("-Dsources=${staged_sources}")
   [ -f "$staged_javadoc" ] && extra_args+=("-Djavadoc=${staged_javadoc}")
 
+  # gpg:sign-and-deploy-file signs every artifact with a detached .asc signature
+  # and uploads both the artifact and its signature in one step.
+  # The passphrase is read from MAVEN_GPG_PASSPHRASE to avoid pinentry prompts.
   if [ -f "$staged_jar" ]; then
-    "$MVN" -B -ntp deploy:deploy-file \
-      -Dfile="$staged_jar"        \
-      -DpomFile="$staged_pom"     \
-      -Durl="$GH_PKG_URL"         \
-      -DrepositoryId=github-ether \
-      "${extra_args[@]}"          \
+    "$MVN" -B -ntp gpg:sign-and-deploy-file \
+      -Dfile="$staged_jar"                        \
+      -DpomFile="$staged_pom"                     \
+      -Durl="$GH_PKG_URL"                         \
+      -DrepositoryId=github-ether                 \
+      -Dgpg.passphrase="${MAVEN_GPG_PASSPHRASE}"  \
+      "${extra_args[@]}"                          \
       --settings "$GH_SETTINGS_FILE"
   else
-    # POM-only (BOM) artifact — deploy staged copy
-    "$MVN" -B -ntp deploy:deploy-file \
-      -Dfile="$staged_pom"        \
-      -DpomFile="$staged_pom"     \
-      -Dpackaging=pom             \
-      -Durl="$GH_PKG_URL"         \
-      -DrepositoryId=github-ether \
+    # POM-only (BOM) artifact — sign and deploy staged copy
+    "$MVN" -B -ntp gpg:sign-and-deploy-file \
+      -Dfile="$staged_pom"                        \
+      -DpomFile="$staged_pom"                     \
+      -Dpackaging=pom                             \
+      -Durl="$GH_PKG_URL"                         \
+      -DrepositoryId=github-ether                 \
+      -Dgpg.passphrase="${MAVEN_GPG_PASSPHRASE}"  \
       --settings "$GH_SETTINGS_FILE"
   fi
 }

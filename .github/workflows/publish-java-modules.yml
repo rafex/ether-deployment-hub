@@ -286,9 +286,10 @@ jobs:
           echo "════════════════════════════════════════════════════════"
 
   # ────────────────────────────────────────────────────────────────────────────
-  # GitHub Packages deploy — runs in parallel with nothing (starts after deploy)
-  # Re-uses pre-built artifacts from ~/.m2 that were installed during the Maven
-  # Central deploy step.  No recompilation; no GPG signing required.
+  # GitHub Packages deploy — starts after Maven Central deploy succeeds.
+  # Re-uses pre-built artifacts from ~/.m2 (installed in the deploy job).
+  # Artifacts are staged outside ~/.m2, signed with GPG (gpg:sign-and-deploy-file)
+  # and uploaded together with their .asc signatures.
   # Packages land at: https://maven.pkg.github.com/rafex/ether-deployment-hub
   # ────────────────────────────────────────────────────────────────────────────
   deploy-github-packages:
@@ -326,6 +327,13 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: maven
+
+      - name: Import GPG private key
+        env:
+          GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
+        run: |
+          echo "$GPG_PRIVATE_KEY_B64" | base64 --decode | gpg --batch --import
+          gpg --list-secret-keys
 
       - name: Build all modules (install to local Maven cache)
         # DEPLOY_PROFILE="" disables the Sonatype Central profile and GPG plugin.
@@ -383,8 +391,9 @@ jobs:
       - name: Deploy all modules to GitHub Packages
         shell: bash
         env:
-          GH_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_ACTOR: ${{ github.actor }}
+          GH_PACKAGES_TOKEN:    ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR:         ${{ github.actor }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
         run: |
           chmod +x ./scripts/deploy-to-github-packages.sh
           echo "Deploying to: https://maven.pkg.github.com/${{ github.repository }}"
