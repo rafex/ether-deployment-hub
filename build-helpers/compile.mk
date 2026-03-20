@@ -1,4 +1,4 @@
-.PHONY: compile validate-main-build install-all \
+.PHONY: compile validate-main-build install-all sync-manifest release-plan validate-release-plan deploy \
         compile-ether-parent compile-ether-config compile-ether-database-core \
         compile-ether-jdbc compile-ether-database-postgres compile-ether-json compile-ether-jwt \
         compile-ether-observability-core \
@@ -215,3 +215,28 @@ install-all:
 	@echo "==> Installing ether-glowroot-jetty12"
 	@$(call install_local_module,ether-glowroot-jetty12)
 	@echo "All modules installed to local Maven repository."
+
+## sync-manifest: synchronize releases/manifest.json against Maven Central
+sync-manifest:
+	@echo "Synchronizing manifest from Maven Central..."
+	@./scripts/sync-manifest-from-central.sh
+
+## release-plan: generate release plan artifacts for BASE_REF..HEAD_REF (defaults handled by script)
+release-plan:
+	@echo "Generating release plan..."
+	@if [ -n "$(BASE_REF)" ] || [ -n "$(HEAD_REF)" ]; then \
+		./scripts/generate-release-plan.sh "$(if $(BASE_REF),$(BASE_REF),)" "$(if $(HEAD_REF),$(HEAD_REF),)"; \
+	else \
+		./scripts/generate-release-plan.sh; \
+	fi
+	@echo "Release plan generated under release-artifacts/."
+
+## validate-release-plan: verify planned versions do not collide in Maven Central
+validate-release-plan:
+	@echo "Validating release plan against Maven Central..."
+	@./scripts/validate-release-plan-against-central.sh
+
+## deploy: prepare hub artifacts and validations before triggering GitHub Actions publish workflow
+deploy: sync-manifest validate-main-build release-plan validate-release-plan
+	@echo "Deploy preparation completed."
+	@echo "Next step: trigger GitHub Actions with 'make publish-ci' or run the Publish Java Modules workflow manually."

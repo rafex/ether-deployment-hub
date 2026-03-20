@@ -14,6 +14,13 @@ The release planner currently:
 - classifies the change as `none`, `patch`, `minor` or `major`
 - propagates dependency-driven releases as `patch`
 - generates a release plan and per-module changelog artifacts
+- validates target versions against Maven Central before publish
+- applies the resulting version plan to module `pom.xml` files
+- updates the internal version catalog in `ether-parent`
+- is consumed by the GitHub Actions publish workflow to deploy to Maven Central in manifest order
 
-The planner does not publish to Maven Central yet. It is meant to make release
-decisions visible before wiring automated deploys.
+## Notes
+
+- `manifest.json` is the source of truth for module ordering, internal dependencies and release propagation.
+- The hub uses `independent` versioning, but the manifest can still be aligned intentionally to start a new major line across many modules.
+- Development should stay on `*-SNAPSHOT`; the release plan removes `SNAPSHOT` only for the version being published.
