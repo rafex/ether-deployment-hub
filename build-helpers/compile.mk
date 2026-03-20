@@ -117,11 +117,15 @@ compile-ether-http-client:
 	@$(call install_local_module,ether-json)
 	@$(call compile_local_module,ether-http-client)
 
-## compile-ether-http-jetty12: install parent+http-core and compile jetty12
+## compile-ether-http-jetty12: install all direct deps and compile jetty12
 compile-ether-http-jetty12:
 	@$(call install_local_module,ether-parent)
+	@$(call install_local_module,ether-config)
 	@$(call install_local_module,ether-json)
+	@$(call install_local_module,ether-observability-core)
 	@$(call install_local_module,ether-http-core)
+	@$(call install_local_module,ether-http-security)
+	@$(call install_local_module,ether-http-problem)
 	@$(call compile_local_module,ether-http-jetty12)
 
 ## compile-ether-websocket-core: install parent and compile websocket-core
@@ -163,13 +167,11 @@ compile: compile-ether-parent compile-ether-config compile-ether-database-core \
          compile-ether-webhook compile-ether-glowroot-jetty12
 	@echo "Compiled all modules in dependency order."
 
-## validate-main-build: replicate CI local compile validations for main
-validate-main-build: compile-ether-parent compile-ether-config compile-ether-database-core \
-                     compile-ether-jdbc compile-ether-database-postgres compile-ether-json compile-ether-jwt \
-                     compile-ether-observability-core compile-ether-http-core compile-ether-http-security \
-                     compile-ether-http-problem compile-ether-http-openapi compile-ether-http-client \
-                     compile-ether-websocket-core compile-ether-http-jetty12 compile-ether-websocket-jetty12 \
-                     compile-ether-webhook compile-ether-glowroot-jetty12
+## validate-main-build: install all modules in strict dependency order (mvn clean install -DskipTests)
+## Uses install-all so each module is available in the local Maven repo before the next one compiles.
+## This avoids dependency resolution failures for inter-module SNAPSHOT dependencies that are not
+## yet published to Maven Central.
+validate-main-build: install-all
 	@echo "Local compile validation completed."
 
 ## install-all: mvn clean install for every module in strict dependency order
