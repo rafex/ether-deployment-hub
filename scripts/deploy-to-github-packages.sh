@@ -100,23 +100,37 @@ deploy_module() {
     return 0   # warn but do not fail; artifact may have been skipped in Central
   fi
 
-  local extra_args=()
-  [ -f "$sources_file" ] && extra_args+=("-Dsources=${sources_file}")
-  [ -f "$javadoc_file" ] && extra_args+=("-Djavadoc=${javadoc_file}")
+  # Maven refuses to deploy:deploy-file from inside the local repository path.
+  # Copy artifacts to a staging area outside ~/.m2 to avoid the restriction:
+  #   "Cannot deploy artifact from the local repository"
+  local stage_dir="${RUNNER_TEMP:-/tmp}/gh-stage/${name}"
+  mkdir -p "$stage_dir"
+  cp "$pom_file" "$stage_dir/"
+  local staged_pom="${stage_dir}/${artifact_id}-${version}.pom"
+  local staged_jar="${stage_dir}/${artifact_id}-${version}.jar"
+  local staged_sources="${stage_dir}/${artifact_id}-${version}-sources.jar"
+  local staged_javadoc="${stage_dir}/${artifact_id}-${version}-javadoc.jar"
+  [ -f "$jar_file" ]     && cp "$jar_file"     "$staged_jar"
+  [ -f "$sources_file" ] && cp "$sources_file" "$staged_sources"
+  [ -f "$javadoc_file" ] && cp "$javadoc_file" "$staged_javadoc"
 
-  if [ -f "$jar_file" ]; then
+  local extra_args=()
+  [ -f "$staged_sources" ] && extra_args+=("-Dsources=${staged_sources}")
+  [ -f "$staged_javadoc" ] && extra_args+=("-Djavadoc=${staged_javadoc}")
+
+  if [ -f "$staged_jar" ]; then
     "$MVN" -B -ntp deploy:deploy-file \
-      -Dfile="$jar_file"          \
-      -DpomFile="$pom_file"       \
+      -Dfile="$staged_jar"        \
+      -DpomFile="$staged_pom"     \
       -Durl="$GH_PKG_URL"         \
       -DrepositoryId=github-ether \
       "${extra_args[@]}"          \
       --settings "$GH_SETTINGS_FILE"
   else
-    # POM-only (BOM) artifact
+    # POM-only (BOM) artifact — deploy staged copy
     "$MVN" -B -ntp deploy:deploy-file \
-      -Dfile="$pom_file"          \
-      -DpomFile="$pom_file"       \
+      -Dfile="$staged_pom"        \
+      -DpomFile="$staged_pom"     \
       -Dpackaging=pom             \
       -Durl="$GH_PKG_URL"         \
       -DrepositoryId=github-ether \
