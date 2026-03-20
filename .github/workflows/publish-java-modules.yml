@@ -27,6 +27,7 @@ env:
 
 permissions:
   contents: write
+  packages: write
 
 jobs:
   release-plan:
@@ -273,10 +274,122 @@ jobs:
           echo "  failed    : $total_fail"
           echo "══════════════════════════════════"
 
+  # ────────────────────────────────────────────────────────────────────────────
+  # GitHub Packages deploy — runs in parallel with nothing (starts after deploy)
+  # Re-uses pre-built artifacts from ~/.m2 that were installed during the Maven
+  # Central deploy step.  No recompilation; no GPG signing required.
+  # Packages land at: https://maven.pkg.github.com/rafex/ether-deployment-hub
+  # ────────────────────────────────────────────────────────────────────────────
+  deploy-github-packages:
+    needs:
+      - release-plan
+      - deploy
+    if: ${{ needs.release-plan.outputs.selected_count != '0' && needs.deploy.result == 'success' && (github.event_name != 'workflow_dispatch' || inputs.run_deploy == true) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Download release plan artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: release-plan
+          path: release-artifacts
+
+      - name: Apply release plan versions to pom files
+        shell: bash
+        run: |
+          chmod +x ./scripts/apply-release-plan.sh
+          ./scripts/apply-release-plan.sh \
+            ./release-artifacts/release-plan.json \
+            ./releases/manifest.json
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Build all modules (install to local Maven cache)
+        # DEPLOY_PROFILE="" disables the Sonatype Central profile and GPG plugin.
+        # maven.deploy.skip=true (derived automatically when DEPLOY_PROFILE is empty)
+        # means mvn runs through the install lifecycle but does NOT deploy remotely.
+        # Artifacts land in ~/.m2/repository for the deploy:deploy-file step below.
+        shell: bash
+        env:
+          MAVEN_OPTS: "-Xmx768m"
+        run: |
+          chmod +x ./scripts/compute-deploy-levels.sh
+          LEVELS_FILE="${RUNNER_TEMP}/deploy-levels.json"
+          ./scripts/compute-deploy-levels.sh ./release-artifacts/release-plan.json \
+            > "$LEVELS_FILE"
+
+          PLAN="./release-artifacts/release-plan.json"
+          ROOT_DIR="$(pwd)"
+          level_count=$(jq '.levels | length' "$LEVELS_FILE")
+
+          for level_idx in $(seq 0 $((level_count - 1))); do
+            mapfile -t level_modules < <(jq -r ".levels[$level_idx][]" "$LEVELS_FILE")
+            echo "=== Build Level $level_idx: ${level_modules[*]} ==="
+            pids=()
+
+            for module in "${level_modules[@]}"; do
+              release_level=$(jq -r --arg m "$module" \
+                '.modules[] | select(.name == $m) | .releaseLevel' "$PLAN")
+              [ "$release_level" = "none" ] && continue
+
+              module_path=$(jq -r --arg m "$module" \
+                '.modules[] | select(.name == $m) | .path' "$PLAN")
+              next_version=$(jq -r --arg m "$module" \
+                '.modules[] | select(.name == $m) | .nextVersion' "$PLAN")
+
+              (
+                cd "$ROOT_DIR/$module_path"
+                # DEPLOY_PROFILE="" → no Sonatype/GPG profile activated
+                # MAVEN_DEPLOY_SKIP is set to true automatically (see common.mk)
+                make deploy                          \
+                  VERSION="$next_version"            \
+                  FORCE_EXACT_VERSION=true           \
+                  SYNC_FROM_REPO=false               \
+                  SKIP_TESTS=true                    \
+                  AUTO_UPDATE_LICENSE_HEADERS=false  \
+                  DEPLOY_PROFILE=""
+              ) >"${RUNNER_TEMP}/build-${module}.log" 2>&1 &
+              pids+=($!)
+            done
+
+            # Wait for all parallel builds in this level before moving to next
+            for pid in "${pids[@]}"; do wait "$pid" || true; done
+            echo "  Level $level_idx built ✓"
+          done
+
+      - name: Deploy all modules to GitHub Packages
+        shell: bash
+        env:
+          GH_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
+        run: |
+          chmod +x ./scripts/deploy-to-github-packages.sh
+          echo "Deploying to: https://maven.pkg.github.com/${{ github.repository }}"
+          ./scripts/deploy-to-github-packages.sh \
+            ./release-artifacts/release-plan.json \
+            ./releases/manifest.json              \
+            "https://maven.pkg.github.com/${{ github.repository }}"
+
+  # ────────────────────────────────────────────────────────────────────────────
+  # Update manifest — waits for both Maven Central and GitHub Packages deploys
+  # ────────────────────────────────────────────────────────────────────────────
   update-manifest:
     needs:
       - release-plan
       - deploy
+      - deploy-github-packages
     if: ${{ needs.release-plan.outputs.selected_count != '0' && needs.deploy.result == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -299,7 +412,9 @@ jobs:
         shell: bash
         run: |
           chmod +x ./scripts/update-manifest-from-plan.sh
-          ./scripts/update-manifest-from-plan.sh ./release-artifacts/release-plan.json ./releases/manifest.json
+          ./scripts/update-manifest-from-plan.sh \
+            ./release-artifacts/release-plan.json \
+            ./releases/manifest.json
 
       - name: Commit and push manifest updates if changed
         shell: bash
