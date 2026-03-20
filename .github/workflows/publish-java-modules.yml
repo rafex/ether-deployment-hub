@@ -185,9 +185,8 @@ jobs:
           mkdir -p "$LOG_DIR"
 
           level_count=$(jq '.levels | length' "$LEVELS_FILE")
-          total_ok=0
-          total_skip=0
-          total_fail=0
+          total_ok=0; total_skip=0; total_fail=0
+          ok_modules=(); skip_modules=(); fail_modules=()
 
           for level_idx in $(seq 0 $((level_count - 1))); do
             # ── collect modules for this level ─────────────────────────────
@@ -200,12 +199,15 @@ jobs:
             pids=()
             log_files=()
             deployed_modules=()
+            deployed_versions=()
 
             for module in "${level_modules[@]}"; do
               release_level=$(jq -r --arg m "$module" \
                 '.modules[] | select(.name == $m) | .releaseLevel' "$PLAN")
               if [ "$release_level" = "none" ]; then
                 echo "  [SKIP] $module (releaseLevel=none)"
+                skip_modules+=("$module (releaseLevel=none)")
+                (( total_skip++ )) || true
                 continue
               fi
 
@@ -229,28 +231,33 @@ jobs:
               pids+=($!)
               log_files+=("$log_file")
               deployed_modules+=("$module")
+              deployed_versions+=("$next_version")
             done
 
             # ── wait for every background process in this level ───────────
             level_failed=false
             for i in "${!pids[@]}"; do
               module="${deployed_modules[$i]}"
+              version="${deployed_versions[$i]}"
               log_file="${log_files[$i]}"
 
               if wait "${pids[$i]}"; then
-                echo "  [OK]   $module"
+                echo "  [OK]   $module ($version)"
+                ok_modules+=("$module ($version)")
                 (( total_ok++ )) || true
               else
                 if grep -Eq \
                   "already exists|Component with package url:.*already exists" \
                   "$log_file" 2>/dev/null; then
-                  echo "  [SKIP] $module — already published in Sonatype Central"
+                  echo "  [SKIP] $module ($version) — already published in Sonatype Central"
+                  skip_modules+=("$module ($version) — already in Central")
                   (( total_skip++ )) || true
                 else
-                  echo "  [FAIL] $module — see log below"
+                  echo "  [FAIL] $module ($version) — see log below"
                   echo "──── $log_file ────"
                   cat "$log_file"
                   echo "────────────────────"
+                  fail_modules+=("$module ($version)")
                   level_failed=true
                   (( total_fail++ )) || true
                 fi
@@ -267,12 +274,16 @@ jobs:
           done
 
           echo ""
-          echo "══════════════════════════════════"
-          echo " Deploy summary"
-          echo "  published : $total_ok"
-          echo "  skipped   : $total_skip"
-          echo "  failed    : $total_fail"
-          echo "══════════════════════════════════"
+          echo "════════════════════════════════════════════════════════"
+          echo " Maven Central — Deploy summary"
+          echo "════════════════════════════════════════════════════════"
+          echo " ✅ published : $total_ok"
+          for m in "${ok_modules[@]}";   do echo "      • $m"; done
+          echo " ⏭  skipped   : $total_skip"
+          for m in "${skip_modules[@]}"; do echo "      • $m"; done
+          echo " ❌ failed    : $total_fail"
+          for m in "${fail_modules[@]}"; do echo "      • $m"; done
+          echo "════════════════════════════════════════════════════════"
 
   # ────────────────────────────────────────────────────────────────────────────
   # GitHub Packages deploy — runs in parallel with nothing (starts after deploy)

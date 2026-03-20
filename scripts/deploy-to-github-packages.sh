@@ -177,28 +177,47 @@ done < <(jq -c '.modules[]' "$PLAN_PATH")
 
 # ── collect results ───────────────────────────────────────────────────────────
 any_failed=false
+total_ok=0; total_skip=0; total_fail=0
+ok_modules=(); skip_modules=(); fail_modules=()
+
 for i in "${!pids[@]}"; do
   module="${names[$i]}"
   log_file="${log_files[$i]}"
 
   if wait "${pids[$i]}"; then
     echo "  [GH OK]   $module"
+    ok_modules+=("$module")
+    (( total_ok++ )) || true
   else
     if grep -Eq "already exists|409|Conflict" "$log_file" 2>/dev/null; then
       echo "  [GH SKIP] $module — already exists in GitHub Packages"
+      skip_modules+=("$module — already in GitHub Packages")
+      (( total_skip++ )) || true
     else
       echo "  [GH FAIL] $module"
       echo "──── $log_file ────"
       cat "$log_file"
       echo "────────────────────"
+      fail_modules+=("$module")
+      (( total_fail++ )) || true
       any_failed=true
     fi
   fi
 done
 
+echo ""
+echo "════════════════════════════════════════════════════════"
+echo " GitHub Packages — Deploy summary"
+echo "════════════════════════════════════════════════════════"
+echo " ✅ published : $total_ok"
+for m in "${ok_modules[@]}";   do echo "      • $m"; done
+echo " ⏭  skipped   : $total_skip"
+for m in "${skip_modules[@]}"; do echo "      • $m"; done
+echo " ❌ failed    : $total_fail"
+for m in "${fail_modules[@]}"; do echo "      • $m"; done
+echo "════════════════════════════════════════════════════════"
+
 if $any_failed; then
   echo "ERROR: One or more modules failed to deploy to GitHub Packages" >&2
   exit 1
 fi
-
-echo "GitHub Packages deploy complete ✓"
