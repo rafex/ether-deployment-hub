@@ -117,6 +117,42 @@
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.http/ether-http-client"
   },
   {
+    "module": "ether-logging-core",
+    "groupId": "dev.rafex.ether.logging",
+    "artifactId": "ether-logging-core",
+    "deployed": false,
+    "latestVersion": "",
+    "lastUpdatedUtc": "",
+    "artifactUrl": "https://central.sonatype.com/search?q=ether-logging-core"
+  },
+  {
+    "module": "ether-ai-core",
+    "groupId": "dev.rafex.ether.ai",
+    "artifactId": "ether-ai-core",
+    "deployed": false,
+    "latestVersion": "",
+    "lastUpdatedUtc": "",
+    "artifactUrl": "https://central.sonatype.com/search?q=ether-ai-core"
+  },
+  {
+    "module": "ether-ai-openai",
+    "groupId": "dev.rafex.ether.ai",
+    "artifactId": "ether-ai-openai",
+    "deployed": false,
+    "latestVersion": "",
+    "lastUpdatedUtc": "",
+    "artifactUrl": "https://central.sonatype.com/search?q=ether-ai-openai"
+  },
+  {
+    "module": "ether-ai-deepseek",
+    "groupId": "dev.rafex.ether.ai",
+    "artifactId": "ether-ai-deepseek",
+    "deployed": false,
+    "latestVersion": "",
+    "lastUpdatedUtc": "",
+    "artifactUrl": "https://central.sonatype.com/search?q=ether-ai-deepseek"
+  },
+  {
     "module": "ether-http-jetty12",
     "groupId": "dev.rafex.ether.http",
     "artifactId": "ether-http-jetty12",
