@@ -21,8 +21,8 @@
 | ether-http-problem | ![ether-http-problem](https://img.shields.io/maven-central/v/dev.rafex.ether.http/ether-http-problem) | dev.rafex.ether.http | ether-http-problem | si |
 | ether-http-openapi | ![ether-http-openapi](https://img.shields.io/maven-central/v/dev.rafex.ether.http/ether-http-openapi) | dev.rafex.ether.http | ether-http-openapi | si |
 | ether-http-client | ![ether-http-client](https://img.shields.io/maven-central/v/dev.rafex.ether.http/ether-http-client) | dev.rafex.ether.http | ether-http-client | si |
-| ether-logging-core | ![ether-logging-core](https://img.shields.io/maven-central/v/dev.rafex.ether.logging/ether-logging-core) | dev.rafex.ether.logging | ether-logging-core | no |
-| ether-ai-core | ![ether-ai-core](https://img.shields.io/maven-central/v/dev.rafex.ether.ai/ether-ai-core) | dev.rafex.ether.ai | ether-ai-core | no |
+| ether-logging-core | ![ether-logging-core](https://img.shields.io/maven-central/v/dev.rafex.ether.logging/ether-logging-core) | dev.rafex.ether.logging | ether-logging-core | si |
+| ether-ai-core | ![ether-ai-core](https://img.shields.io/maven-central/v/dev.rafex.ether.ai/ether-ai-core) | dev.rafex.ether.ai | ether-ai-core | si |
 | ether-ai-openai | ![ether-ai-openai](https://img.shields.io/maven-central/v/dev.rafex.ether.ai/ether-ai-openai) | dev.rafex.ether.ai | ether-ai-openai | no |
 | ether-ai-deepseek | ![ether-ai-deepseek](https://img.shields.io/maven-central/v/dev.rafex.ether.ai/ether-ai-deepseek) | dev.rafex.ether.ai | ether-ai-deepseek | no |
 | ether-http-jetty12 | ![ether-http-jetty12](https://img.shields.io/maven-central/v/dev.rafex.ether.http/ether-http-jetty12) | dev.rafex.ether.http | ether-http-jetty12 | si |

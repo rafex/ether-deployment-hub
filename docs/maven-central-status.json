@@ -120,19 +120,19 @@
     "module": "ether-logging-core",
     "groupId": "dev.rafex.ether.logging",
     "artifactId": "ether-logging-core",
-    "deployed": false,
-    "latestVersion": "",
+    "deployed": true,
+    "latestVersion": "8.0.0",
     "lastUpdatedUtc": "",
-    "artifactUrl": "https://central.sonatype.com/search?q=ether-logging-core"
+    "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.logging/ether-logging-core"
   },
   {
     "module": "ether-ai-core",
     "groupId": "dev.rafex.ether.ai",
     "artifactId": "ether-ai-core",
-    "deployed": false,
-    "latestVersion": "",
+    "deployed": true,
+    "latestVersion": "8.0.0",
     "lastUpdatedUtc": "",
-    "artifactUrl": "https://central.sonatype.com/search?q=ether-ai-core"
+    "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.ai/ether-ai-core"
   },
   {
     "module": "ether-ai-openai",
