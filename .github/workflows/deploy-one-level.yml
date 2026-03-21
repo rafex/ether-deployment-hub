@@ -75,7 +75,7 @@ jobs:
           echo "$GPG_PRIVATE_KEY_B64" | base64 --decode | gpg --batch --import
           gpg --list-secret-keys
 
-      - name: Deploy level ${{ inputs.level_index }} modules in parallel
+      - name: Deploy level ${{ inputs.level_index }} modules
         shell: bash
         env:
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
@@ -93,13 +93,11 @@ jobs:
           mapfile -t level_modules < <(echo "$LEVEL_MODULES_JSON" | jq -r '.[]')
 
           echo "════════════════════════════════════════════════════════"
-          echo " Level ${{ inputs.level_index }} — ${#level_modules[@]} module(s) deploying in parallel"
+          echo " Level ${{ inputs.level_index }} — ${#level_modules[@]} module(s) deploying sequentially"
           echo "════════════════════════════════════════════════════════"
 
-          pids=()
-          log_files=()
-          deployed_modules=()
-          deployed_versions=()
+          ok_modules=(); skip_modules=(); fail_modules=()
+          level_failed=false
 
           for module in "${level_modules[@]}"; do
             release_level=$(jq -r --arg m "$module" \
@@ -116,7 +114,7 @@ jobs:
             log_file="$LOG_DIR/deploy-${module}.log"
 
             echo "  [START] $module ($next_version)"
-            (
+            if (
               cd "$ROOT_DIR/$module_path"
               make deploy \
                 VERSION="$next_version" \
@@ -124,37 +122,21 @@ jobs:
                 SYNC_FROM_REPO=false \
                 SKIP_TESTS=false \
                 AUTO_UPDATE_LICENSE_HEADERS=true
-            ) >"$log_file" 2>&1 &
-
-            pids+=($!)
-            log_files+=("$log_file")
-            deployed_modules+=("$module")
-            deployed_versions+=("$next_version")
-          done
-
-          ok_modules=(); skip_modules=(); fail_modules=()
-          level_failed=false
-
-          for i in "${!pids[@]}"; do
-            module="${deployed_modules[$i]}"
-            version="${deployed_versions[$i]}"
-            log_file="${log_files[$i]}"
-
-            if wait "${pids[$i]}"; then
-              echo "  [OK]   $module ($version)"
-              ok_modules+=("$module ($version)")
+            ) >"$log_file" 2>&1; then
+              echo "  [OK]   $module ($next_version)"
+              ok_modules+=("$module ($next_version)")
             else
               if grep -Eq \
                 "already exists|Component with package url:.*already exists" \
                 "$log_file" 2>/dev/null; then
-                echo "  [SKIP] $module ($version) — already published in Sonatype Central"
-                skip_modules+=("$module ($version)")
+                echo "  [SKIP] $module ($next_version) — already published in Sonatype Central"
+                skip_modules+=("$module ($next_version)")
               else
-                echo "  [FAIL] $module ($version)"
+                echo "  [FAIL] $module ($next_version)"
                 echo "──── $log_file ────"
                 cat "$log_file"
                 echo "────────────────────"
-                fail_modules+=("$module ($version)")
+                fail_modules+=("$module ($next_version)")
                 level_failed=true
               fi
             fi
