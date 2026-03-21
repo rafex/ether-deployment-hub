@@ -16,6 +16,10 @@
     "ether-http-problem",
     "ether-http-openapi",
     "ether-http-client",
+    "ether-logging-core",
+    "ether-ai-core",
+    "ether-ai-openai",
+    "ether-ai-deepseek",
     "ether-websocket-core",
     "ether-http-jetty12",
     "ether-websocket-jetty12",
@@ -253,6 +257,80 @@
       ],
       "internalDependencyProperties": {
         "ether-json": "ether-json.version"
+      },
+      "dependencyReleaseImpact": "patch"
+    },
+    {
+      "name": "ether-logging-core",
+      "path": "ether-logging-core",
+      "projectDir": "ether-logging-core/ether-logging-core",
+      "pomPath": "ether-logging-core/ether-logging-core/pom.xml",
+      "groupId": "dev.rafex.ether.logging",
+      "artifactId": "ether-logging-core",
+      "currentVersion": "0.1.0",
+      "published": false,
+      "usesParent": true,
+      "dependencies": [
+        "ether-parent"
+      ],
+      "internalDependencyProperties": {},
+      "dependencyReleaseImpact": "patch"
+    },
+    {
+      "name": "ether-ai-core",
+      "path": "ether-ai-core",
+      "projectDir": "ether-ai-core/ether-ai-core",
+      "pomPath": "ether-ai-core/ether-ai-core/pom.xml",
+      "groupId": "dev.rafex.ether.ai",
+      "artifactId": "ether-ai-core",
+      "currentVersion": "0.1.0",
+      "published": false,
+      "usesParent": true,
+      "dependencies": [
+        "ether-parent"
+      ],
+      "internalDependencyProperties": {},
+      "dependencyReleaseImpact": "patch"
+    },
+    {
+      "name": "ether-ai-openai",
+      "path": "ether-ai-openai",
+      "projectDir": "ether-ai-openai/ether-ai-openai",
+      "pomPath": "ether-ai-openai/ether-ai-openai/pom.xml",
+      "groupId": "dev.rafex.ether.ai",
+      "artifactId": "ether-ai-openai",
+      "currentVersion": "0.1.0",
+      "published": false,
+      "usesParent": true,
+      "dependencies": [
+        "ether-parent",
+        "ether-json",
+        "ether-ai-core"
+      ],
+      "internalDependencyProperties": {
+        "ether-json": "ether-json.version",
+        "ether-ai-core": "ether-ai-core.version"
+      },
+      "dependencyReleaseImpact": "patch"
+    },
+    {
+      "name": "ether-ai-deepseek",
+      "path": "ether-ai-deepseek",
+      "projectDir": "ether-ai-deepseek/ether-ai-deepseek",
+      "pomPath": "ether-ai-deepseek/ether-ai-deepseek/pom.xml",
+      "groupId": "dev.rafex.ether.ai",
+      "artifactId": "ether-ai-deepseek",
+      "currentVersion": "0.1.0",
+      "published": false,
+      "usesParent": true,
+      "dependencies": [
+        "ether-parent",
+        "ether-json",
+        "ether-ai-core"
+      ],
+      "internalDependencyProperties": {
+        "ether-json": "ether-json.version",
+        "ether-ai-core": "ether-ai-core.version"
       },
       "dependencyReleaseImpact": "patch"
     },

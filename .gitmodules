@@ -33,24 +33,31 @@
 [submodule "ether-config"]
 	path = ether-config
 	url = git@github.com:rafex/ether-config.git
+	branch = main
 [submodule "ether-http-security"]
 	path = ether-http-security
 	url = git@github.com:rafex/ether-http-security.git
+	branch = main
 [submodule "ether-webhook"]
 	path = ether-webhook
 	url = git@github.com:rafex/ether-webhook.git
+	branch = main
 [submodule "ether-http-client"]
 	path = ether-http-client
 	url = git@github.com:rafex/ether-http-client.git
+	branch = main
 [submodule "ether-http-problem"]
 	path = ether-http-problem
 	url = git@github.com:rafex/ether-http-problem.git
+	branch = main
 [submodule "ether-observability-core"]
 	path = ether-observability-core
 	url = git@github.com:rafex/ether-observability-core.git
+	branch = main
 [submodule "ether-http-openapi"]
 	path = ether-http-openapi
 	url = git@github.com:rafex/ether-http-openapi.git
+	branch = main
 [submodule "ether-database-core"]
 	path = ether-database-core
 	url = git@github.com:rafex/ether-database-core.git
@@ -66,9 +73,16 @@
 [submodule "ether-ai-core"]
 	path = ether-ai-core
 	url = git@github.com:rafex/ether-ai-core.git
+	branch = main
 [submodule "ether-ai-openai"]
 	path = ether-ai-openai
 	url = git@github.com:rafex/ether-ai-openai.git
+	branch = main
 [submodule "ether-ai-deepseek"]
 	path = ether-ai-deepseek
 	url = git@github.com:rafex/ether-ai-deepseek.git
+	branch = main
+[submodule "ether-logging-core"]
+	path = ether-logging-core
+	url = git@github.com:rafex/ether-logging-core.git
+	branch = main
