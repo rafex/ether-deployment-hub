@@ -1,7 +1,8 @@
 .PHONY: compile validate-main-build install-all sync-manifest release-plan validate-release-plan deploy \
         compile-ether-parent compile-ether-config compile-ether-database-core \
         compile-ether-jdbc compile-ether-database-postgres compile-ether-json compile-ether-jwt \
-        compile-ether-observability-core \
+        compile-ether-observability-core compile-ether-logging-core compile-ether-ai-core \
+        compile-ether-ai-openai compile-ether-ai-deepseek \
         compile-ether-http-core compile-ether-http-jetty12 \
         compile-ether-http-security compile-ether-http-problem \
         compile-ether-http-openapi compile-ether-http-client \
@@ -88,6 +89,30 @@ compile-ether-observability-core:
 	@$(call install_local_module,ether-parent)
 	@$(call compile_local_module,ether-observability-core)
 
+## compile-ether-logging-core: install parent and compile logging-core
+compile-ether-logging-core:
+	@$(call install_local_module,ether-parent)
+	@$(call compile_local_module,ether-logging-core)
+
+## compile-ether-ai-core: install parent and compile ai-core
+compile-ether-ai-core:
+	@$(call install_local_module,ether-parent)
+	@$(call compile_local_module,ether-ai-core)
+
+## compile-ether-ai-openai: install parent+json+ai-core and compile ai-openai
+compile-ether-ai-openai:
+	@$(call install_local_module,ether-parent)
+	@$(call install_local_module,ether-json)
+	@$(call install_local_module,ether-ai-core)
+	@$(call compile_local_module,ether-ai-openai)
+
+## compile-ether-ai-deepseek: install parent+json+ai-core and compile ai-deepseek
+compile-ether-ai-deepseek:
+	@$(call install_local_module,ether-parent)
+	@$(call install_local_module,ether-json)
+	@$(call install_local_module,ether-ai-core)
+	@$(call compile_local_module,ether-ai-deepseek)
+
 ## compile-ether-http-core: install parent and compile http-core
 compile-ether-http-core:
 	@$(call install_local_module,ether-parent)
@@ -163,6 +188,7 @@ compile: compile-ether-parent compile-ether-config compile-ether-database-core \
          compile-ether-jdbc compile-ether-database-postgres compile-ether-json compile-ether-jwt \
          compile-ether-observability-core compile-ether-http-core compile-ether-http-security \
          compile-ether-http-problem compile-ether-http-openapi compile-ether-http-client \
+         compile-ether-logging-core compile-ether-ai-core compile-ether-ai-openai compile-ether-ai-deepseek \
          compile-ether-websocket-core compile-ether-http-jetty12 compile-ether-websocket-jetty12 \
          compile-ether-webhook compile-ether-glowroot-jetty12
 	@echo "Compiled all modules in dependency order."
@@ -176,7 +202,8 @@ validate-main-build: install-all
 
 ## install-all: mvn clean install for every module in strict dependency order
 ## Order: parent → config → database-core → jdbc → database-postgres → json → jwt → observability-core → http-core
-##        → http-security → http-problem → http-openapi → http-client
+##        → http-security → http-problem → http-openapi → http-client → logging-core
+##        → ai-core → ai-openai → ai-deepseek
 ##        → websocket-core → http-jetty12 → websocket-jetty12 → webhook
 ##        → glowroot-jetty12
 install-all:
@@ -206,6 +233,14 @@ install-all:
 	@$(call install_local_module,ether-http-openapi)
 	@echo "==> Installing ether-http-client"
 	@$(call install_local_module,ether-http-client)
+	@echo "==> Installing ether-logging-core"
+	@$(call install_local_module,ether-logging-core)
+	@echo "==> Installing ether-ai-core"
+	@$(call install_local_module,ether-ai-core)
+	@echo "==> Installing ether-ai-openai"
+	@$(call install_local_module,ether-ai-openai)
+	@echo "==> Installing ether-ai-deepseek"
+	@$(call install_local_module,ether-ai-deepseek)
 	@echo "==> Installing ether-websocket-core"
 	@$(call install_local_module,ether-websocket-core)
 	@echo "==> Installing ether-http-jetty12"
