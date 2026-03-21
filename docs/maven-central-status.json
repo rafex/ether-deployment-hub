@@ -31,7 +31,7 @@
     "groupId": "dev.rafex.ether.jdbc",
     "artifactId": "ether-jdbc",
     "deployed": true,
-    "latestVersion": "8.0.5",
+    "latestVersion": "8.1.0",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.jdbc/ether-jdbc"
   },
@@ -40,7 +40,7 @@
     "groupId": "dev.rafex.ether.database",
     "artifactId": "ether-database-postgres",
     "deployed": true,
-    "latestVersion": "8.0.5",
+    "latestVersion": "8.1.0",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.database/ether-database-postgres"
   },
@@ -58,7 +58,7 @@
     "groupId": "dev.rafex.ether.jwt",
     "artifactId": "ether-jwt",
     "deployed": true,
-    "latestVersion": "8.0.5",
+    "latestVersion": "8.1.0",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.jwt/ether-jwt"
   },
@@ -67,7 +67,7 @@
     "groupId": "dev.rafex.ether.observability",
     "artifactId": "ether-observability-core",
     "deployed": true,
-    "latestVersion": "8.0.5",
+    "latestVersion": "8.1.0",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.observability/ether-observability-core"
   },
@@ -94,7 +94,7 @@
     "groupId": "dev.rafex.ether.http",
     "artifactId": "ether-http-problem",
     "deployed": true,
-    "latestVersion": "8.0.4",
+    "latestVersion": "8.1.0",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.http/ether-http-problem"
   },
@@ -103,7 +103,7 @@
     "groupId": "dev.rafex.ether.http",
     "artifactId": "ether-http-openapi",
     "deployed": true,
-    "latestVersion": "8.0.4",
+    "latestVersion": "8.1.0",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.http/ether-http-openapi"
   },
@@ -112,7 +112,7 @@
     "groupId": "dev.rafex.ether.http",
     "artifactId": "ether-http-client",
     "deployed": true,
-    "latestVersion": "8.0.4",
+    "latestVersion": "8.1.0",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.http/ether-http-client"
   },
@@ -121,7 +121,7 @@
     "groupId": "dev.rafex.ether.logging",
     "artifactId": "ether-logging-core",
     "deployed": true,
-    "latestVersion": "8.0.0",
+    "latestVersion": "8.1.0",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.logging/ether-logging-core"
   },
@@ -138,26 +138,26 @@
     "module": "ether-ai-openai",
     "groupId": "dev.rafex.ether.ai",
     "artifactId": "ether-ai-openai",
-    "deployed": false,
-    "latestVersion": "",
+    "deployed": true,
+    "latestVersion": "8.1.0",
     "lastUpdatedUtc": "",
-    "artifactUrl": "https://central.sonatype.com/search?q=ether-ai-openai"
+    "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.ai/ether-ai-openai"
   },
   {
     "module": "ether-ai-deepseek",
     "groupId": "dev.rafex.ether.ai",
     "artifactId": "ether-ai-deepseek",
-    "deployed": false,
-    "latestVersion": "",
+    "deployed": true,
+    "latestVersion": "8.1.0",
     "lastUpdatedUtc": "",
-    "artifactUrl": "https://central.sonatype.com/search?q=ether-ai-deepseek"
+    "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.ai/ether-ai-deepseek"
   },
   {
     "module": "ether-http-jetty12",
     "groupId": "dev.rafex.ether.http",
     "artifactId": "ether-http-jetty12",
     "deployed": true,
-    "latestVersion": "8.0.3",
+    "latestVersion": "8.1.0",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.http/ether-http-jetty12"
   },
@@ -166,7 +166,7 @@
     "groupId": "dev.rafex.ether.websocket",
     "artifactId": "ether-websocket-core",
     "deployed": true,
-    "latestVersion": "8.0.5",
+    "latestVersion": "8.1.0",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.websocket/ether-websocket-core"
   },
@@ -175,7 +175,7 @@
     "groupId": "dev.rafex.ether.websocket",
     "artifactId": "ether-websocket-jetty12",
     "deployed": true,
-    "latestVersion": "8.0.4",
+    "latestVersion": "8.1.0",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.websocket/ether-websocket-jetty12"
   },
@@ -184,7 +184,7 @@
     "groupId": "dev.rafex.ether.webhook",
     "artifactId": "ether-webhook",
     "deployed": true,
-    "latestVersion": "8.0.3",
+    "latestVersion": "8.1.0",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.webhook/ether-webhook"
   },
@@ -193,7 +193,7 @@
     "groupId": "dev.rafex.ether.glowroot",
     "artifactId": "ether-glowroot-jetty12",
     "deployed": true,
-    "latestVersion": "8.0.3",
+    "latestVersion": "8.1.0",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.glowroot/ether-glowroot-jetty12"
   }
