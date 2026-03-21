@@ -38,6 +38,19 @@ PRE_DEPLOY_GOALS ?= source:jar javadoc:jar
 # Directory containing the Maven module to build/deploy
 PROJECT_DIR ?= ether-parent
 
+# Helper function to find and execute mvnw
+define run_mvnw
+	@# Check if mvnw exists in PROJECT_DIR, if not try PROJECT_DIR/PROJECT_DIR
+	@if [ -f "$(PROJECT_DIR)/mvnw" ]; then \
+		cd $(PROJECT_DIR) && ./mvnw $(1); \
+	elif [ -f "$(PROJECT_DIR)/$(notdir $(PROJECT_DIR))/mvnw" ]; then \
+		cd $(PROJECT_DIR)/$(notdir $(PROJECT_DIR)) && ./mvnw $(1); \
+	else \
+		echo "Error: mvnw not found in $(PROJECT_DIR) or $(PROJECT_DIR)/$(notdir $(PROJECT_DIR))"; \
+		exit 1; \
+	fi
+endef
+
 # Coordinates for Maven Central existence check
 PROJECT_GROUP_ID    ?= dev.rafex.ether.parent
 PROJECT_ARTIFACT_ID ?= ether-parent
@@ -116,13 +129,13 @@ write-settings:
 ## set-version: update project version in POM based on Git tag (in $(PROJECT_DIR))
 set-version:
 	@echo "Setting project version to $(FINAL_VERSION)..."
-	cd $(PROJECT_DIR) && ./mvnw versions:set -DnewVersion=$(FINAL_VERSION) -DgenerateBackupPoms=true
+	$(call run_mvnw,versions:set -DnewVersion=$(FINAL_VERSION) -DgenerateBackupPoms=true)
 
 ## update-license-headers: add missing license headers in Java sources/tests when enabled
 update-license-headers:
 	@if [ "$(AUTO_UPDATE_LICENSE_HEADERS)" = "true" ]; then \
 		echo "Updating missing license headers..."; \
-		cd $(PROJECT_DIR) && ./mvnw -B -ntp license:update-file-header; \
+		$(call run_mvnw,-B -ntp license:update-file-header); \
 	else \
 		echo "Skipping license header update (AUTO_UPDATE_LICENSE_HEADERS=$(AUTO_UPDATE_LICENSE_HEADERS))"; \
 	fi
@@ -134,7 +147,15 @@ sync-pom-versions:
 		exit 0; \
 	fi
 	@echo "Syncing parent/dependency versions from $(VERSION_SOURCE_REPO)..."
-	@project_pom="$(PROJECT_DIR)/pom.xml"; \
+	@# First, find the actual pom.xml location
+	@if [ -f "$(PROJECT_DIR)/pom.xml" ]; then \
+		project_pom="$(PROJECT_DIR)/pom.xml"; \
+	elif [ -f "$(PROJECT_DIR)/$(notdir $(PROJECT_DIR))/pom.xml" ]; then \
+		project_pom="$(PROJECT_DIR)/$(notdir $(PROJECT_DIR))/pom.xml"; \
+	else \
+		echo "Error: pom.xml not found in $(PROJECT_DIR) or $(PROJECT_DIR)/$(notdir $(PROJECT_DIR))"; \
+		exit 1; \
+	fi; \
 	repo_url="$(VERSION_SOURCE_REPO)"; \
 	if [ -n "$(PARENT_COORD)" ]; then \
 		parent_group_id="$(word 1,$(subst :, ,$(PARENT_COORD)))"; \
@@ -142,7 +163,7 @@ sync-pom-versions:
 		if grep -q "<parent>" "$$project_pom" && grep -q "<groupId>$$parent_group_id</groupId>" "$$project_pom" && grep -q "<artifactId>$$parent_artifact_id</artifactId>" "$$project_pom"; then \
 			if parent_version="$$(./scripts/latest-maven-version.sh "$$repo_url" "$$parent_group_id" "$$parent_artifact_id" 2>/dev/null)"; then \
 				echo "Updating parent $$parent_group_id:$$parent_artifact_id -> $$parent_version"; \
-				cd $(PROJECT_DIR) && ./mvnw -B -ntp versions:update-parent -DparentVersion="[$$parent_version]" -DallowSnapshots=false -DgenerateBackupPoms=true; \
+				$(call run_mvnw,-B -ntp versions:update-parent -DparentVersion="[$$parent_version]" -DallowSnapshots=false -DgenerateBackupPoms=true); \
 			else \
 				echo "Skipping parent sync for $$parent_group_id:$$parent_artifact_id (not found in $$repo_url)"; \
 			fi; \
@@ -155,7 +176,7 @@ sync-pom-versions:
 		dep_artifact_id="$${coord##*:}"; \
 		if dep_version="$$(./scripts/latest-maven-version.sh "$$repo_url" "$$dep_group_id" "$$dep_artifact_id" 2>/dev/null)"; then \
 			echo "Updating property $$prop_name -> $$dep_version ($$dep_group_id:$$dep_artifact_id)"; \
-			cd $(PROJECT_DIR) && ./mvnw -B -ntp versions:set-property -Dproperty="$$prop_name" -DnewVersion="$$dep_version" -DgenerateBackupPoms=true; \
+			$(call run_mvnw,-B -ntp versions:set-property -Dproperty="$$prop_name" -DnewVersion="$$dep_version" -DgenerateBackupPoms=true); \
 		else \
 			echo "Skipping property $$prop_name (artifact $$dep_group_id:$$dep_artifact_id not found in $$repo_url)"; \
 		fi; \
@@ -164,14 +185,14 @@ sync-pom-versions:
 ## build: update version and compile+test project (in $(PROJECT_DIR))
 build: sync-pom-versions set-version
 	@echo "Building project version $(FINAL_VERSION)..."
-	cd $(PROJECT_DIR) && ./mvnw clean verify
+	$(call run_mvnw,clean verify)
 
 ## deploy: write settings and set version, then deploy using profile $(DEPLOY_PROFILE) (in $(PROJECT_DIR))
 deploy: write-settings sync-pom-versions set-version update-license-headers
 	@echo "Deploying version $(FINAL_VERSION)..."
-	cd $(PROJECT_DIR) && ./mvnw clean $(PRE_DEPLOY_GOALS) deploy $(DEPLOY_PROFILE_ARG) $(ARTIFACTORY_BASE_URL_ARG) $(CENTRAL_WAIT_UNTIL_ARG) -DskipTests=$(SKIP_TESTS) -Dgpg.skip=false -Dmaven.deploy.skip=$(MAVEN_DEPLOY_SKIP)
+	$(call run_mvnw,clean $(PRE_DEPLOY_GOALS) deploy $(DEPLOY_PROFILE_ARG) $(ARTIFACTORY_BASE_URL_ARG) $(CENTRAL_WAIT_UNTIL_ARG) -DskipTests=$(SKIP_TESTS) -Dgpg.skip=false -Dmaven.deploy.skip=$(MAVEN_DEPLOY_SKIP))
 	@echo "Reverting POM changes after deploy..."
-	@cd $(PROJECT_DIR) && ./mvnw versions:revert
+	$(call run_mvnw,versions:revert)
 
 ## show-version: display the computed version that will be used
 show-version:
