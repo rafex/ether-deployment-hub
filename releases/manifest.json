@@ -267,7 +267,7 @@
       "pomPath": "ether-logging-core/ether-logging-core/pom.xml",
       "groupId": "dev.rafex.ether.logging",
       "artifactId": "ether-logging-core",
-      "currentVersion": "0.1.0",
+      "currentVersion": "8.0.0",
       "published": false,
       "usesParent": true,
       "dependencies": [
@@ -283,7 +283,7 @@
       "pomPath": "ether-ai-core/ether-ai-core/pom.xml",
       "groupId": "dev.rafex.ether.ai",
       "artifactId": "ether-ai-core",
-      "currentVersion": "0.1.0",
+      "currentVersion": "8.0.0",
       "published": false,
       "usesParent": true,
       "dependencies": [
@@ -299,7 +299,7 @@
       "pomPath": "ether-ai-openai/ether-ai-openai/pom.xml",
       "groupId": "dev.rafex.ether.ai",
       "artifactId": "ether-ai-openai",
-      "currentVersion": "0.1.0",
+      "currentVersion": "8.0.0",
       "published": false,
       "usesParent": true,
       "dependencies": [
@@ -320,7 +320,7 @@
       "pomPath": "ether-ai-deepseek/ether-ai-deepseek/pom.xml",
       "groupId": "dev.rafex.ether.ai",
       "artifactId": "ether-ai-deepseek",
-      "currentVersion": "0.1.0",
+      "currentVersion": "8.0.0",
       "published": false,
       "usesParent": true,
       "dependencies": [
