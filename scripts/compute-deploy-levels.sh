@@ -5,7 +5,12 @@
 # modules at the same level have no inter-dependencies and can be deployed
 # in parallel.
 #
-# Usage: ./compute-deploy-levels.sh <release-plan.json>
+# Large levels are automatically subdivided so that no single level exceeds
+# MAX_LEVEL_SIZE modules. This prevents GitHub Actions job timeouts (30 min)
+# when many independent modules land in the same topological wave.
+#
+# Usage: ./compute-deploy-levels.sh <release-plan.json> [max-per-level]
+#   max-per-level  Maximum modules per level (default: 5)
 #
 # Output (stdout): JSON of the form:
 #   {
@@ -22,19 +27,22 @@
 
 set -euo pipefail
 
-PLAN_PATH="${1:?Usage: $0 <release-plan.json>}"
+PLAN_PATH="${1:?Usage: $0 <release-plan.json> [max-per-level]}"
+MAX_LEVEL_SIZE="${2:-5}"
 
 if [ ! -f "$PLAN_PATH" ]; then
   echo "Release plan not found: $PLAN_PATH" >&2
   exit 1
 fi
 
-python3 - "$PLAN_PATH" <<'PYEOF'
+python3 - "$PLAN_PATH" "$MAX_LEVEL_SIZE" <<'PYEOF'
 import json
 import sys
 
 with open(sys.argv[1]) as f:
     plan = json.load(f)
+
+max_level_size = int(sys.argv[2])
 
 # Only modules that are actually being released
 releasable = [
@@ -53,8 +61,8 @@ dep_map: dict[str, list[str]] = {
     for m in releasable
 }
 
-# Kahn's algorithm — assign each module to a level
-levels: list[list[str]] = []
+# Kahn's algorithm — assign each module to a topological level
+topo_levels: list[list[str]] = []
 assigned: dict[str, int] = {}
 remaining = set(dep_map.keys())
 
@@ -68,12 +76,22 @@ while remaining:
         # Safety valve: cycle or unresolvable — dump all remaining
         current_level = sorted(remaining)
 
-    level_idx = len(levels)
+    level_idx = len(topo_levels)
     for name in current_level:
         assigned[name] = level_idx
 
-    levels.append(current_level)
+    topo_levels.append(current_level)
     remaining -= set(current_level)
 
-print(json.dumps({"levels": levels}, indent=2))
+# Split any level that exceeds max_level_size into consecutive sub-levels.
+# Modules within a topological level share no inter-dependencies, so any
+# arbitrary partition preserves correctness.
+final_levels: list[list[str]] = []
+for level in topo_levels:
+    chunk_start = 0
+    while chunk_start < len(level):
+        final_levels.append(level[chunk_start : chunk_start + max_level_size])
+        chunk_start += max_level_size
+
+print(json.dumps({"levels": final_levels}, indent=2))
 PYEOF

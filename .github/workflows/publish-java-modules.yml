@@ -42,6 +42,8 @@ jobs:
       level2: ${{ steps.plan.outputs.level2 }}
       level3: ${{ steps.plan.outputs.level3 }}
       level4: ${{ steps.plan.outputs.level4 }}
+      level5: ${{ steps.plan.outputs.level5 }}
+      level6: ${{ steps.plan.outputs.level6 }}
 
     steps:
       - name: Checkout repo
@@ -101,7 +103,7 @@ jobs:
           echo "Deploy levels:"
           echo "$LEVELS" | jq -r '.levels | to_entries[] | "  L\(.key): \(.value | join(", "))"'
           level_count=$(echo "$LEVELS" | jq '.levels | length')
-          for i in 0 1 2 3 4; do
+          for i in 0 1 2 3 4 5 6; do
             if [ "$i" -lt "$level_count" ]; then
               arr=$(echo "$LEVELS" | jq -c ".levels[$i]")
             else
@@ -190,6 +192,34 @@ jobs:
       MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
       GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
 
+  # ── L5: overflow from L3/L4 split or deeper deps ─────────────────────────
+  deploy-level-5:
+    needs: [release-plan, deploy-level-4]
+    if: ${{ needs.release-plan.outputs.level5 != '[]' && (needs.deploy-level-4.result == 'success' || needs.deploy-level-4.result == 'skipped') && (github.event_name != 'workflow_dispatch' || inputs.run_deploy == true) }}
+    uses: ./.github/workflows/deploy-one-level.yml
+    with:
+      modules_json: ${{ needs.release-plan.outputs.level5 }}
+      level_index: 5
+    secrets:
+      OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+      OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+      MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+      GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
+
+  # ── L6: overflow from L4/L5 split or deepest deps ────────────────────────
+  deploy-level-6:
+    needs: [release-plan, deploy-level-5]
+    if: ${{ needs.release-plan.outputs.level6 != '[]' && (needs.deploy-level-5.result == 'success' || needs.deploy-level-5.result == 'skipped') && (github.event_name != 'workflow_dispatch' || inputs.run_deploy == true) }}
+    uses: ./.github/workflows/deploy-one-level.yml
+    with:
+      modules_json: ${{ needs.release-plan.outputs.level6 }}
+      level_index: 6
+    secrets:
+      OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+      OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+      MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+      GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
+
   # ────────────────────────────────────────────────────────────────────────────
   # GitHub Packages deploy — starts after Maven Central deploy succeeds.
   # Re-uses pre-built artifacts from ~/.m2 (installed in the deploy job).
@@ -200,8 +230,8 @@ jobs:
   deploy-github-packages:
     needs:
       - release-plan
-      - deploy-level-4
-    if: ${{ needs.release-plan.outputs.selected_count != '0' && (needs.deploy-level-4.result == 'success' || needs.deploy-level-4.result == 'skipped') && (github.event_name != 'workflow_dispatch' || inputs.run_deploy == true) }}
+      - deploy-level-6
+    if: ${{ needs.release-plan.outputs.selected_count != '0' && (needs.deploy-level-6.result == 'success' || needs.deploy-level-6.result == 'skipped') && (github.event_name != 'workflow_dispatch' || inputs.run_deploy == true) }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
@@ -313,9 +343,9 @@ jobs:
   update-manifest:
     needs:
       - release-plan
-      - deploy-level-4
+      - deploy-level-6
       - deploy-github-packages
-    if: ${{ needs.release-plan.outputs.selected_count != '0' && (needs.deploy-level-4.result == 'success' || needs.deploy-level-4.result == 'skipped') }}
+    if: ${{ needs.release-plan.outputs.selected_count != '0' && (needs.deploy-level-6.result == 'success' || needs.deploy-level-6.result == 'skipped') }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
