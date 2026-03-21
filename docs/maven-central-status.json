@@ -4,7 +4,7 @@
     "groupId": "dev.rafex.ether.parent",
     "artifactId": "ether-parent",
     "deployed": true,
-    "latestVersion": "8.0.8",
+    "latestVersion": "8.1.0",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.parent/ether-parent"
   },
@@ -13,7 +13,7 @@
     "groupId": "dev.rafex.ether.config",
     "artifactId": "ether-config",
     "deployed": true,
-    "latestVersion": "8.0.6",
+    "latestVersion": "8.1.0",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.config/ether-config"
   },
@@ -22,7 +22,7 @@
     "groupId": "dev.rafex.ether.database",
     "artifactId": "ether-database-core",
     "deployed": true,
-    "latestVersion": "8.0.6",
+    "latestVersion": "8.1.0",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.database/ether-database-core"
   },
@@ -49,7 +49,7 @@
     "groupId": "dev.rafex.ether.json",
     "artifactId": "ether-json",
     "deployed": true,
-    "latestVersion": "8.0.6",
+    "latestVersion": "8.1.0",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.json/ether-json"
   },
@@ -76,7 +76,7 @@
     "groupId": "dev.rafex.ether.http",
     "artifactId": "ether-http-core",
     "deployed": true,
-    "latestVersion": "8.0.5",
+    "latestVersion": "8.1.0",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.http/ether-http-core"
   },
@@ -85,7 +85,7 @@
     "groupId": "dev.rafex.ether.http",
     "artifactId": "ether-http-security",
     "deployed": true,
-    "latestVersion": "8.0.5",
+    "latestVersion": "8.1.0",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.http/ether-http-security"
   },
@@ -130,7 +130,7 @@
     "groupId": "dev.rafex.ether.ai",
     "artifactId": "ether-ai-core",
     "deployed": true,
-    "latestVersion": "8.0.0",
+    "latestVersion": "8.1.0",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.ai/ether-ai-core"
   },
