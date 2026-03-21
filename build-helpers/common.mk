@@ -155,8 +155,8 @@ sync-pom-versions:
 	else \
 		echo "Error: pom.xml not found in $(PROJECT_DIR) or $(PROJECT_DIR)/$(notdir $(PROJECT_DIR))"; \
 		exit 1; \
-	fi; \
-	repo_url="$(VERSION_SOURCE_REPO)"; \
+	fi
+	@repo_url="$(VERSION_SOURCE_REPO)"; \
 	if [ -n "$(PARENT_COORD)" ]; then \
 		parent_group_id="$(word 1,$(subst :, ,$(PARENT_COORD)))"; \
 		parent_artifact_id="$(word 2,$(subst :, ,$(PARENT_COORD)))"; \
