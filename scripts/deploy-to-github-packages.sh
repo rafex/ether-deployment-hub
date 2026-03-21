@@ -152,12 +152,26 @@ deploy_module() {
   fi
 }
 
-# ── iterate all releasable modules, deploy in parallel ────────────────────────
+# ── iterate all releasable modules, deploy with bounded parallelism ───────────
+# MAX_GH_PARALLEL caps concurrent GPG signing processes to prevent
+# "Cannot allocate memory" failures when too many gpg-agent instances compete
+# for the same runner resources at once.
+MAX_GH_PARALLEL="${MAX_GH_PARALLEL:-4}"
+
 pids=()
 names=()
 log_files=()
 LOG_DIR="${RUNNER_TEMP:-/tmp}/gh-deploy-logs"
 mkdir -p "$LOG_DIR"
+
+# Semaphore via anonymous FIFO: pre-fill with MAX_GH_PARALLEL tokens.
+# Each worker reads one token before starting and writes one back when done,
+# so at most MAX_GH_PARALLEL subprocesses run concurrently.
+_sem_fifo="$(mktemp -u /tmp/ghsem.XXXXXX)"
+mkfifo "$_sem_fifo"
+exec {SEM_FD}<>"$_sem_fifo"
+rm -f "$_sem_fifo"
+for _ in $(seq 1 "$MAX_GH_PARALLEL"); do printf . >&"$SEM_FD"; done
 
 while IFS= read -r module_json; do
   name=$(printf '%s' "$module_json"     | jq -r '.name')
@@ -180,14 +194,22 @@ while IFS= read -r module_json; do
   log_file="$LOG_DIR/gh-${name}.log"
   echo "  [GH START] ${name} ${group_id}:${artifact_id}:${version}"
 
-  (deploy_module "$name" "$group_id" "$artifact_id" "$version") \
-    >"$log_file" 2>&1 &
+  # Acquire one semaphore token (blocks when MAX_GH_PARALLEL slots are busy)
+  read -r -n 1 -u "$SEM_FD"
+
+  (
+    deploy_module "$name" "$group_id" "$artifact_id" "$version"
+    # Release token regardless of exit status so next waiter can proceed
+    printf . >&"$SEM_FD"
+  ) >"$log_file" 2>&1 &
 
   pids+=($!)
   names+=("$name")
   log_files+=("$log_file")
 
 done < <(jq -c '.modules[]' "$PLAN_PATH")
+
+exec {SEM_FD}>&-   # close semaphore FD once all jobs are dispatched
 
 # ── collect results ───────────────────────────────────────────────────────────
 any_failed=false
