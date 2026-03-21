@@ -17,3 +17,5 @@ docs/api/doxygen/
 *.class
 *.jar
 target/
+.claude/
+
