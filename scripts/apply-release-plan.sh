@@ -62,6 +62,12 @@ set_property_version() {
 parent_version="$(planned_version "ether-parent")"
 parent_pom_path="$ROOT_DIR/ether-parent/ether-parent/pom.xml"
 
+# Keep the local parent POM aligned with the planned parent version even when
+# ether-parent itself is not being released in this run. Child modules rely on
+# relativePath to this file, so version drift here breaks dependencyManagement
+# resolution for internal modules during versions:set / deploy.
+set_project_version "$parent_pom_path" "ether-parent" "$parent_version"
+
 while IFS= read -r module; do
   name="$(printf '%s' "$module" | jq -r '.name')"
   artifact_id="$(printf '%s' "$module" | jq -r '.artifactId')"
