@@ -36,7 +36,7 @@
   "modules": [
     {
       "name": "ether-parent",
-      "path": "ether-parent",
+      "path": "ether-parent/ether-parent",
       "projectDir": "ether-parent/ether-parent",
       "pomPath": "ether-parent/ether-parent/pom.xml",
       "groupId": "dev.rafex.ether.parent",
@@ -50,7 +50,7 @@
     },
     {
       "name": "ether-config",
-      "path": "ether-config",
+      "path": "ether-config/ether-config",
       "projectDir": "ether-config/ether-config",
       "pomPath": "ether-config/ether-config/pom.xml",
       "groupId": "dev.rafex.ether.config",
@@ -66,7 +66,7 @@
     },
     {
       "name": "ether-database-core",
-      "path": "ether-database-core",
+      "path": "ether-database-core/ether-database-core",
       "projectDir": "ether-database-core/ether-database-core",
       "pomPath": "ether-database-core/ether-database-core/pom.xml",
       "groupId": "dev.rafex.ether.database",
@@ -82,7 +82,7 @@
     },
     {
       "name": "ether-jdbc",
-      "path": "ether-jdbc",
+      "path": "ether-jdbc/ether-jdbc",
       "projectDir": "ether-jdbc/ether-jdbc",
       "pomPath": "ether-jdbc/ether-jdbc/pom.xml",
       "groupId": "dev.rafex.ether.jdbc",
@@ -101,7 +101,7 @@
     },
     {
       "name": "ether-database-postgres",
-      "path": "ether-database-postgres",
+      "path": "ether-database-postgres/ether-database-postgres",
       "projectDir": "ether-database-postgres/ether-database-postgres",
       "pomPath": "ether-database-postgres/ether-database-postgres/pom.xml",
       "groupId": "dev.rafex.ether.database",
@@ -120,7 +120,7 @@
     },
     {
       "name": "ether-json",
-      "path": "ether-json",
+      "path": "ether-json/ether-json",
       "projectDir": "ether-json/ether-json",
       "pomPath": "ether-json/ether-json/pom.xml",
       "groupId": "dev.rafex.ether.json",
@@ -136,7 +136,7 @@
     },
     {
       "name": "ether-jwt",
-      "path": "ether-jwt",
+      "path": "ether-jwt/ether-jwt",
       "projectDir": "ether-jwt/ether-jwt",
       "pomPath": "ether-jwt/ether-jwt/pom.xml",
       "groupId": "dev.rafex.ether.jwt",
@@ -155,7 +155,7 @@
     },
     {
       "name": "ether-observability-core",
-      "path": "ether-observability-core",
+      "path": "ether-observability-core/ether-observability-core",
       "projectDir": "ether-observability-core/ether-observability-core",
       "pomPath": "ether-observability-core/ether-observability-core/pom.xml",
       "groupId": "dev.rafex.ether.observability",
@@ -171,7 +171,7 @@
     },
     {
       "name": "ether-http-core",
-      "path": "ether-http-core",
+      "path": "ether-http-core/ether-http-core",
       "projectDir": "ether-http-core/ether-http-core",
       "pomPath": "ether-http-core/ether-http-core/pom.xml",
       "groupId": "dev.rafex.ether.http",
@@ -187,7 +187,7 @@
     },
     {
       "name": "ether-http-security",
-      "path": "ether-http-security",
+      "path": "ether-http-security/ether-http-security",
       "projectDir": "ether-http-security/ether-http-security",
       "pomPath": "ether-http-security/ether-http-security/pom.xml",
       "groupId": "dev.rafex.ether.http",
@@ -203,7 +203,7 @@
     },
     {
       "name": "ether-http-problem",
-      "path": "ether-http-problem",
+      "path": "ether-http-problem/ether-http-problem",
       "projectDir": "ether-http-problem/ether-http-problem",
       "pomPath": "ether-http-problem/ether-http-problem/pom.xml",
       "groupId": "dev.rafex.ether.http",
@@ -224,7 +224,7 @@
     },
     {
       "name": "ether-http-openapi",
-      "path": "ether-http-openapi",
+      "path": "ether-http-openapi/ether-http-openapi",
       "projectDir": "ether-http-openapi/ether-http-openapi",
       "pomPath": "ether-http-openapi/ether-http-openapi/pom.xml",
       "groupId": "dev.rafex.ether.http",
@@ -243,7 +243,7 @@
     },
     {
       "name": "ether-http-client",
-      "path": "ether-http-client",
+      "path": "ether-http-client/ether-http-client",
       "projectDir": "ether-http-client/ether-http-client",
       "pomPath": "ether-http-client/ether-http-client/pom.xml",
       "groupId": "dev.rafex.ether.http",
@@ -262,7 +262,7 @@
     },
     {
       "name": "ether-logging-core",
-      "path": "ether-logging-core",
+      "path": "ether-logging-core/ether-logging-core",
       "projectDir": "ether-logging-core/ether-logging-core",
       "pomPath": "ether-logging-core/ether-logging-core/pom.xml",
       "groupId": "dev.rafex.ether.logging",
@@ -278,7 +278,7 @@
     },
     {
       "name": "ether-ai-core",
-      "path": "ether-ai-core",
+      "path": "ether-ai-core/ether-ai-core",
       "projectDir": "ether-ai-core/ether-ai-core",
       "pomPath": "ether-ai-core/ether-ai-core/pom.xml",
       "groupId": "dev.rafex.ether.ai",
@@ -294,7 +294,7 @@
     },
     {
       "name": "ether-ai-openai",
-      "path": "ether-ai-openai",
+      "path": "ether-ai-openai/ether-ai-openai",
       "projectDir": "ether-ai-openai/ether-ai-openai",
       "pomPath": "ether-ai-openai/ether-ai-openai/pom.xml",
       "groupId": "dev.rafex.ether.ai",
@@ -315,7 +315,7 @@
     },
     {
       "name": "ether-ai-deepseek",
-      "path": "ether-ai-deepseek",
+      "path": "ether-ai-deepseek/ether-ai-deepseek",
       "projectDir": "ether-ai-deepseek/ether-ai-deepseek",
       "pomPath": "ether-ai-deepseek/ether-ai-deepseek/pom.xml",
       "groupId": "dev.rafex.ether.ai",
@@ -336,7 +336,7 @@
     },
     {
       "name": "ether-http-jetty12",
-      "path": "ether-http-jetty12",
+      "path": "ether-http-jetty12/ether-http-jetty12",
       "projectDir": "ether-http-jetty12/ether-http-jetty12",
       "pomPath": "ether-http-jetty12/ether-http-jetty12/pom.xml",
       "groupId": "dev.rafex.ether.http",
@@ -365,7 +365,7 @@
     },
     {
       "name": "ether-websocket-core",
-      "path": "ether-websocket-core",
+      "path": "ether-websocket-core/ether-websocket-core",
       "projectDir": "ether-websocket-core/ether-websocket-core",
       "pomPath": "ether-websocket-core/ether-websocket-core/pom.xml",
       "groupId": "dev.rafex.ether.websocket",
@@ -381,7 +381,7 @@
     },
     {
       "name": "ether-websocket-jetty12",
-      "path": "ether-websocket-jetty12",
+      "path": "ether-websocket-jetty12/ether-websocket-jetty12",
       "projectDir": "ether-websocket-jetty12/ether-websocket-jetty12",
       "pomPath": "ether-websocket-jetty12/ether-websocket-jetty12/pom.xml",
       "groupId": "dev.rafex.ether.websocket",
@@ -400,7 +400,7 @@
     },
     {
       "name": "ether-webhook",
-      "path": "ether-webhook",
+      "path": "ether-webhook/ether-webhook",
       "projectDir": "ether-webhook/ether-webhook",
       "pomPath": "ether-webhook/ether-webhook/pom.xml",
       "groupId": "dev.rafex.ether.webhook",
@@ -421,7 +421,7 @@
     },
     {
       "name": "ether-glowroot-jetty12",
-      "path": "ether-glowroot-jetty12",
+      "path": "ether-glowroot-jetty12/ether-glowroot-jetty12",
       "projectDir": "ether-glowroot-jetty12/ether-glowroot-jetty12",
       "pomPath": "ether-glowroot-jetty12/ether-glowroot-jetty12/pom.xml",
       "groupId": "dev.rafex.ether.glowroot",
