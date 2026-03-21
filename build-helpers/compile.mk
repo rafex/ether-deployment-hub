@@ -31,7 +31,12 @@ define install_local_module
     export JAVA_HOME; \
   fi; \
   echo "Installing local module $(1) (dir: $$module_dir)"; \
-  cd "$$module_dir" && ./mvnw -B -ntp -DskipTests=true -Dgpg.skip=true clean install
+  cd "$$module_dir" && \
+  if [ -x "./mvnw" ] && [ -f "./.mvn/wrapper/maven-wrapper.properties" ]; then \
+    ./mvnw -B -ntp -DskipTests=true -Dgpg.skip=true clean install; \
+  else \
+    mvn -B -ntp -DskipTests=true -Dgpg.skip=true clean install; \
+  fi
 endef
 
 define compile_local_module
@@ -44,7 +49,12 @@ define compile_local_module
     export JAVA_HOME; \
   fi; \
   echo "Compiling module $(1) (dir: $$module_dir)"; \
-  cd "$$module_dir" && ./mvnw -B -ntp -DskipTests=true clean compile
+  cd "$$module_dir" && \
+  if [ -x "./mvnw" ] && [ -f "./.mvn/wrapper/maven-wrapper.properties" ]; then \
+    ./mvnw -B -ntp -DskipTests=true clean compile; \
+  else \
+    mvn -B -ntp -DskipTests=true clean compile; \
+  fi
 endef
 
 ## compile-ether-parent: compile ether-parent
