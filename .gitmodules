@@ -63,3 +63,12 @@
 	path = ether-database-postgres
 	url = git@github.com:rafex/ether-database-postgres.git
 	branch = main
+[submodule "ether-ai-core"]
+	path = ether-ai-core
+	url = git@github.com:rafex/ether-ai-core.git
+[submodule "ether-ai-openai"]
+	path = ether-ai-openai
+	url = git@github.com:rafex/ether-ai-openai.git
+[submodule "ether-ai-deepseek"]
+	path = ether-ai-deepseek
+	url = git@github.com:rafex/ether-ai-deepseek.git
