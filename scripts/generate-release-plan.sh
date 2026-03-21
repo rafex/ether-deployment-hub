@@ -167,6 +167,33 @@ while [ "$changed" = "true" ]; do
   done < <(find "$TMP_PLAN_DIR" -name '*.json' | sort)
 done
 
+# If ether-parent is not scheduled for release but any first-time module depends
+# on it, force a patch release of ether-parent so that the newly-published parent
+# POM on Maven Central includes the <dependencyManagement> entries for the new
+# modules. Without this, Maven Central validation of child POMs fails because it
+# fetches the stale published parent (which lacks the new module versions) rather
+# than the locally-updated one used during the build.
+parent_file="$TMP_PLAN_DIR/ether-parent.json"
+if [ -f "$parent_file" ] && [ "$(jq -r '.releaseLevel' "$parent_file")" = "none" ]; then
+  while IFS= read -r module_file; do
+    [ "$(basename "$module_file")" = "ether-parent.json" ] && continue
+    if jq -r '.reasons[]?' "$module_file" | grep -q "initial_publish_pending" && \
+       jq -r '.dependencies[]?' "$module_file" | grep -q "^ether-parent$"; then
+      parent_current_version="$(jq -r '.currentVersion' "$parent_file")"
+      new_parent_version="$(release_bump_version "$parent_current_version" "patch")"
+      jq \
+        --arg level "patch" \
+        --arg nextVersion "$new_parent_version" \
+        '.releaseLevel = $level
+         | .nextVersion = $nextVersion
+         | .reasons = ((.reasons + ["managed_dependency_added"]) | unique)' \
+        "$parent_file" > "${parent_file}.next"
+      mv "${parent_file}.next" "$parent_file"
+      break
+    fi
+  done < <(find "$TMP_PLAN_DIR" -name '*.json' | sort)
+fi
+
 modules_json="$(jq -s 'sort_by(.name)' "$TMP_PLAN_DIR"/*.json)"
 selected_count="$(printf '%s' "$modules_json" | jq '[.[] | select(.releaseLevel != "none")] | length')"
 selected_names_json="$(printf '%s' "$modules_json" | jq '[.[] | select(.releaseLevel != "none") | .name]')"
