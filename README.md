@@ -427,6 +427,31 @@ List.of(glowroot::wrap)
 
 Este repositorio actúa como un hub orquestador para la publicación y despliegue automáticos de los módulos de **Ether** en **Maven Central**.
 
+### Sistema de Automatización
+
+El hub implementa un pipeline robusto de 16 scripts Bash que automatizan el ciclo completo de publicación:
+
+```mermaid
+flowchart TD
+    A[Cambios en código] --> B[Detección de módulos<br/>modificados]
+    B --> C[Cálculo de nivel<br/>semántico]
+    C --> D[Generación de<br/>plan de release]
+    D --> E[Validación contra<br/>Maven Central]
+    E --> F[Despliegue ordenado<br/>por dependencias]
+    F --> G[Actualización de<br/>manifest y estado]
+    G --> H[Generación de<br/>documentación API]
+```
+
+**Características clave del pipeline**:
+- ✅ **Detección inteligente** - Solo módulos con cambios reales
+- ✅ **Versionamiento semántico** - Basado en Conventional Commits
+- ✅ **Validación preventiva** - Chequea colisiones en Maven Central antes de publicar
+- ✅ **Despliegue ordenado** - Respeta dependencias entre módulos
+- ✅ **Idempotente** - Puede re-ejecutarse sin efectos secundarios
+- ✅ **Documentación automática** - Genera API docs con Doxygen
+
+**Documentación detallada**: [docs/scripts-automation.md](docs/scripts-automation.md) - Análisis completo de los 16 scripts del sistema.
+
 ```mermaid
 flowchart LR
     DEV[Developer\npush a main] --> CI[GitHub Actions\nValidate Build]
@@ -446,6 +471,39 @@ Incluye:
 - Actualización automática del manifest tras despliegue exitoso
 
 ---
+
+## Estado de Automatización
+
+### Scripts Revisados (3/16)
+
+| Script | Propósito | Estado | Mejores Prácticas Identificadas |
+|--------|-----------|--------|---------------------------------|
+| `generate-doxygen-docs.sh` | Genera docs API localmente | ✅ Revisado | Cleanup con `trap`, validación de paths, mensajes de error claros |
+| `doxygenw.sh` | Genera docs API en Docker | ✅ Revisado | Compatibilidad multiplataforma, permisos de usuario, detección de arquitectura |
+| `release-common.sh` | Funciones comunes para releases | ✅ Revisado | Funciones puras, soporte Conventional Commits, detección inteligente de archivos |
+
+### Scripts Pendientes de Revisión (13)
+
+**Críticos para el pipeline**:
+- `generate-release-plan.sh` - Core del sistema de planificación
+- `apply-release-plan.sh` - Ejecución de despliegue
+- `validate-release-plan-against-central.sh` - Validación preventiva
+
+**Importantes para sincronización**:
+- `sync-manifest-from-central.sh` - Mantiene estado actualizado
+- `update-manifest-from-plan.sh` - Actualización post-despliegue
+- `generate-maven-central-status.sh` - Generación de reportes
+
+**Utilidades y soporte**:
+- `detect-changed-modules.sh` - Detección de cambios
+- `compute-deploy-levels.sh` - Análisis semántico
+- `latest-maven-version.sh` - Consultas a Maven Central
+- `deploy-to-github-packages.sh` - Despliegue alternativo
+- `push-all-submodules.sh` - Gestión de submódulos
+- `render-readme.sh` - Generación de documentación
+- `setup-hooks.sh` - Configuración de entorno
+
+**Ver documentación completa**: [docs/scripts-automation.md](docs/scripts-automation.md)
 
 ## Cómo compilar y publicar
 

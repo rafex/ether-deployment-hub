@@ -20,6 +20,7 @@ jq -c '.modules[]' "$MANIFEST_PATH" | while IFS= read -r module_json; do
   name="$(printf '%s' "$module_json" | jq -r '.name')"
   path="$(printf '%s' "$module_json" | jq -r '.path')"
   current_version="$(printf '%s' "$module_json" | jq -r '.currentVersion')"
+  published="$(printf '%s' "$module_json" | jq -r 'if has("published") then (.published | tostring) else "true" end')"
   dependency_impact="$(printf '%s' "$module_json" | jq -r '.dependencyReleaseImpact // "patch"')"
   direct_files_json="$(printf '%s' "$DETECTION_JSON" | jq --arg name "$name" -c '.modules[] | select(.name == $name) | .changedFiles')"
   direct_changed="$(printf '%s' "$DETECTION_JSON" | jq --arg name "$name" -r '.modules[] | select(.name == $name) | .changed')"
@@ -27,6 +28,11 @@ jq -c '.modules[]' "$MANIFEST_PATH" | while IFS= read -r module_json; do
   level="none"
   reasons=()
   commits_json='[]'
+
+  if [ "$published" != "true" ]; then
+    level="patch"
+    reasons+=("initial_publish_pending")
+  fi
 
   if [ "$direct_changed" = "true" ]; then
     docs_only=true
@@ -42,14 +48,16 @@ jq -c '.modules[]' "$MANIFEST_PATH" | while IFS= read -r module_json; do
     done < <(printf '%s' "$direct_files_json" | jq -r '.[]')
 
     if [ "$docs_only" = "true" ]; then
-      level="none"
+      if [ "$published" = "true" ]; then
+        level="none"
+      fi
       reasons+=("docs_or_tests_only")
     elif [ "$build_only" = "true" ]; then
-      level="patch"
+      level="$(release_max_level "$level" "patch")"
       reasons+=("build_metadata_changed")
     else
       commit_log="$(git -C "$ROOT_DIR" log --format='%s%n%b' "$BASE_REF".."$HEAD_REF" -- "$path")"
-      level="$(release_commit_level_for_log "$commit_log")"
+      level="$(release_max_level "$level" "$(release_commit_level_for_log "$commit_log")")"
       reasons+=("direct_changes")
       if [ "$level" = "major" ]; then
         reasons+=("breaking_change_detected")
@@ -78,13 +86,18 @@ jq -c '.modules[]' "$MANIFEST_PATH" | while IFS= read -r module_json; do
     )"
   fi
 
-  next_version="$(release_bump_version "$current_version" "$level")"
+  if [ "$published" != "true" ] && [ "$level" != "none" ]; then
+    next_version="$current_version"
+  else
+    next_version="$(release_bump_version "$current_version" "$level")"
+  fi
   jq -n \
     --arg name "$name" \
     --arg path "$path" \
     --arg currentVersion "$current_version" \
     --arg nextVersion "$next_version" \
     --arg level "$level" \
+    --arg publishedRaw "$published" \
     --arg dependencyImpact "$dependency_impact" \
     --argjson directChanged "$direct_changed" \
     --argjson directChangedFiles "$direct_files_json" \
@@ -96,6 +109,7 @@ jq -c '.modules[]' "$MANIFEST_PATH" | while IFS= read -r module_json; do
       path: $path,
       currentVersion: $currentVersion,
       nextVersion: $nextVersion,
+      published: ($publishedRaw == "true"),
       releaseLevel: $level,
       directChanged: $directChanged,
       directChangedFiles: $directChangedFiles,
@@ -129,7 +143,11 @@ while [ "$changed" = "true" ]; do
       target_level="$(release_max_level "$current_level" "$propagated_level")"
       if [ "$target_level" != "$current_level" ]; then
         current_level="$target_level"
-        next_version="$(release_bump_version "$(jq -r '.currentVersion' "$module_file")" "$target_level")"
+        if [ "$(jq -r '.published' "$module_file")" != "true" ]; then
+          next_version="$(jq -r '.currentVersion' "$module_file")"
+        else
+          next_version="$(release_bump_version "$(jq -r '.currentVersion' "$module_file")" "$target_level")"
+        fi
         jq \
           --arg level "$target_level" \
           --arg nextVersion "$next_version" \
@@ -151,6 +169,7 @@ done
 
 modules_json="$(jq -s 'sort_by(.name)' "$TMP_PLAN_DIR"/*.json)"
 selected_count="$(printf '%s' "$modules_json" | jq '[.[] | select(.releaseLevel != "none")] | length')"
+selected_names_json="$(printf '%s' "$modules_json" | jq '[.[] | select(.releaseLevel != "none") | .name]')"
 deploy_order='[]'
 preferred_deploy_order="$(jq -c '.deployOrder // [.modules[].name]' "$MANIFEST_PATH")"
 
@@ -179,14 +198,17 @@ if [ "$selected_count" -gt 0 ]; then
     ready_now="$(jq -cn \
       --argjson ready "$ready_now" \
       --argjson preferred "$preferred_deploy_order" \
-      '([ $preferred[] | select(($ready | index(.)) != null) ]
-        + [ $ready[] | select(($preferred | index(.)) == null) ])')"
+      '([ $preferred[] as $name | select(($ready | index($name)) != null) | $name ]
+        + [ $ready[] as $name | select(($preferred | index($name)) == null) | $name ])')"
 
     ordered_names="$(jq -cn --argjson left "$ordered_names" --argjson right "$ready_now" '$left + $right')"
     unresolved_names="$(jq -cn --argjson unresolved "$unresolved_names" --argjson ready "$ready_now" '
       [ $unresolved[] as $u | select($ready | index($u) | not) | $u ]')"
   done
-  deploy_order="$ordered_names"
+  deploy_order="$(jq -cn \
+    --argjson ordered "$ordered_names" \
+    --argjson selected "$selected_names_json" \
+    '[ $ordered[] as $name | select(($selected | index($name)) != null) | $name ]')"
 fi
 
 plan_json="$(jq -n \
