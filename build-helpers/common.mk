@@ -40,8 +40,7 @@ PROJECT_DIR ?= ether-parent
 
 # Helper function to find and execute mvnw
 define run_mvnw
-	@# Check if mvnw exists in PROJECT_DIR, if not try PROJECT_DIR/PROJECT_DIR
-	@if [ -f "$(PROJECT_DIR)/mvnw" ]; then \
+	if [ -f "$(PROJECT_DIR)/mvnw" ]; then \
 		cd $(PROJECT_DIR) && ./mvnw $(1); \
 	elif [ -f "$(PROJECT_DIR)/$(notdir $(PROJECT_DIR))/mvnw" ]; then \
 		cd $(PROJECT_DIR)/$(notdir $(PROJECT_DIR)) && ./mvnw $(1); \
@@ -129,7 +128,7 @@ write-settings:
 ## set-version: update project version in POM based on Git tag (in $(PROJECT_DIR))
 set-version:
 	@echo "Setting project version to $(FINAL_VERSION)..."
-	$(call run_mvnw,versions:set -DnewVersion=$(FINAL_VERSION) -DgenerateBackupPoms=true)
+	@$(call run_mvnw,versions:set -DnewVersion=$(FINAL_VERSION) -DgenerateBackupPoms=true)
 
 ## update-license-headers: add missing license headers in Java sources/tests when enabled
 update-license-headers:
@@ -142,10 +141,7 @@ update-license-headers:
 
 ## sync-pom-versions: update parent and dependency properties using latest versions from repository
 sync-pom-versions:
-	@if [ "$(SYNC_FROM_REPO)" != "true" ]; then \
-		echo "Skipping dependency sync (SYNC_FROM_REPO=$(SYNC_FROM_REPO))"; \
-		exit 0; \
-	fi
+ifeq ($(SYNC_FROM_REPO),true)
 	@echo "Syncing parent/dependency versions from $(VERSION_SOURCE_REPO)..."
 	@# First, find the actual pom.xml location
 	@if [ -f "$(PROJECT_DIR)/pom.xml" ]; then \
@@ -181,18 +177,21 @@ sync-pom-versions:
 			echo "Skipping property $$prop_name (artifact $$dep_group_id:$$dep_artifact_id not found in $$repo_url)"; \
 		fi; \
 	done
+else
+	@echo "Skipping dependency sync (SYNC_FROM_REPO=$(SYNC_FROM_REPO))"
+endif
 
 ## build: update version and compile+test project (in $(PROJECT_DIR))
 build: sync-pom-versions set-version
 	@echo "Building project version $(FINAL_VERSION)..."
-	$(call run_mvnw,clean verify)
+	@$(call run_mvnw,clean verify)
 
 ## deploy: write settings and set version, then deploy using profile $(DEPLOY_PROFILE) (in $(PROJECT_DIR))
 deploy: write-settings sync-pom-versions set-version update-license-headers
 	@echo "Deploying version $(FINAL_VERSION)..."
-	$(call run_mvnw,clean $(PRE_DEPLOY_GOALS) deploy $(DEPLOY_PROFILE_ARG) $(ARTIFACTORY_BASE_URL_ARG) $(CENTRAL_WAIT_UNTIL_ARG) -DskipTests=$(SKIP_TESTS) -Dgpg.skip=false -Dmaven.deploy.skip=$(MAVEN_DEPLOY_SKIP))
+	@$(call run_mvnw,clean $(PRE_DEPLOY_GOALS) deploy $(DEPLOY_PROFILE_ARG) $(ARTIFACTORY_BASE_URL_ARG) $(CENTRAL_WAIT_UNTIL_ARG) -DskipTests=$(SKIP_TESTS) -Dgpg.skip=false -Dmaven.deploy.skip=$(MAVEN_DEPLOY_SKIP))
 	@echo "Reverting POM changes after deploy..."
-	$(call run_mvnw,versions:revert)
+	@$(call run_mvnw,versions:revert)
 
 ## show-version: display the computed version that will be used
 show-version:
