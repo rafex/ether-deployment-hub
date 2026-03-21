@@ -3,7 +3,11 @@ include build-helpers/compile.mk
 include build-helpers/gh.mk
 include build-helpers/docs.mk
 
-.PHONY: help
+.PHONY: help validate-submodule-refs
+
+## validate-submodule-refs: verify hub submodule SHAs exist in remotes
+validate-submodule-refs:
+	@./scripts/validate-submodule-remote-refs.sh
 
 ## help: show this help message
 help:
@@ -21,6 +25,7 @@ help:
 	@echo "  make submodules-clean     - Reset all submodules (loses changes)"
 	@echo "  make submodules-all       - Run complete workflow"
 	@echo "  make submodules-pull      - Pull all submodules and update parent"
+	@echo "  make validate-submodule-refs - Verify hub submodule SHAs exist in remotes"
 	@echo "  make submodules-help      - Detailed submodule help"
 	@echo ""
 	@echo "Documentation:"
