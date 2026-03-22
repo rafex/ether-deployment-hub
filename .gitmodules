@@ -86,3 +86,7 @@
 	path = ether-logging-core
 	url = git@github.com:rafex/ether-logging-core.git
 	branch = main
+[submodule "ether-crypto"]
+	path = ether-crypto
+	url = git@github.com:rafex/ether-crypto.git
+	branch = main
