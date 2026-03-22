@@ -1,0 +1,136 @@
+---
+name: Deploy GitHub Packages One Level
+
+on:
+  workflow_call:
+    inputs:
+      modules_json:
+        required: true
+        type: string
+        description: 'JSON array of module names to build and deploy in this level'
+      level_index:
+        required: true
+        type: number
+        description: 'Level index (0-based) for logging'
+    secrets:
+      MAVEN_GPG_PASSPHRASE:
+        required: true
+      GPG_PRIVATE_KEY_B64:
+        required: true
+      GH_PACKAGES_TOKEN:
+        required: true
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  deploy-gh-packages:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Download release plan artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: release-plan
+          path: release-artifacts
+
+      - name: Apply release plan versions to pom files
+        shell: bash
+        run: |
+          chmod +x ./scripts/apply-release-plan.sh
+          ./scripts/apply-release-plan.sh \
+            ./release-artifacts/release-plan.json \
+            ./releases/manifest.json
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Import GPG private key
+        env:
+          GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
+        run: |
+          echo "$GPG_PRIVATE_KEY_B64" | base64 --decode | gpg --batch --import
+          gpg --list-secret-keys
+
+      - name: Build level ${{ inputs.level_index }} modules (install to local Maven cache)
+        # DEPLOY_PROFILE="" disables the Sonatype Central profile so mvn runs
+        # through the install lifecycle only — no remote deploy to Maven Central.
+        # Dependencies for each module are resolved from Maven Central (already
+        # published by the Maven Central deploy phase that precedes this job).
+        shell: bash
+        env:
+          LEVEL_MODULES_JSON: ${{ inputs.modules_json }}
+          MAVEN_OPTS: "-Xmx768m -XX:+TieredCompilation"
+        run: |
+          set -euo pipefail
+          PLAN="./release-artifacts/release-plan.json"
+          ROOT_DIR="$(pwd)"
+
+          mapfile -t level_modules < <(echo "$LEVEL_MODULES_JSON" | jq -r '.[]')
+
+          echo "════════════════════════════════════════════════════════"
+          echo " GH Packages Level ${{ inputs.level_index }} — building ${#level_modules[@]} module(s)"
+          echo "════════════════════════════════════════════════════════"
+
+          for module in "${level_modules[@]}"; do
+            release_level=$(jq -r --arg m "$module" \
+              '.modules[] | select(.name == $m) | .releaseLevel' "$PLAN")
+            [ "$release_level" = "none" ] && continue
+
+            module_path=$(jq -r --arg m "$module" \
+              '.modules[] | select(.name == $m) | .path' "$PLAN")
+            next_version=$(jq -r --arg m "$module" \
+              '.modules[] | select(.name == $m) | .nextVersion' "$PLAN")
+
+            echo "  [BUILD] $module ($next_version)"
+            (
+              cd "$ROOT_DIR/$module_path"
+              make deploy                         \
+                VERSION="$next_version"           \
+                FORCE_EXACT_VERSION=true          \
+                SYNC_FROM_REPO=false              \
+                SKIP_TESTS=true                   \
+                AUTO_UPDATE_LICENSE_HEADERS=false \
+                DEPLOY_PROFILE=""
+            )
+          done
+          echo "  Build completed for level ${{ inputs.level_index }} ✓"
+
+      - name: Deploy level ${{ inputs.level_index }} modules to GitHub Packages
+        shell: bash
+        env:
+          GH_PACKAGES_TOKEN:    ${{ secrets.GH_PACKAGES_TOKEN }}
+          GITHUB_ACTOR:         ${{ github.actor }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+          LEVEL_MODULES_JSON:   ${{ inputs.modules_json }}
+        run: |
+          set -euo pipefail
+          chmod +x ./scripts/deploy-to-github-packages.sh
+
+          # Build a filtered release plan containing only this level's modules.
+          # deploy-to-github-packages.sh iterates plan.modules[], so filtering
+          # here restricts it to only the modules assigned to this level.
+          LEVEL_PLAN="${RUNNER_TEMP}/release-plan-gh-l${{ inputs.level_index }}.json"
+          mapfile -t level_modules < <(echo "$LEVEL_MODULES_JSON" | jq -r '.[]')
+          level_names_json=$(printf '%s\n' "${level_modules[@]}" | jq -R . | jq -s .)
+
+          jq --argjson names "$level_names_json" \
+            '.modules = [.modules[] | select(.name as $n | $names | index($n) != null)]' \
+            ./release-artifacts/release-plan.json > "$LEVEL_PLAN"
+
+          echo "Deploying level ${{ inputs.level_index }} to: https://maven.pkg.github.com/${{ github.repository }}"
+          ./scripts/deploy-to-github-packages.sh \
+            "$LEVEL_PLAN"                         \
+            ./releases/manifest.json              \
+            "https://maven.pkg.github.com/${{ github.repository }}"
