@@ -5,6 +5,7 @@
   "deployOrder": [
     "ether-parent",
     "ether-config",
+    "ether-crypto",
     "ether-database-core",
     "ether-jdbc",
     "ether-database-postgres",
@@ -57,6 +58,22 @@
       "artifactId": "ether-config",
       "currentVersion": "9.0.0",
       "published": true,
+      "usesParent": true,
+      "dependencies": [
+        "ether-parent"
+      ],
+      "internalDependencyProperties": {},
+      "dependencyReleaseImpact": "patch"
+    },
+    {
+      "name": "ether-crypto",
+      "path": "ether-crypto",
+      "projectDir": "ether-crypto/ether-crypto",
+      "pomPath": "ether-crypto/ether-crypto/pom.xml",
+      "groupId": "dev.rafex.ether.crypto",
+      "artifactId": "ether-crypto",
+      "currentVersion": "9.0.0",
+      "published": false,
       "usesParent": true,
       "dependencies": [
         "ether-parent"

@@ -169,11 +169,11 @@ Basado en `releases/manifest.json` y `MAX_LEVEL_SIZE=5`, el orden actual es:
 | Nivel | Módulos |
 |-------|---------|
 | L0 | `ether-parent` |
-| L1 | `ether-config`, `ether-json`, `ether-jwt`, `ether-database-core`, `ether-logging-core` |
-| L2 | `ether-jdbc`, `ether-http-core`, `ether-websocket-core`, `ether-observability-core` |
-| L3 | `ether-database-postgres`, `ether-http-security`, `ether-http-problem`, `ether-http-openapi`, `ether-http-client` |
-| L4 | `ether-http-jetty12`, `ether-websocket-jetty12`, `ether-webhook`, `ether-ai-core` |
-| L5 | `ether-ai-openai`, `ether-ai-deepseek` |
+| L1 | `ether-ai-core`, `ether-config`, `ether-crypto`, `ether-database-core`, `ether-http-core` |
+| L2 | `ether-http-security`, `ether-json`, `ether-logging-core`, `ether-observability-core`, `ether-websocket-core` |
+| L3 | `ether-ai-deepseek`, `ether-ai-openai`, `ether-database-postgres`, `ether-http-client`, `ether-http-openapi` |
+| L4 | `ether-http-problem`, `ether-jdbc`, `ether-jwt`, `ether-websocket-jetty12` |
+| L5 | `ether-http-jetty12`, `ether-webhook` |
 | L6 | `ether-glowroot-jetty12` |
 
 ## Convenciones CI/Runtime
