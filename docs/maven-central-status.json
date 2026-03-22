@@ -4,7 +4,7 @@
     "groupId": "dev.rafex.ether.parent",
     "artifactId": "ether-parent",
     "deployed": true,
-    "latestVersion": "8.1.0",
+    "latestVersion": "9.0.1",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.parent/ether-parent"
   },
@@ -21,10 +21,10 @@
     "module": "ether-crypto",
     "groupId": "dev.rafex.ether.crypto",
     "artifactId": "ether-crypto",
-    "deployed": false,
-    "latestVersion": "",
+    "deployed": true,
+    "latestVersion": "9.0.0",
     "lastUpdatedUtc": "",
-    "artifactUrl": "https://central.sonatype.com/search?q=ether-crypto"
+    "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.crypto/ether-crypto"
   },
   {
     "module": "ether-database-core",
