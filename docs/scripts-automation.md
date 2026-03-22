@@ -2,7 +2,7 @@
 
 ## Visión General
 
-El sistema de automatización del Ether Deployment Hub está compuesto por 16 scripts Bash que orquestan el ciclo completo de publicación de módulos Java a Maven Central. Estos scripts implementan un pipeline robusto que incluye detección de cambios, planificación de releases, validación contra Maven Central, despliegue ordenado y documentación automática.
+El sistema de automatización del Ether Deployment Hub está compuesto por 16 scripts Bash que orquestan el ciclo completo de publicación de módulos Java a Maven Central y GitHub Packages. Estos scripts implementan un pipeline robusto que incluye detección de cambios, planificación de releases, validación contra Maven Central, despliegue ordenado y documentación automática.
 
 ## Arquitectura del Sistema
 
@@ -15,25 +15,55 @@ flowchart TD
     C --> D[generate-release-plan.sh]
     D --> E[validate-release-plan-against-central.sh]
     E --> F[apply-release-plan.sh]
-    F --> G[Deploy a Maven Central]
-    G --> H[update-manifest-from-plan.sh]
-    H --> I[sync-manifest-from-central.sh]
-    I --> J[Documentación actualizada]
+    F --> G[Deploy a Maven Central\ndeploy-one-level.yml × 7 niveles]
+    G --> H[Artifacts subidos a\nGitHub Actions Storage]
+    G --> I[update-manifest-from-plan.sh]
+    H --> J[deploy-github-packages-one-level.yml × 7 niveles]
+    J --> K[GitHub Packages actualizado]
+    I --> L[sync-manifest-from-central.sh]
+    L --> M[Documentación actualizada]
 ```
+
+### CI Workflows (arquitectura separada)
+
+El pipeline de publicación está dividido en dos workflows independientes para mayor resiliencia y facilidad de re-ejecución:
+
+#### `publish-java-modules-maven-central.yml`
+- Despliega los 22 módulos a Maven Central en 7 niveles topológicos (L0–L6).
+- Sube los JARs/POMs compilados como **GitHub Actions artifacts** (`maven-artifacts-level-N`) para uso posterior.
+- Sube el `release-plan` artifact para consumo del workflow de GitHub Packages.
+- Trigger: tag push o `workflow_dispatch`.
+
+#### `publish-java-modules-gh-pkg.yml`
+- Se dispara automáticamente vía `workflow_run` cuando el workflow de Maven Central completa con éxito.
+- También soporta `workflow_dispatch` con `maven_central_run_id` para re-ejecuciones manuales.
+- Descarga los JARs del workflow de Maven Central (no de `repo1.maven.apache.org`) → elimina dependencia de propagación de Central.
+- Firma con GPG y sube a `maven.pkg.github.com`.
+
+#### `deploy-one-level.yml` (reusable)
+- Despliega un nivel de dependencias a Maven Central secuencialmente.
+- Al finalizar, recoge los artifacts de `~/.m2/repository` y los sube como `maven-artifacts-level-N`.
+- Timeout: 30 minutos. Máx. 5 módulos por nivel (`MAX_LEVEL_SIZE=5`).
+
+#### `deploy-github-packages-one-level.yml` (reusable)
+- Descarga `maven-artifacts-level-N` del run de Maven Central vía `run-id`.
+- Restaura los JARs al repositorio Maven local.
+- Firma con GPG (`MAX_GH_PARALLEL=4`) y despliega a GitHub Packages.
+- Timeout: 30 minutos. No recompila desde fuente.
 
 ### Scripts por Categoría
 
 #### 1. **Detección y Análisis de Cambios**
 - `detect-changed-modules.sh` - Identifica módulos modificados desde un commit base
-- `compute-deploy-levels.sh` - Calcula el nivel semántico (major/minor/patch) basado en Conventional Commits
+- `compute-deploy-levels.sh` - Calcula niveles topológicos con Kahn's algorithm + chunking `MAX_LEVEL_SIZE=5`
 
 #### 2. **Planificación de Releases**
 - `generate-release-plan.sh` - Genera un plan de release con versiones incrementadas
 - `validate-release-plan-against-central.sh` - Valida que las versiones no colisionen en Maven Central
 
 #### 3. **Ejecución de Despliegue**
-- `apply-release-plan.sh` - Ejecuta el despliegue siguiendo el orden de dependencias
-- `deploy-to-github-packages.sh` - Despliega a GitHub Packages (alternativa/backup)
+- `apply-release-plan.sh` - Aplica las versiones del plan a los `pom.xml` antes del build
+- `deploy-to-github-packages.sh` - Firma y despliega a GitHub Packages (usado por `deploy-github-packages-one-level.yml`)
 
 #### 4. **Sincronización y Estado**
 - `sync-manifest-from-central.sh` - Sincroniza el manifest.json con Maven Central
@@ -62,12 +92,6 @@ flowchart TD
 - Crea Doxyfile temporal con rutas de entrada dinámicas
 - Manejo robusto de errores con `set -euo pipefail`
 
-**Mejores prácticas identificadas**:
-- Uso de `trap` para limpieza de archivos temporales
-- Validación de existencia de directorios antes de procesar
-- Mensajes de error claros en stderr
-- Paths relativos al directorio raíz del proyecto
-
 ### 2. `doxygenw.sh`
 **Propósito**: Genera documentación API usando Doxygen en contenedor Docker.
 
@@ -75,13 +99,6 @@ flowchart TD
 - Compatibilidad multiplataforma (especialmente ARM64/macOS)
 - Mapeo de volúmenes Docker con permisos de usuario correctos
 - Detección automática de arquitectura para evitar warnings
-- Mismo algoritmo de detección de fuentes que la versión local
-
-**Mejores prácticas identificadas**:
-- Configuración de plataforma Docker explícita para ARM64
-- Uso de `-u $(id -u):$(id -g)` para preservar permisos
-- Normalización de paths entre host y contenedor
-- Variables de entorno configurables (`DOXYGEN_IMAGE`, `DOXYGEN_PLATFORM`)
 
 ### 3. `release-common.sh`
 **Propósito**: Biblioteca de funciones comunes para scripts de release.
@@ -97,36 +114,24 @@ flowchart TD
 - `release_is_build_file()` - Identifica archivos de build
 - `release_commit_level_for_log()` - Analiza mensajes de commit para determinar nivel
 
-**Mejores prácticas identificadas**:
-- Funciones puras con entrada/salida predecible
-- Manejo consistente de errores
-- Soporte para Conventional Commits
-- Detección inteligente de archivos que no requieren release
+### 4. `compute-deploy-levels.sh`
+**Propósito**: Calcula niveles de despliegue con ordenamiento topológico.
 
-## Scripts Pendientes de Revisión (13 scripts)
+**Características clave**:
+- Implementa el algoritmo de Kahn para ordenamiento topológico de dependencias
+- `MAX_LEVEL_SIZE=5` (configurable vía `$2`): divide niveles grandes en sub-niveles para respetar el timeout de 30 min de GitHub Actions
+- Para los 22 módulos actuales produce 7 niveles: `L0(1) L1(5) L2(4) L3(5) L4(4) L5(2) L6(1)`
+- Salida JSON: `{"levels": [["mod-a", "mod-b"], ["mod-c"], ...]}`
 
-### Por prioridad de revisión:
+### 5. `deploy-to-github-packages.sh`
+**Propósito**: Firma y despliega artefactos a GitHub Packages.
 
-1. **Críticos para el pipeline**:
-   - `generate-release-plan.sh` - Core del sistema
-   - `apply-release-plan.sh` - Ejecución de despliegue
-   - `validate-release-plan-against-central.sh` - Validación preventiva
+**Características clave**:
+- `MAX_GH_PARALLEL=4`: semáforo FIFO para limitar procesos GPG concurrentes y evitar `Cannot allocate memory`
+- Lee `groupId`/`artifactId` de `releases/manifest.json` (no del release plan, que los tiene como `null`)
+- Usa `mvn gpg:sign-and-deploy-file` para firma y deploy en un solo paso
 
-2. **Importantes para sincronización**:
-   - `sync-manifest-from-central.sh` - Mantiene estado actualizado
-   - `update-manifest-from-plan.sh` - Actualización post-despliegue
-   - `generate-maven-central-status.sh` - Generación de reportes
-
-3. **Utilidades y soporte**:
-   - `detect-changed-modules.sh` - Detección de cambios
-   - `compute-deploy-levels.sh` - Análisis semántico
-   - `latest-maven-version.sh` - Consultas a Maven Central
-   - `deploy-to-github-packages.sh` - Despliegue alternativo
-   - `push-all-submodules.sh` - Gestión de submódulos
-   - `render-readme.sh` - Generación de documentación
-   - `setup-hooks.sh` - Configuración de entorno
-
-## Mejores Prácticas Identificadas
+## Mejores Prácticas del Pipeline
 
 ### 1. **Manejo de Errores**
 - Todos los scripts usan `set -euo pipefail` para fail-fast
@@ -141,7 +146,7 @@ flowchart TD
 ### 3. **Mantenibilidad**
 - Funciones comunes centralizadas en `release-common.sh`
 - Configuración mediante variables de entorno
-- Logging consistente y informativo
+- Logging consistente y formatado con separadores visuales (`═══`)
 
 ### 4. **Seguridad**
 - Uso de `mktemp` para archivos temporales
@@ -151,50 +156,43 @@ flowchart TD
 ### 5. **Idempotencia**
 - Los scripts pueden ejecutarse múltiples veces sin efectos secundarios
 - Validación contra estado externo (Maven Central)
-- Skip de módulos ya publicados
+- Skip de módulos ya publicados (`already exists` en Sonatype Central)
 
-## Recomendaciones para Mejora Continua
+### 6. **Resiliencia en red** ✅
+- `deploy-github-packages-one-level.yml` descarga artifacts de GitHub Actions Storage en lugar de `repo1.maven.apache.org`, eliminando dependencia de propagación de Maven Central
+- `curl_retry()` con 5 reintentos y 30s de espera usado en operaciones de red opcionales
 
-### 1. **Documentación**
-- [ ] Agregar comentarios JSDoc-style a todas las funciones
-- [ ] Documentar variables de entorno y parámetros
-- [ ] Crear ejemplos de uso para cada script
+## Orden de Despliegue
 
-### 2. **Testing**
-- [ ] Implementar tests unitarios para funciones en `release-common.sh`
-- [ ] Crear tests de integración para el pipeline completo
-- [ ] Validar en múltiples entornos (Linux, macOS, CI)
+Basado en `releases/manifest.json` y `MAX_LEVEL_SIZE=5`, el orden actual es:
 
-### 3. **Monitoreo**
-- [ ] Agregar métricas de ejecución (tiempos, éxito/fallo)
-- [ ] Implementar alertas para fallos críticos
-- [ ] Logging estructurado (JSON) para análisis
-
-### 4. **Robustez**
-- [ ] Agregar retries con backoff para operaciones de red
-- [ ] Implementar timeouts para comandos de larga duración
-- [ ] Validar checksums de artefactos publicados
-
-### 5. **UX/Desarrollador**
-- [ ] Crear comandos `make` para operaciones comunes
-- [ ] Implementar modo dry-run para todos los scripts
-- [ ] Agregar colores y formato a la salida de consola
-
-## Orden de Despliegue Actual
-
-Basado en `releases/manifest.json`, el orden de despliegue es:
-1. `ether-parent` (BOM y POM padre)
-2. `ether-json` (serialización JSON)
-3. `ether-jwt` (tokens JWT)
-4. `ether-http-core` (contratos HTTP)
-5. `ether-websocket-core` (contratos WebSocket)
-6. `ether-http-jetty12` (servidor HTTP)
-7. `ether-websocket-jetty12` (servidor WebSocket)
+| Nivel | Módulos |
+|-------|---------|
+| L0 | `ether-parent` |
+| L1 | `ether-config`, `ether-json`, `ether-jwt`, `ether-database-core`, `ether-logging-core` |
+| L2 | `ether-jdbc`, `ether-http-core`, `ether-websocket-core`, `ether-observability-core` |
+| L3 | `ether-database-postgres`, `ether-http-security`, `ether-http-problem`, `ether-http-openapi`, `ether-http-client` |
+| L4 | `ether-http-jetty12`, `ether-websocket-jetty12`, `ether-webhook`, `ether-ai-core` |
+| L5 | `ether-ai-openai`, `ether-ai-deepseek` |
+| L6 | `ether-glowroot-jetty12` |
 
 ## Convenciones CI/Runtime
 
 - GitHub workflows fuerzan JavaScript actions a Node 24 via `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true`
 - Publicación a Central espera disponibilidad con `central.waitUntil=published` (configurable)
+- **Java 25 LTS** (Temurin) en todos los workflows desde la rama `migrate-jdk25`
+
+## Make targets (CI)
+
+| Target | Descripción |
+|--------|-------------|
+| `make deploy` | Install local + genera release plan |
+| `make publish-ci` | Lanza workflow Maven Central (`run_deploy=true`) |
+| `make publish-plan-ci` | Dry-run Maven Central (`run_deploy=false`) |
+| `make publish-gh-pkg-ci RUN_ID=<id>` | Re-trigger manual de GitHub Packages |
+| `make gh-runs` | Lista runs recientes de ambos workflows |
+| `make gh-watch RUN_ID=<id>` | Observa un run específico |
+| `make gh-logs RUN_ID=<id>` | Logs de un run específico |
 
 ## Stack de Documentación (Fase 1)
 
@@ -214,14 +212,17 @@ Basado en `releases/manifest.json`, el orden de despliegue es:
 
 ## Próximos Pasos
 
-1. **Revisar scripts críticos** (`generate-release-plan.sh`, `apply-release-plan.sh`)
-2. **Implementar validación cruzada** entre scripts
-3. **Agregar logging estructurado** para mejor trazabilidad
-4. **Crear dashboard** de estado del pipeline
-5. **Documentar casos de error** y procedimientos de recuperación
+1. ✅ ~~Artifact sharing entre workflows Maven Central → GitHub Packages~~
+2. ✅ ~~Separar `publish-java-modules.yml` en dos workflows independientes~~
+3. ✅ ~~Migración a Java 25 LTS~~
+4. ✅ ~~Retries robustos para operaciones de red~~
+5. [ ] Implementar Structured Concurrency (JEP 505) en módulos AI cuando se estabilice
+6. [ ] Agregar métricas de ejecución (tiempos, éxito/fallo por nivel)
+7. [ ] Tests unitarios para funciones en `release-common.sh`
+8. [ ] Logging estructurado (JSON) para análisis de pipeline
 
 ---
 
-*Última actualización: 21 de marzo de 2026*  
-*Scripts revisados: 3 de 16*  
+*Última actualización: 22 de marzo de 2026*
+*Scripts revisados: 5 de 16*
 *Estado: En progreso*
