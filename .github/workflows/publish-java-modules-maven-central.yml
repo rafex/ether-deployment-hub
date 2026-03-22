@@ -1,5 +1,5 @@
 ---
-name: Publish Java Modules
+name: Publish Java Modules - Maven Central
 
 on:
   workflow_dispatch:
@@ -27,7 +27,6 @@ env:
 
 permissions:
   contents: write
-  packages: write
 
 jobs:
   release-plan:
@@ -221,113 +220,14 @@ jobs:
       GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
 
   # ────────────────────────────────────────────────────────────────────────────
-  # GitHub Packages deploy — split into 7 per-level jobs (mirrors Maven Central
-  # levels) so each job stays well under the 30-min runner time limit.
-  # Each level builds only its own modules (dependencies are resolved from
-  # Maven Central, already published by the Maven Central deploy phase).
-  # Artifacts are staged outside ~/.m2, signed with GPG and uploaded.
-  # Packages land at: https://maven.pkg.github.com/rafex/ether-deployment-hub
-  # ────────────────────────────────────────────────────────────────────────────
-
-  # ── GH L0: ether-parent ──────────────────────────────────────────────────
-  deploy-gh-packages-level-0:
-    needs: [release-plan, deploy-level-6]
-    if: ${{ needs.release-plan.outputs.selected_count != '0' && needs.release-plan.outputs.level0 != '[]' && (needs.deploy-level-6.result == 'success' || needs.deploy-level-6.result == 'skipped') && (github.event_name != 'workflow_dispatch' || inputs.run_deploy == true) }}
-    uses: ./.github/workflows/deploy-github-packages-one-level.yml
-    with:
-      modules_json: ${{ needs.release-plan.outputs.level0 }}
-      level_index: 0
-    secrets:
-      MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
-      GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
-      GH_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  # ── GH L1 ────────────────────────────────────────────────────────────────
-  deploy-gh-packages-level-1:
-    needs: [release-plan, deploy-gh-packages-level-0]
-    if: ${{ needs.release-plan.outputs.level1 != '[]' && (needs.deploy-gh-packages-level-0.result == 'success' || needs.deploy-gh-packages-level-0.result == 'skipped') && (github.event_name != 'workflow_dispatch' || inputs.run_deploy == true) }}
-    uses: ./.github/workflows/deploy-github-packages-one-level.yml
-    with:
-      modules_json: ${{ needs.release-plan.outputs.level1 }}
-      level_index: 1
-    secrets:
-      MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
-      GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
-      GH_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  # ── GH L2 ────────────────────────────────────────────────────────────────
-  deploy-gh-packages-level-2:
-    needs: [release-plan, deploy-gh-packages-level-1]
-    if: ${{ needs.release-plan.outputs.level2 != '[]' && (needs.deploy-gh-packages-level-1.result == 'success' || needs.deploy-gh-packages-level-1.result == 'skipped') && (github.event_name != 'workflow_dispatch' || inputs.run_deploy == true) }}
-    uses: ./.github/workflows/deploy-github-packages-one-level.yml
-    with:
-      modules_json: ${{ needs.release-plan.outputs.level2 }}
-      level_index: 2
-    secrets:
-      MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
-      GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
-      GH_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  # ── GH L3 ────────────────────────────────────────────────────────────────
-  deploy-gh-packages-level-3:
-    needs: [release-plan, deploy-gh-packages-level-2]
-    if: ${{ needs.release-plan.outputs.level3 != '[]' && (needs.deploy-gh-packages-level-2.result == 'success' || needs.deploy-gh-packages-level-2.result == 'skipped') && (github.event_name != 'workflow_dispatch' || inputs.run_deploy == true) }}
-    uses: ./.github/workflows/deploy-github-packages-one-level.yml
-    with:
-      modules_json: ${{ needs.release-plan.outputs.level3 }}
-      level_index: 3
-    secrets:
-      MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
-      GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
-      GH_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  # ── GH L4 ────────────────────────────────────────────────────────────────
-  deploy-gh-packages-level-4:
-    needs: [release-plan, deploy-gh-packages-level-3]
-    if: ${{ needs.release-plan.outputs.level4 != '[]' && (needs.deploy-gh-packages-level-3.result == 'success' || needs.deploy-gh-packages-level-3.result == 'skipped') && (github.event_name != 'workflow_dispatch' || inputs.run_deploy == true) }}
-    uses: ./.github/workflows/deploy-github-packages-one-level.yml
-    with:
-      modules_json: ${{ needs.release-plan.outputs.level4 }}
-      level_index: 4
-    secrets:
-      MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
-      GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
-      GH_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  # ── GH L5 ────────────────────────────────────────────────────────────────
-  deploy-gh-packages-level-5:
-    needs: [release-plan, deploy-gh-packages-level-4]
-    if: ${{ needs.release-plan.outputs.level5 != '[]' && (needs.deploy-gh-packages-level-4.result == 'success' || needs.deploy-gh-packages-level-4.result == 'skipped') && (github.event_name != 'workflow_dispatch' || inputs.run_deploy == true) }}
-    uses: ./.github/workflows/deploy-github-packages-one-level.yml
-    with:
-      modules_json: ${{ needs.release-plan.outputs.level5 }}
-      level_index: 5
-    secrets:
-      MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
-      GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
-      GH_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  # ── GH L6 ────────────────────────────────────────────────────────────────
-  deploy-gh-packages-level-6:
-    needs: [release-plan, deploy-gh-packages-level-5]
-    if: ${{ needs.release-plan.outputs.level6 != '[]' && (needs.deploy-gh-packages-level-5.result == 'success' || needs.deploy-gh-packages-level-5.result == 'skipped') && (github.event_name != 'workflow_dispatch' || inputs.run_deploy == true) }}
-    uses: ./.github/workflows/deploy-github-packages-one-level.yml
-    with:
-      modules_json: ${{ needs.release-plan.outputs.level6 }}
-      level_index: 6
-    secrets:
-      MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
-      GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
-      GH_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  # ────────────────────────────────────────────────────────────────────────────
-  # Update manifest — waits for both Maven Central and GitHub Packages deploys
+  # Update manifest — runs after all Maven Central levels complete.
+  # GitHub Packages deploy is handled by a separate workflow
+  # (publish-java-modules-gh-pkg.yml) triggered via workflow_run.
   # ────────────────────────────────────────────────────────────────────────────
   update-manifest:
     needs:
       - release-plan
       - deploy-level-6
-      - deploy-gh-packages-level-6
     if: ${{ needs.release-plan.outputs.selected_count != '0' && (needs.deploy-level-6.result == 'success' || needs.deploy-level-6.result == 'skipped') }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
