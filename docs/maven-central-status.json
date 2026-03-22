@@ -18,6 +18,15 @@
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.config/ether-config"
   },
   {
+    "module": "ether-crypto",
+    "groupId": "dev.rafex.ether.crypto",
+    "artifactId": "ether-crypto",
+    "deployed": false,
+    "latestVersion": "",
+    "lastUpdatedUtc": "",
+    "artifactUrl": "https://central.sonatype.com/search?q=ether-crypto"
+  },
+  {
     "module": "ether-database-core",
     "groupId": "dev.rafex.ether.database",
     "artifactId": "ether-database-core",

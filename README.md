@@ -10,6 +10,7 @@
 |---|---|---|---|---|
 | ether-parent | ![ether-parent](https://img.shields.io/maven-central/v/dev.rafex.ether.parent/ether-parent) | dev.rafex.ether.parent | ether-parent | si |
 | ether-config | ![ether-config](https://img.shields.io/maven-central/v/dev.rafex.ether.config/ether-config) | dev.rafex.ether.config | ether-config | si |
+| ether-crypto | ![ether-crypto](https://img.shields.io/maven-central/v/dev.rafex.ether.crypto/ether-crypto) | dev.rafex.ether.crypto | ether-crypto | no |
 | ether-database-core | ![ether-database-core](https://img.shields.io/maven-central/v/dev.rafex.ether.database/ether-database-core) | dev.rafex.ether.database | ether-database-core | si |
 | ether-jdbc | ![ether-jdbc](https://img.shields.io/maven-central/v/dev.rafex.ether.jdbc/ether-jdbc) | dev.rafex.ether.jdbc | ether-jdbc | si |
 | ether-database-postgres | ![ether-database-postgres](https://img.shields.io/maven-central/v/dev.rafex.ether.database/ether-database-postgres) | dev.rafex.ether.database | ether-database-postgres | si |
@@ -43,7 +44,7 @@ Consulta el archivo [docs/maven-central-status.json](docs/maven-central-status.j
 
 ```
 Sin Spring. Sin Quarkus. Sin Micronaut.
-Solo Java 25, Jetty 12 y las partes que realmente necesitas.
+Solo Java 21, Jetty 12 y las partes que realmente necesitas.
 ```
 
 ### Principios de diseño
@@ -52,7 +53,7 @@ Solo Java 25, Jetty 12 y las partes que realmente necesitas.
 - **Cero magia** — sin reflexión en tiempo de ejecución, sin anotaciones de framework
 - **Modular** — usa solo los módulos que necesitas; sin transitive bloat
 - **Testeable** — todas las interfaces son fáciles de mockear; no hay statics ocultos
-- **Java 25** — records, sealed classes, pattern matching, virtual threads
+- **Java 21** — records, sealed classes, pattern matching, virtual threads
 
 ---
 
@@ -66,7 +67,6 @@ graph TD
 
     subgraph Contratos["Contratos — APIs puras sin implementación"]
         CFG[ether-config<br/>Configuración tipada]
-        CRY[ether-crypto<br/>Password hashing, crypto primitives]
         DBC[ether-database-core<br/>DatabaseClient, RowMapper]
         JSON[ether-json<br/>JsonCodec]
         OBS[ether-observability-core<br/>TimingRecorder, RequestIdGenerator, ProbeCheck]
@@ -91,7 +91,7 @@ graph TD
         GLW[ether-glowroot-jetty12<br/>Instrumentación Glowroot APM]
     end
 
-    P --> CFG & CRY & DBC & JSON & OBS & HC & SEC & WSC
+    P --> CFG & DBC & JSON & OBS & HC & SEC & WSC
     DBC --> JDBC & PG
     JSON --> JWT & PROB & OAI & CLI
     HC --> PROB & HJ
@@ -186,19 +186,6 @@ var config = EtherConfig.builder()
     .source(new EnvironmentConfigSource())   // env override
     .build()
     .bind("server", ServerConfig.class);
-```
-
----
-
-### 🔐 Criptografía
-
-#### [`ether-crypto`](ether-crypto/README.md)
-Primitivas criptográficas ligeras para Ether. Arranca con `PasswordHasherPBKDF2`, extraído de Kiwi y HouseDB, y queda preparado para incorporar HMAC, firmas, key derivation y generación de tokens aleatorios.
-
-```java
-var hasher = new PasswordHasherPBKDF2(32);
-var result = hasher.hash("secret".toCharArray(), salt, 120_000);
-var valid = hasher.verify("secret".toCharArray(), result.salt(), result.iterations(), result.hash());
 ```
 
 ---
