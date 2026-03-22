@@ -1,5 +1,5 @@
 .PHONY: compile validate-main-build install-all sync-manifest release-plan validate-release-plan deploy \
-        compile-ether-parent compile-ether-config compile-ether-database-core \
+        compile-ether-parent compile-ether-config compile-ether-crypto compile-ether-database-core \
         compile-ether-jdbc compile-ether-database-postgres compile-ether-json compile-ether-jwt \
         compile-ether-observability-core compile-ether-logging-core compile-ether-ai-core \
         compile-ether-ai-openai compile-ether-ai-deepseek \
@@ -27,7 +27,7 @@ define install_local_module
     unset JAVA_HOME; \
   fi; \
   if [ -z "$$JAVA_HOME" ] && [ -x "/usr/libexec/java_home" ]; then \
-    JAVA_HOME="$$(/usr/libexec/java_home -v 21 2>/dev/null || /usr/libexec/java_home)"; \
+    JAVA_HOME="$$(/usr/libexec/java_home -v 25 2>/dev/null || /usr/libexec/java_home)"; \
     export JAVA_HOME; \
   fi; \
   echo "Installing local module $(1) (dir: $$module_dir)"; \
@@ -45,7 +45,7 @@ define compile_local_module
     unset JAVA_HOME; \
   fi; \
   if [ -z "$$JAVA_HOME" ] && [ -x "/usr/libexec/java_home" ]; then \
-    JAVA_HOME="$$(/usr/libexec/java_home -v 21 2>/dev/null || /usr/libexec/java_home)"; \
+    JAVA_HOME="$$(/usr/libexec/java_home -v 25 2>/dev/null || /usr/libexec/java_home)"; \
     export JAVA_HOME; \
   fi; \
   echo "Compiling module $(1) (dir: $$module_dir)"; \
@@ -65,6 +65,11 @@ compile-ether-parent:
 compile-ether-config:
 	@$(call install_local_module,ether-parent)
 	@$(call compile_local_module,ether-config)
+
+## compile-ether-crypto: install parent and compile crypto
+compile-ether-crypto:
+	@$(call install_local_module,ether-parent)
+	@$(call compile_local_module,ether-crypto)
 
 ## compile-ether-database-core: install parent and compile database-core
 compile-ether-database-core:
@@ -194,7 +199,7 @@ compile-ether-glowroot-jetty12:
 	@$(call compile_local_module,ether-glowroot-jetty12)
 
 ## compile: compile all modules in dependency order
-compile: compile-ether-parent compile-ether-config compile-ether-database-core \
+compile: compile-ether-parent compile-ether-config compile-ether-crypto compile-ether-database-core \
          compile-ether-jdbc compile-ether-database-postgres compile-ether-json compile-ether-jwt \
          compile-ether-observability-core compile-ether-http-core compile-ether-http-security \
          compile-ether-http-problem compile-ether-http-openapi compile-ether-http-client \
@@ -211,7 +216,7 @@ validate-main-build: install-all
 	@echo "Local compile validation completed."
 
 ## install-all: mvn clean install for every module in strict dependency order
-## Order: parent → config → database-core → jdbc → database-postgres → json → jwt → observability-core → http-core
+## Order: parent → config → crypto → database-core → jdbc → database-postgres → json → jwt → observability-core → http-core
 ##        → http-security → http-problem → http-openapi → http-client → logging-core
 ##        → ai-core → ai-openai → ai-deepseek
 ##        → websocket-core → http-jetty12 → websocket-jetty12 → webhook
@@ -221,6 +226,8 @@ install-all:
 	@$(call install_local_module,ether-parent)
 	@echo "==> Installing ether-config"
 	@$(call install_local_module,ether-config)
+	@echo "==> Installing ether-crypto"
+	@$(call install_local_module,ether-crypto)
 	@echo "==> Installing ether-database-core"
 	@$(call install_local_module,ether-database-core)
 	@echo "==> Installing ether-jdbc"

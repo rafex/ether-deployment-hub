@@ -19,10 +19,10 @@ on:
         type: string
         default: 'temurin'
       java-version:
-        description: "Java version to use (default: 21)"
+        description: "Java version to use (default: 25)"
         required: false
         type: string
-        default: '21'
+        default: '25'
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"

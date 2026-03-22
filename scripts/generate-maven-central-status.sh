@@ -11,6 +11,7 @@ mkdir -p "$OUT_DIR"
 MODULES=(
   "ether-parent|dev.rafex.ether.parent|ether-parent"
   "ether-config|dev.rafex.ether.config|ether-config"
+  "ether-crypto|dev.rafex.ether.crypto|ether-crypto"
   "ether-database-core|dev.rafex.ether.database|ether-database-core"
   "ether-jdbc|dev.rafex.ether.jdbc|ether-jdbc"
   "ether-database-postgres|dev.rafex.ether.database|ether-database-postgres"

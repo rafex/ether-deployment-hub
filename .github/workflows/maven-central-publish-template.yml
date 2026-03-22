@@ -28,10 +28,10 @@ on:
         type: string
         default: 'temurin'
       java-version:
-        description: "Java version to use (default: 21)"
+        description: "Java version to use (default: 25)"
         required: false
         type: string
-        default: '21'
+        default: '25'
     secrets:
       OSSRH_USERNAME:
         required: true
