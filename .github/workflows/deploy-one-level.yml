@@ -158,3 +158,55 @@ jobs:
             echo "ERROR: One or more modules failed in level ${{ inputs.level_index }}."
             exit 1
           fi
+
+      - name: Collect built artifacts for GitHub Packages
+        # Stage the JARs/POMs built (and installed to ~/.m2) by the deploy step
+        # so the independent GitHub Packages workflow can download them directly
+        # from GitHub Actions artifact storage instead of polling Maven Central.
+        shell: bash
+        env:
+          LEVEL_MODULES_JSON: ${{ inputs.modules_json }}
+        run: |
+          set -euo pipefail
+          PLAN="./release-artifacts/release-plan.json"
+          M2_REPO="${HOME}/.m2/repository"
+          STAGING="${RUNNER_TEMP}/maven-artifacts-level-${{ inputs.level_index }}"
+          mkdir -p "$STAGING"
+
+          mapfile -t level_modules < <(echo "$LEVEL_MODULES_JSON" | jq -r '.[]')
+
+          for module in "${level_modules[@]}"; do
+            release_level=$(jq -r --arg m "$module" \
+              '.modules[] | select(.name == $m) | .releaseLevel' "$PLAN")
+            [ "$release_level" = "none" ] && continue
+
+            version=$(jq -r --arg m "$module" \
+              '.modules[] | select(.name == $m) | .nextVersion' "$PLAN")
+            group_id=$(jq -r --arg m "$module" \
+              '.modules[] | select(.name == $m) | .groupId' "./releases/manifest.json")
+            artifact_id=$(jq -r --arg m "$module" \
+              '.modules[] | select(.name == $m) | .artifactId' "./releases/manifest.json")
+
+            group_path="${group_id//./\/}"
+            src="${M2_REPO}/${group_path}/${artifact_id}/${version}"
+            dst="${STAGING}/${group_path}/${artifact_id}/${version}"
+            mkdir -p "$dst"
+
+            # Copy POM + JARs (skip GPG signatures and checksums — GH Packages
+            # will re-sign with its own key via deploy-to-github-packages.sh).
+            for f in \
+              "${artifact_id}-${version}.pom" \
+              "${artifact_id}-${version}.jar" \
+              "${artifact_id}-${version}-sources.jar" \
+              "${artifact_id}-${version}-javadoc.jar"; do
+              [ -f "${src}/${f}" ] && cp "${src}/${f}" "${dst}/${f}" && \
+                echo "  [STAGED] ${f}" || true
+            done
+          done
+
+      - name: Upload level ${{ inputs.level_index }} artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: maven-artifacts-level-${{ inputs.level_index }}
+          path: ${{ runner.temp }}/maven-artifacts-level-${{ inputs.level_index }}/
+          if-no-files-found: warn

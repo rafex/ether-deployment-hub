@@ -12,6 +12,10 @@ on:
         required: true
         type: number
         description: 'Level index (0-based) for logging'
+      maven_central_run_id:
+        required: true
+        type: string
+        description: 'Run ID of the Maven Central workflow whose staged artifacts we use'
     secrets:
       MAVEN_GPG_PASSPHRASE:
         required: true
@@ -30,9 +34,9 @@ jobs:
 
     steps:
       # Shallow checkout — sources are not needed.
-      # We download pre-built artifacts from Maven Central (already published
-      # by the Maven Central deploy phase) instead of recompiling from source.
-      # Only the scripts/ and releases/ directories are used here.
+      # We re-use pre-built artifacts staged by the Maven Central workflow
+      # instead of recompiling from source.
+      # Only the scripts/ and releases/ directories are needed here.
       - name: Checkout repo (shallow, no submodules)
         uses: actions/checkout@v6
         with:
@@ -44,6 +48,29 @@ jobs:
         with:
           name: release-plan
           path: release-artifacts
+
+      # Download the JARs/POMs built and staged by deploy-one-level.yml.
+      # These come from the Maven Central workflow run, so there is no
+      # dependency on Maven Central propagation timing.
+      - name: Download level ${{ inputs.level_index }} artifacts from Maven Central run
+        uses: actions/download-artifact@v8
+        with:
+          name: maven-artifacts-level-${{ inputs.level_index }}
+          path: ${{ runner.temp }}/maven-artifacts/
+          run-id: ${{ inputs.maven_central_run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Restore artifacts to local Maven repository
+        shell: bash
+        run: |
+          set -euo pipefail
+          M2_REPO="${HOME}/.m2/repository"
+          SRC="${RUNNER_TEMP}/maven-artifacts"
+          mkdir -p "$M2_REPO"
+          # Merge staged tree into ~/.m2/repository preserving directory structure.
+          cp -r "$SRC"/. "$M2_REPO/"
+          echo "Restored artifacts:"
+          find "$M2_REPO" \( -name "*.pom" -o -name "*.jar" \) | sort
 
       - name: Set up Java (needed for Maven GPG signing)
         uses: actions/setup-java@v5
@@ -57,101 +84,6 @@ jobs:
         run: |
           echo "$GPG_PRIVATE_KEY_B64" | base64 --decode | gpg --batch --import
           gpg --list-secret-keys
-
-      - name: Download level ${{ inputs.level_index }} artifacts from Maven Central
-        # Artifacts are already published to Maven Central by the Maven Central
-        # deploy phase. We download them directly with curl instead of rebuilding
-        # from source, which eliminates the slow dependency-resolution step.
-        # Files are placed in ~/.m2/repository so that deploy-to-github-packages.sh
-        # can find them without modification.
-        shell: bash
-        env:
-          LEVEL_MODULES_JSON: ${{ inputs.modules_json }}
-          CENTRAL_BASE_URL: "https://repo1.maven.apache.org/maven2"
-          MAX_RETRIES: "5"
-          RETRY_DELAY: "30"
-        run: |
-          set -euo pipefail
-          PLAN="./release-artifacts/release-plan.json"
-          M2_REPO="${HOME}/.m2/repository"
-
-          mapfile -t level_modules < <(echo "$LEVEL_MODULES_JSON" | jq -r '.[]')
-
-          echo "════════════════════════════════════════════════════════"
-          echo " GH Packages Level ${{ inputs.level_index }} — downloading ${#level_modules[@]} module(s) from Maven Central"
-          echo "════════════════════════════════════════════════════════"
-
-          # curl_retry: download URL to FILE, retrying up to MAX_RETRIES times.
-          # Returns 0 on success, 1 if the file is permanently absent (404).
-          #
-          # NOTE: the inner curl call is guarded with "|| { rm -f ...; echo 000; }"
-          # so that network-level errors (e.g. curl exit 6 = can't resolve host)
-          # never propagate through the command substitution and abort the script
-          # under "set -e".  On any curl failure the http_code becomes "000" and
-          # the retry loop handles it.
-          curl_retry() {
-            local url="$1"
-            local out="$2"
-            local attempt=0
-            while [ "$attempt" -lt "$MAX_RETRIES" ]; do
-              http_code=$(curl -sSL -w "%{http_code}" -o "$out" "$url" 2>/dev/null \
-                            || { rm -f "$out"; echo "000"; })
-              if [ "$http_code" = "200" ]; then
-                return 0
-              elif [ "$http_code" = "404" ]; then
-                rm -f "$out"
-                return 1   # File does not exist on Central — skip silently
-              fi
-              attempt=$(( attempt + 1 ))
-              echo "  [WARN] HTTP $http_code fetching $(basename "$url") — retry $attempt/$MAX_RETRIES in ${RETRY_DELAY}s"
-              sleep "$RETRY_DELAY"
-            done
-            echo "  [ERROR] Failed to download $(basename "$url") after $MAX_RETRIES attempts" >&2
-            rm -f "$out"
-            return 2
-          }
-
-          for module in "${level_modules[@]}"; do
-            release_level=$(jq -r --arg m "$module" \
-              '.modules[] | select(.name == $m) | .releaseLevel' "$PLAN")
-            [ "$release_level" = "none" ] && continue
-
-            version=$(jq -r --arg m "$module" \
-              '.modules[] | select(.name == $m) | .nextVersion' "$PLAN")
-            group_id=$(jq -r --arg m "$module" \
-              '.modules[] | select(.name == $m) | .groupId' "./releases/manifest.json")
-            artifact_id=$(jq -r --arg m "$module" \
-              '.modules[] | select(.name == $m) | .artifactId' "./releases/manifest.json")
-
-            group_path="${group_id//./\/}"
-            base_url="${CENTRAL_BASE_URL}/${group_path}/${artifact_id}/${version}"
-            m2_dir="${M2_REPO}/${group_path}/${artifact_id}/${version}"
-            mkdir -p "$m2_dir"
-
-            echo "  [DOWNLOAD] ${group_id}:${artifact_id}:${version}"
-
-            # POM — always required
-            curl_retry \
-              "${base_url}/${artifact_id}-${version}.pom" \
-              "${m2_dir}/${artifact_id}-${version}.pom"
-
-            # JAR — absent for BOM/POM-only modules (ether-parent); ignore 404
-            curl_retry \
-              "${base_url}/${artifact_id}-${version}.jar" \
-              "${m2_dir}/${artifact_id}-${version}.jar" || true
-
-            # Sources JAR
-            curl_retry \
-              "${base_url}/${artifact_id}-${version}-sources.jar" \
-              "${m2_dir}/${artifact_id}-${version}-sources.jar" || true
-
-            # Javadoc JAR
-            curl_retry \
-              "${base_url}/${artifact_id}-${version}-javadoc.jar" \
-              "${m2_dir}/${artifact_id}-${version}-javadoc.jar" || true
-
-            echo "  [READY]    $module ($version)"
-          done
 
       - name: Deploy level ${{ inputs.level_index }} modules to GitHub Packages
         shell: bash
