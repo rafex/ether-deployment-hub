@@ -83,12 +83,19 @@ jobs:
 
           # curl_retry: download URL to FILE, retrying up to MAX_RETRIES times.
           # Returns 0 on success, 1 if the file is permanently absent (404).
+          #
+          # NOTE: the inner curl call is guarded with "|| { rm -f ...; echo 000; }"
+          # so that network-level errors (e.g. curl exit 6 = can't resolve host)
+          # never propagate through the command substitution and abort the script
+          # under "set -e".  On any curl failure the http_code becomes "000" and
+          # the retry loop handles it.
           curl_retry() {
             local url="$1"
             local out="$2"
             local attempt=0
             while [ "$attempt" -lt "$MAX_RETRIES" ]; do
-              http_code=$(curl -sSL -w "%{http_code}" -o "$out" "$url" 2>/dev/null)
+              http_code=$(curl -sSL -w "%{http_code}" -o "$out" "$url" 2>/dev/null \
+                            || { rm -f "$out"; echo "000"; })
               if [ "$http_code" = "200" ]; then
                 return 0
               elif [ "$http_code" = "404" ]; then
