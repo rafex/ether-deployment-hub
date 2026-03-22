@@ -21,8 +21,6 @@ on:
         required: true
       GPG_PRIVATE_KEY_B64:
         required: true
-      GH_PACKAGES_TOKEN:
-        required: true
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
@@ -88,7 +86,7 @@ jobs:
       - name: Deploy level ${{ inputs.level_index }} modules to GitHub Packages
         shell: bash
         env:
-          GH_PACKAGES_TOKEN:    ${{ secrets.GH_PACKAGES_TOKEN }}
+          GH_PACKAGES_TOKEN:    ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR:         ${{ github.actor }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
           LEVEL_MODULES_JSON:   ${{ inputs.modules_json }}
