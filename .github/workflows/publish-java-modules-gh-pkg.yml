@@ -106,7 +106,6 @@ jobs:
     secrets:
       MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
       GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
-      GH_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # ── L1 ────────────────────────────────────────────────────────────────────────
   deploy-gh-packages-level-1:
@@ -120,7 +119,6 @@ jobs:
     secrets:
       MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
       GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
-      GH_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # ── L2 ────────────────────────────────────────────────────────────────────────
   deploy-gh-packages-level-2:
@@ -134,7 +132,6 @@ jobs:
     secrets:
       MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
       GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
-      GH_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # ── L3 ────────────────────────────────────────────────────────────────────────
   deploy-gh-packages-level-3:
@@ -148,7 +145,6 @@ jobs:
     secrets:
       MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
       GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
-      GH_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # ── L4 ────────────────────────────────────────────────────────────────────────
   deploy-gh-packages-level-4:
@@ -162,7 +158,6 @@ jobs:
     secrets:
       MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
       GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
-      GH_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # ── L5 ────────────────────────────────────────────────────────────────────────
   deploy-gh-packages-level-5:
@@ -176,7 +171,6 @@ jobs:
     secrets:
       MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
       GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
-      GH_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # ── L6 ────────────────────────────────────────────────────────────────────────
   deploy-gh-packages-level-6:
@@ -190,4 +184,3 @@ jobs:
     secrets:
       MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
       GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
-      GH_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
