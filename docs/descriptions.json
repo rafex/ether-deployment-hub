@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "note": "Hand-maintained descriptions for Ether modules. Edit this file to update descriptions.",
+  "descriptions": {
+    "ether-parent": "Parent POM and BOM managing all external dependency versions across the ecosystem",
+    "ether-config": "Typed configuration entry points and composition APIs for Ether applications",
+    "ether-crypto": "Cryptographic utilities: hashing, encoding, secure random, key generation",
+    "ether-database-core": "Database contracts: DatabaseClient interface and RowMapper abstraction",
+    "ether-jdbc": "JDBC implementation of ether-database-core abstractions",
+    "ether-database-postgres": "PostgreSQL error classification, SQL state constants, and pg-specific helpers",
+    "ether-json": "JsonCodec interface built on Jackson for flexible and pluggable serialization",
+    "ether-jwt": "Lightweight cryptographic primitives for JWT: HS256, RS256, ES256 token operations",
+    "ether-observability-core": "Health checks, request ID generation, timing recording, and metrics contracts",
+    "ether-http-core": "Core HTTP contracts: HttpExchange, HttpHandler, Middleware, routing abstractions",
+    "ether-http-security": "CORS policies, security headers, IP allowlisting, and rate limiting configurations",
+    "ether-http-problem": "RFC 7807 Problem Details error response formatting for HTTP APIs",
+    "ether-http-openapi": "Programmatic OpenAPI 3.1 specification builder — describe your API in Java code",
+    "ether-http-client": "Outbound HTTP client built on java.net.http with retry and JSON parsing support",
+    "ether-logging-core": "Logging contracts and structured log support for Ether applications",
+    "ether-ai-core": "AI provider contracts: ChatClient, CompletionRequest, Message abstractions",
+    "ether-ai-openai": "OpenAI provider implementation for ether-ai-core (chat completions, embeddings)",
+    "ether-ai-deepseek": "DeepSeek provider implementation for ether-ai-core",
+    "ether-http-jetty12": "Production-ready HTTP server integrating all ether-http-* modules via Jetty 12",
+    "ether-websocket-core": "Transport-agnostic WebSocket contracts: Session, MessageHandler, frame types",
+    "ether-websocket-jetty12": "Jetty 12-based WebSocket server implementation of ether-websocket-core",
+    "ether-webhook": "Webhook delivery, signing (HMAC-SHA256), and signature verification support",
+    "ether-glowroot-jetty12": "Glowroot APM instrumentation plugin for Jetty 12 — zero code modification required"
+  }
+}
