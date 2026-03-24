@@ -18,4 +18,5 @@ docs/api/doxygen/
 *.jar
 target/
 .claude/
+.opencode/
 
