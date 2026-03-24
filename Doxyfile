@@ -56,6 +56,9 @@ HTML_DYNAMIC_SECTIONS  = YES
 GENERATE_TREEVIEW      = YES
 DISABLE_INDEX          = NO
 FULL_SIDEBAR           = YES
+# Custom footer injects Mermaid CDN so ```mermaid fenced blocks render as diagrams.
+# GitHub renders the same blocks natively, so no source changes are needed.
+HTML_FOOTER            = docs/doxygen/footer.html
 GENERATE_LATEX         = NO
 GENERATE_XML           = NO
 
