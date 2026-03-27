@@ -20,3 +20,10 @@ target/
 .claude/
 .opencode/
 
+
+# opencode (local, no versionar)
+.opencode/sessions.db
+.opencode/worktrees/
+.opencode/node_modules/
+# opencode — exportaciones de sesión
+session-ses_*.md
