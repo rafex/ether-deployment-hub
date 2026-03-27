@@ -90,3 +90,6 @@
 	path = ether-crypto
 	url = git@github.com:rafex/ether-crypto.git
 	branch = main
+[submodule "ether-archetype"]
+	path = ether-archetype
+	url = git@github.com:rafex/ether-archetype.git
