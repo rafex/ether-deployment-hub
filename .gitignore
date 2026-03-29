@@ -27,3 +27,6 @@ target/
 .opencode/node_modules/
 # opencode — exportaciones de sesión
 session-ses_*.md
+
+# opencode — base de datos de worktrees (generada, no committear)
+.opencode/worktrees.db

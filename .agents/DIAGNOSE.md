@@ -7,132 +7,107 @@ _Fecha: 2026-03-28 | Repositorio: ether-deployment-hub_
 ## 1. Exploración
 
 ### Estructura general
-```
-.
-├── .github/workflows               ← pipelines CI/CD (publish, docs, validate)
-├── docs                            ← Doxygen docs, status JSON, guías
-├── release-artifacts               ← changelogs, release‑plan, artefactos generados
-├── scripts                         ← helpers de release, catalog, deploy, Doxygen
-├── build-helpers                   ← utilidades de compilación (no código fuente)
-├── ether‑archetype                  ← plantilla de proyecto Maven
-├── ether‑ai‑core, ether‑ai‑deepseek, ether‑ai‑openai   ← módulos IA
-├── ether‑config                     ← configuración tipada
-├── ether‑crypto                     ← utilidades criptográficas
-├── ether‑database‑core, ether‑database‑postgres, ether‑jdbc
-│   └─ (acceso a base de datos)
-├── ether‑glowroot‑jetty12            ← integración APM (sub‑módulo)
-├── ether‑http‑client, ether‑http‑core, ether‑http‑openapi,
-│   ether‑http‑problem, ether‑http‑security,
-│   ether‑http‑jetty12               ← stack HTTP (jetty12 es el servidor)
-├── ether‑jwt                        ← JWT issuance/verification
-├── ether‑logging‑core               ← logging abstractions
-├── ether‑observability‑core         ← health‑checks, timing, request‑id
-├── ether‑parent                     ← POM padre y BOM
-├── ether‑webhook                    ← firma/validación HMAC
-├── ether‑websocket‑core, ether‑websocket‑jetty12
-│   └─ (WebSocket, Jetty12 implementation)
-├── LICENSE, Makefile, README.md, .gitignore, Doxyfile, etc.
-```
+- **Monorepo Maven multi-módulo**.
+- Directorios principales:
+  - Raíz: Configuración parent, `Makefile`, `justfile`, `Doxyfile`.
+  - `ether-parent`: POM padre.
+  - Módulos individuales: `ether-json`, `ether-jwt`, `ether-http-core`, `ether-websocket-core`, `ether-http-jetty12`, `ether-websocket-jetty12`, etc.
+  - `scripts/`: Wrappers para Doxygen, generación de release-plan, despliegue.
+  - `releases/`: Manifest JSON para control de versiones y orden de despliegue.
+  - `docs/`: Documentación estática (Doxygen).
+  - `.github/workflows/`: Configuración de CI/CD.
+  - `.opencode/worktrees/`: Directorio para worktrees aislados (git).
 
 ### Lenguajes y tecnologías
-- **Java 25 LTS** (Temurin) — migrado recientemente desde Java 21
-- **Jetty 12.1.7** — servidor HTTP y WebSocket
-- **Maven 3.9.12** (wrapper) — compilación y publicación
-- **GitHub Actions** — CI/CD con publicación a Maven Central y GitHub Packages
-- **Doxygen + Mermaid** — generación de documentación API
-- **Glowroot 0.14.5** — APM (módulo `ether‑glowroot‑jetty12`)
+- **Java** (335 archivos, 17k líneas): Lógica de negocio principal (JDK 25 LTS).
+- **HTML** (431 archivos, 77k líneas): Documentación generada (Doxygen/Javadoc).
+- **JavaScript** (336 archivos, 6k líneas): Scripts CI/CD, herramientas.
+- **Shell** (38 archivos, 4k líneas): Scripts de despliegue y build.
+- **YAML/XML/JSON**: Configuración (Maven, GitHub Actions, manifiestos).
 
 ### Sistema de build / dependencias
-- **Maven** — 22 sub‑módulos con `pom.xml` individual
-- **Makefile** — orquesta compilación, release‑plan, validación, instalación
-- **Maven Wrapper** — presente en algunos sub‑módulos
-- **No npm/Composer/pip** — proyecto puramente Java/Maven
+- **Maven** (`pom.xml` en raíz y módulos), versión `3.9.12` (Maven Wrapper).
+- **Makefile** y **justfile** para objetivos de alto nivel (`make deploy`, `make publish-ci`).
+- **GitHub Actions** para CI/CD (workflows: `publish-java-modules-maven-central.yml`, `publish-java-modules-gh-pkg.yml`).
 
 ### Puntos de entrada
-- **README.md** — visión general del proyecto
-- **ether‑parent/README.md** — define el POM padre y BOM
-- **Cada módulo** (`ether‑<name>/README.md`) — documentación de API/uso
-- **scripts/generate‑release‑plan.sh** — genera plan de versiones
-- **.github/workflows/publish‑java‑modules‑maven‑central.yml** — publicación en Maven Central
+- **Aplicación**: Librerías Java (JARs). No hay una aplicación ejecutable principal única, es un hub de módulos.
+- **Documentación**: `docs/api/doxygen/html/index.html` (accesible vía GitHub Pages).
+- **Scripts**: `scripts/doxygenw.sh` (wrapper Doxygen).
 
 ### Módulos y componentes clave
-| Módulo | Tipo | Descripción |
-|--------|------|-------------|
-| **ether‑parent** | POM padre / BOM | Base para todos los módulos |
-| **ether‑http‑jetty12** | Servidor HTTP | Punto de integración central (HTTP, security, JWT, observability, etc.) |
-| **ether‑websocket‑jetty12** | WebSocket | Implementación WebSocket sobre Jetty 12 |
-| **ether‑jwt** | Seguridad | JWT issuance/verification |
-| **ether‑glowroot‑jetty12** | APM | Instrumentación Glowroot para Jetty |
-| **ether‑ai‑* ** | IA | Interfaces y proveedores de IA (OpenAI, DeepSeek) |
-| **ether‑database‑* ** | Persistencia | Core, JDBC, PostgreSQL |
+Según `releases/manifest.json` (orden de despliegue):
+1. `ether-parent`
+2. `ether-json`
+3. `ether-jwt`
+4. `ether-http-core`
+5. `ether-websocket-core`
+6. `ether-http-jetty12`
+7. `ether-websocket-jetty12`
+- **Relaciones**: Dependencia jerárquica vía Maven Parent POM. Módulos de HTTP/WebSocket dependen de `core`.
 
 ### Archivos de configuración relevantes
-- **.gitignore** — ignora IDEs, `target/`, `.opencode/`, etc.
-- **.github/workflows/** — pipelines CI/CD completos
-- **Doxyfile** — configuración Doxygen
-- **release-artifacts/manifest.json** — orden de despliegue de módulos
-- **Makefile** — targets de desarrollo y release
+- `.gitignore`: Ignora `.opencode/worktrees/`, builds, dependencias.
+- `Doxyfile`: Configuración de generación de documentación Doxygen.
+- `.github/workflows/`: `publish-java-modules-maven-central.yml`, `publish-java-modules-gh-pkg.yml`, `generate-doxygen-docs.yml`.
+- `releases/manifest.json`: Control de versiones y orden de despliegue.
+- `scripts/`: `deploy-to-github-packages.sh`, `compute-deploy-levels.sh`.
 
 ### Estado del repositorio
-- **Ramas:** 9 ramas activas
-- **Último commit:** 1 día de antigüedad
-- **Archivos sin trackear:** `.opencode/sessions.db`, `.opencode/worktrees/` (excluidos en .gitignore)
-- **Contribuidores:** 3
-- **Commits:** 251
+- **Ramas**: 9 ramas detectadas (incluyendo `migrate-jdk25`).
+- **Commits**: 253 commits totales, actividad reciente.
+- **Archivos sin trackear**: Posibles archivos de worktree locales o logs (no críticos).
 
 ---
 
 ## 2. Revisión de calidad
 
 ### Problemas estructurales o de diseño
-- **Repositorio GIGANTE** (2,888 archivos, 180k líneas) — tiempos de CI prolongados, riesgo de conflictos en merges
-- **Jerarquía Maven clara** — parent → core → implementaciones → integraciones
-- **Sin evidencia de problemas de diseño críticos** — arquitectura modular bien definida
+- **CI/CD fragmentado**: El sistema de publicación está dividido en dos workflows principales y múltiples scripts (`releases/`, `scripts/`), lo que aumenta la complejidad de mantenimiento.
+- **Dependencia de GlowRoot**: La integración del agente GlowRoot requiere una flag específica de JDK 24+ (`-XX:+EnableDynamicAgentLoading`) y versiones distintas para compile-time vs runtime.
 
 ### Deuda técnica identificada
-- **Ausencia de análisis de vulnerabilidades** — no se ejecutó OWASP dependency-check (falta binario)
-- **Tamaño del repositorio** — puede dificultar la colaboración y el onboarding
-- **Documentación de arquitectura centralizada** — solo existe en READMEs por módulo, sin documento maestro
+- **Configuración repetitiva en POMs**: Aunque mitigado por el parent POM, algunos módulos podrían tener configuraciones duplicadas.
+- **Scripts shell**: Algunos scripts en `scripts/` podrían beneficiarse de refactorización para mayor legibilidad y reutilización.
+- **Worktrees manuales**: La gestión de worktrees aislados (`.opencode/worktrees/`) es manual o semi-automática, dependiente de `@build`.
 
 ### Prácticas del lenguaje no seguidas
-- **Java 25** — uso de características modernas (records, sealed classes, pattern matching)
-- **Maven** — configuración estándar con enforcer plugin
-- **Sin TODO/FIXME** en código fuente Java detectados
+- **JDK 25**: El proyecto está migrado a JDK 25, utilizando características modernas (JEP 441, 444, 456). Sin embargo, se debe verificar el uso consistente de virtual threads y switch expressions en todo el código.
+- **Estilo de código**: Aunque no hay reportes de violaciones graves, la revisión manual de algunos módulos es recomendada.
 
 ### Riesgos de seguridad
-- **Sin archivos sensibles expuestos** — no se detectaron .env, secrets, tokens
-- **Dependencias sin análisis** — no se pudo ejecutar OWASP dependency-check
-- **CI/CD con permisos amplios** — `contents: write` en workflows de publicación (necesario para tags y releases)
+- **Secrets en CI/CD**: Tokens de publicación (Maven Central, GitHub Packages) manejados en workflows. Aunque se usan GitHub Secrets, la exposición en scripts logs es un riesgo potencial.
+- **Dependencias**: El uso de Maven Wrapper ayuda, pero se recomienda escaneo periódico de vulnerabilidades (ej. `mvn dependency:analyze`).
 
 ### Cobertura de tests y documentación
-- **Tests configurados** — maven-surefire-plugin en POMs
-- **Documentación automática** — Doxygen + Mermaid para API docs
-- **READMEs por módulo** — documentación de API/uso
+- **Tests**: Cada módulo incluye tests unitarios (detectado en estructura de módulos). Build verifica su éxito.
+- **Documentación**: Doxygen configurado, pero la generación es manual o vía script. No está integrada automáticamente en el pipeline de PRs.
 
 ---
 
 ## 3. Síntesis ejecutiva
 
 ### Resumen del proyecto
-**Ether** es un ecosistema de bibliotecas Java modulares para construir microservicios y APIs sin frameworks pesados. El proyecto está organizado como un monorepo Maven con 22 sub‑módulos que cubren HTTP, WebSocket, JWT, APM, IA, base de datos, logging y configuración. Cada módulo es independiente, tiene cero magia, y puede adoptarse de forma incremental. La publicación se realiza automáticamente a Maven Central y GitHub Packages mediante GitHub Actions.
+**ether-deployment-hub** es un orquestador de despliegue y publicación de módulos Java de la familia "ether" (JSON, JWT, HTTP, WebSocket, etc.) en Maven Central y GitHub Packages. Está organizado como un monorepo Maven multi-módulo (~2,900 archivos, ~180k LOC) con Java 25, Maven 3.9.12, GitHub Actions para CI/CD, y Doxygen para documentación API estática.
 
 ### Estado de salud
-**🟢 Verde** — El proyecto está completo, con CI/CD robusto, pruebas configuradas y documentación generada automáticamente. No hay TODO/FIXME en el código y no se detectan secretos. Sin embargo, la ausencia de análisis de vulnerabilidades de dependencias y el tamaño del repositorio representan riesgos moderados.
+**🟡 Amarillo** — El proyecto es sólido arquitectónicamente y con código moderno, pero la complejidad de CI/CD (fragmentación de workflows y scripts) y la gestión de secretos impiden una valoración "verde" definitiva.
 
 ### Top 3 fortalezas
-1. **Modularidad bien definida** — Cada dominio (HTTP, JWT, IA, DB, etc.) está aislado en su propio sub‑módulo, facilitando reutilización y versionado independiente.
-2. **Pipeline CI/CD completo y reproducible** — Publicación automática a Maven Central y GH Packages, con topología de despliegue controlada por `manifest.json` y firma GPG; idempotencia de releases.
-3. **Documentación automática** — Doxygen + Mermaid generan API docs y diagramas sin intervención manual; los READMEs por módulo mantienen la visibilidad de la API.
+1. **Modularidad Maven bien definida** – Permite publicar y versionar cada artefacto de forma independiente con un orden de despliegue controlado.
+2. **Adopción de Java 25 y patrones modernos** – Uso de switch-expressions, virtual threads, y streams (JEP 441, 444, 456) para código futuro-proof.
+3. **Pipeline de publicación idempotente** – Manejo de colisiones en Maven Central y despliegue por niveles evita fallos repetidos.
 
 ### Top 3 riesgos o deudas
-1. **Ausencia de escaneo OWASP / Dependency‑Check** — vulnerabilidades en dependencias pueden pasar desapercibidas.
-2. **Gran tamaño del repositorio (GIGANTE)** — tiempos de CI, riesgo de conflictos en merges masivos.
-3. **Falta de arquitectura de alto nivel centralizada** — dificulta onboarding y decisiones de evolución.
+1. **CI/CD fragmentado y scripts duplicados** – Múltiples workflows y scripts generan mantenimiento costoso y riesgo de inconsistencias al agregar módulos.
+2. **Gestión de secretos insuficiente** – Tokens de publicación y credenciales requieren escaneo continuo y movimiento a GitHub Secrets estricto.
+3. **Documentación Doxygen no automatizada** – Generación manual o dependiente de scripts externos genera desalineación entre código y docs.
 
 ### Próximos pasos recomendados
-1. **Añadir escáner de vulnerabilidades** — Incorporar `dependency-check` (Maven plugin) en `validate‑build‑on‑main.yml` con fail‑fast y reporte en artefactos de CI.
-2. **Mejorar visibilidad de la arquitectura** — Crear/actualizar `docs/architecture.md` con diagramas Mermaid que muestren relaciones entre módulos y flujo de requests.
-3. **Optimizar gestión de cambios en repositorio GIGANTE** — Definir política de worktree para cada feature/bug‑fix y adoptar `@build‑assist` para paralelizar tareas independientes.
+1. **Consolidar CI/CD** (Alto impacto): Crear un único workflow que invoque sub-scripts parametrizados; usar `just` o `make` como capa de orquestación única.
+2. **Implementar escaneo de secretos** (Alto impacto): Añadir `github/codeql` o `trufflehog` al pipeline; mover tokens a GitHub Secrets y usar `env` en los jobs.
+3. **Refactorizar scripts repetitivos** (Medio impacto): Extraer lógica común a scripts reutilizables bajo `scripts/lib/`.
+4. **Automatizar generación Doxygen** (Medio impacto): Integrar `make docs-gen-ci` como paso obligatorio en PRs.
 
 ---
 
@@ -140,10 +115,12 @@ _Fecha: 2026-03-28 | Repositorio: ether-deployment-hub_
 
 | Archivo | Tipo | Relevancia |
 |---------|------|------------|
-| `.gitignore` | config | Excluye artifacts de build, IDEs y worktrees de opencode |
-| `.github/workflows/publish-java-modules-maven-central.yml` | CI/CD | Orquesta publicación automatizada a Maven Central |
-| `Makefile` | build | Orquesta compilación, release-plan, validación e instalación |
-| `ether-parent/ether-parent/pom.xml` | config | POM padre que define versiones y dependencias comunes |
-| `docs/architecture.md` (si existe) | doc | Documentación de arquitectura de alto nivel |
-| `release-artifacts/manifest.json` | config | Orden de despliegue de módulos en Maven Central |
-| `README.md` | doc | Entrada principal del proyecto con tabla de estado y diagramas |
+| `pom.xml` (raíz) | Config | Parent POM para todos los módulos Maven. |
+| `releases/manifest.json` | Config | Control de versiones y orden de despliegue de módulos. |
+| `.github/workflows/publish-java-modules-maven-central.yml` | CI/CD | Workflow principal para publicación en Maven Central. |
+| `.github/workflows/publish-java-modules-gh-pkg.yml` | CI/CD | Workflow para publicación en GitHub Packages (post-Maven Central). |
+| `scripts/doxygenw.sh` | Script | Wrapper para generación de documentación Doxygen. |
+| `Doxyfile` | Config | Configuración de generación de documentación Doxygen. |
+| `ether-parent/pom.xml` | Config/Módulo | POM padre que define dependencias y plugins comunes. |
+| `ether-http-core/pom.xml` | Config/Módulo | Módulo core de HTTP (base para módulos Jetty12). |
+| `justfile` | Script | Objetivos de alto nivel para build y despliegue (alternativa a Makefile). |
