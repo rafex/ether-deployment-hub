@@ -522,7 +522,7 @@
 | ether-websocket-jetty12 | 8 | ⏳ Pendiente |
 | **Total** | **337** | |
 
-## Documentación completada (194 archivos)
+## Documentación completada (182 archivos)
 
 ### Lote A
 - ether-config: 39 archivos ✅
@@ -540,4 +540,13 @@
 - ether-glowroot-jetty12: 25 archivos ✅
 - ether-http-security: 16 archivos ✅
 
-**Total completado:** 182 archivos (54% del total) |
+**Total completado:** 182 archivos (54% del total)
+
+## Pull Requests creados
+
+| PR | Descripción | Estado |
+|----|-------------|--------|
+| [#4](https://github.com/rafex/ether-deployment-hub/pull/4) | Documentar ether-config y ether-http-openapi (Lote A) | ✅ OPEN |
+| [#5](https://github.com/rafex/ether-deployment-hub/pull/5) | Documentar ether-http-jetty12 y ether-http-problem (Lote B) | ✅ OPEN |
+| [#6](https://github.com/rafex/ether-deployment-hub/pull/6) | Documentar ether-jwt y ether-logging-core (Lote C) | ✅ OPEN |
+| [#7](https://github.com/rafex/ether-deployment-hub/pull/7) | Documentar ether-glowroot-jetty12 y ether-http-security (Lote D) | ✅ OPEN |
