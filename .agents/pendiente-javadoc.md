@@ -95,17 +95,17 @@
 
 **Total en ether-config:** 39 archivos
 
-### ether-crypto
+### ether-crypto ✅
 
 | Archivo | Estado | Notas |
 |---------|--------|-------|
-| `MavenWrapperDownloader.java` | Pendiente |  |
-| `PasswordHash.java` | Pendiente |  |
-| `PasswordHasher.java` | Pendiente |  |
-| `PasswordHasherPBKDF2.java` | Pendiente |  |
-| `PasswordHasherPBKDF2Test.java` | Pendiente | Archivo de test |
-| `package-info.java` | Pendiente | Documentación del paquete |
-| `package-info.java` | Pendiente | Documentación del paquete |
+| `MavenWrapperDownloader.java` | ✅ Completado | |
+| `PasswordHash.java` | ✅ Completado | |
+| `PasswordHasher.java` | ✅ Completado | |
+| `PasswordHasherPBKDF2.java` | ✅ Completado | |
+| `PasswordHasherPBKDF2Test.java` | ✅ Completado | Archivo de test |
+| `package-info.java` | ✅ Completado | Documentación del paquete |
+| `package-info.java` | ✅ Completado | Documentación del paquete |
 
 **Total en ether-crypto:** 7 archivos
 
@@ -332,33 +332,33 @@
 
 **Total en ether-http-security:** 16 archivos
 
-### ether-jdbc
+### ether-jdbc ✅
 
 | Archivo | Estado | Notas |
 |---------|--------|-------|
-| `JdbcDatabaseClient.java` | Pendiente |  |
-| `JdbcDatabaseClientTest.java` | Pendiente | Archivo de test |
-| `SimpleDataSource.java` | Pendiente |  |
-| `package-info.java` | Pendiente | Documentación del paquete |
-| `package-info.java` | Pendiente | Documentación del paquete |
-| `package-info.java` | Pendiente | Documentación del paquete |
+| `JdbcDatabaseClient.java` | ✅ Completado | |
+| `JdbcDatabaseClientTest.java` | ✅ Completado | Archivo de test |
+| `SimpleDataSource.java` | ✅ Completado | |
+| `package-info.java` | ✅ Completado | Documentación del paquete |
+| `package-info.java` | ✅ Completado | Documentación del paquete |
+| `package-info.java` | ✅ Completado | Documentación del paquete |
 
 **Total en ether-jdbc:** 6 archivos
 
-### ether-json
+### ether-json ✅
 
 | Archivo | Estado | Notas |
 |---------|--------|-------|
-| `JacksonJsonCodec.java` | Pendiente |  |
-| `JsonCodec.java` | Pendiente |  |
-| `JsonCodecBuilder.java` | Pendiente |  |
-| `JsonCodecBuilderTest.java` | Pendiente | Archivo de test |
-| `JsonCodecException.java` | Pendiente |  |
-| `JsonSchemaUtils.java` | Pendiente |  |
-| `JsonSchemaUtilsTest.java` | Pendiente | Archivo de test |
-| `JsonSchemaValidationException.java` | Pendiente |  |
-| `JsonUtils.java` | Pendiente |  |
-| `JsonUtilsTest.java` | Pendiente | Archivo de test |
+| `JacksonJsonCodec.java` | ✅ Completado | |
+| `JsonCodec.java` | ✅ Completado | |
+| `JsonCodecBuilder.java` | ✅ Completado | |
+| `JsonCodecBuilderTest.java` | ✅ Completado | Archivo de test |
+| `JsonCodecException.java` | ✅ Completado | |
+| `JsonSchemaUtils.java` | ✅ Completado | |
+| `JsonSchemaUtilsTest.java` | ✅ Completado | Archivo de test |
+| `JsonSchemaValidationException.java` | ✅ Completado | |
+| `JsonUtils.java` | ✅ Completado | |
+| `JsonUtilsTest.java` | ✅ Completado | Archivo de test |
 
 **Total en ether-json:** 10 archivos
 
@@ -465,17 +465,17 @@
 
 **Total en ether-webhook:** 16 archivos
 
-### ether-websocket-core
+### ether-websocket-core ✅
 
 | Archivo | Estado | Notas |
 |---------|--------|-------|
-| `WebSocketCloseStatus.java` | Pendiente |  |
-| `WebSocketEndpoint.java` | Pendiente |  |
-| `WebSocketPatterns.java` | Pendiente |  |
-| `WebSocketRoute.java` | Pendiente |  |
-| `WebSocketRouteMatch.java` | Pendiente |  |
-| `WebSocketRouteMatcher.java` | Pendiente |  |
-| `WebSocketSession.java` | Pendiente |  |
+| `WebSocketCloseStatus.java` | ✅ Completado | |
+| `WebSocketEndpoint.java` | ✅ Completado | |
+| `WebSocketPatterns.java` | ✅ Completado | |
+| `WebSocketRoute.java` | ✅ Completado | |
+| `WebSocketRouteMatch.java` | ✅ Completado | |
+| `WebSocketRouteMatcher.java` | ✅ Completado | |
+| `WebSocketSession.java` | ✅ Completado | |
 
 **Total en ether-websocket-core:** 7 archivos
 
@@ -502,7 +502,7 @@
 | ether-ai-deepseek | 6 | ⏳ Pendiente |
 | ether-ai-openai | 6 | ⏳ Pendiente |
 | ether-config | 39 | ✅ Completado |
-| ether-crypto | 7 | ⏳ Pendiente |
+| ether-crypto | 7 | ✅ Completado |
 | ether-database-core | 17 | ⏳ Pendiente |
 | ether-database-postgres | 8 | ⏳ Pendiente |
 | ether-glowroot-jetty12 | 25 | ✅ Completado |
@@ -512,17 +512,17 @@
 | ether-http-openapi | 16 | ✅ Completado |
 | ether-http-problem | 11 | ✅ Completado |
 | ether-http-security | 16 | ✅ Completado |
-| ether-jdbc | 6 | ⏳ Pendiente |
-| ether-json | 10 | ⏳ Pendiente |
+| ether-jdbc | 6 | ✅ Completado |
+| ether-json | 10 | ✅ Completado |
 | ether-jwt | 27 | ✅ Completado |
 | ether-logging-core | 16 | ✅ Completado |
 | ether-observability-core | 16 | ⏳ Pendiente |
 | ether-webhook | 16 | ⏳ Pendiente |
-| ether-websocket-core | 7 | ⏳ Pendiente |
-| ether-websocket-jetty12 | 8 | ⏳ Pendiente |
+| ether-websocket-core | 7 | ✅ Completado |
+| ether-websocket-jetty12 | 8 | ✅ Completado |
 | **Total** | **337** | |
 
-## Documentación completada (182 archivos)
+## Documentación completada (220 archivos)
 
 ### Lote A
 - ether-config: 39 archivos ✅
@@ -540,9 +540,25 @@
 - ether-glowroot-jetty12: 25 archivos ✅
 - ether-http-security: 16 archivos ✅
 
-**Total completado:** 182 archivos (54% del total)
+### Lote E
+- ether-crypto: 7 archivos ✅
+- ether-jdbc: 6 archivos ✅
+- ether-json: 10 archivos ✅
+- ether-websocket-core: 7 archivos ✅
+- ether-websocket-jetty12: 8 archivos ✅
+
+### Lote E
+- ether-crypto: 7 archivos ✅
+- ether-jdbc: 6 archivos ✅
+- ether-json: 10 archivos ✅
+- ether-websocket-core: 7 archivos ✅
+- ether-websocket-jetty12: 8 archivos ✅
+
+**Total completado:** 220 archivos (65% del total)
 
 ## Pull Requests creados y fusionados
+
+### PRs en repositorio principal (`ether-deployment-hub`)
 
 | PR | Descripción | Estado |
 |----|-------------|--------|
@@ -550,12 +566,37 @@
 | [#5](https://github.com/rafex/ether-deployment-hub/pull/5) | Documentar ether-http-jetty12 y ether-http-problem (Lote B) | ✅ Fusionado |
 | [#6](https://github.com/rafex/ether-deployment-hub/pull/6) | Documentar ether-jwt y ether-logging-core (Lote C) | ✅ Fusionado |
 | [#7](https://github.com/rafex/ether-deployment-hub/pull/7) | Documentar ether-glowroot-jetty12 y ether-http-security (Lote D) | ✅ Fusionado |
+| [#8](https://github.com/rafex/ether-deployment-hub/pull/8) | Actualizar submódulos Lote E (ether-crypto, ether-jdbc, ether-json, ether-websocket-core, ether-websocket-jetty12) | ✅ Fusionado |
 
-**Total PRs fusionados:** 4 de 4
+### PRs en submódulos (Lote E)
+
+| Repositorio | PR | Descripción | Estado |
+|-------------|-----|-------------|--------|
+| [ether-crypto](https://github.com/rafex/ether-crypto) | [#2](https://github.com/rafex/ether-crypto/pull/2) | docs(javadoc): Add Javadoc documentation | ✅ Fusionado |
+| [ether-jdbc](https://github.com/rafex/ether-jdbc) | [#2](https://github.com/rafex/ether-jdbc/pull/2) | docs(javadoc): Add Javadoc documentation | ✅ Fusionado |
+| [ether-json](https://github.com/rafex/ether-json) | [#2](https://github.com/rafex/ether-json/pull/2) | docs(javadoc): Add Javadoc documentation | ✅ Fusionado |
+| [ether-websocket-core](https://github.com/rafex/ether-websocket-core) | [#2](https://github.com/rafex/ether-websocket-core/pull/2) | docs(javadoc): Add Javadoc documentation | ✅ Fusionado |
+| [ether-websocket-jetty12](https://github.com/rafex/ether-websocket-jetty12) | [#2](https://github.com/rafex/ether-websocket-jetty12/pull/2) | docs(javadoc): Add Javadoc documentation | ✅ Fusionado |
+
+**Total PRs fusionados:** 5 en principal + 5 en submódulos = 10
 
 ## Estado del trabajo
 
-- **Worktrees eliminados:** A, B, C, D (todos fusionados en main)
-- **Submódulos actualizados:** ether-jwt, ether-glowroot-jetty12, ether-http-security
-- **Commit principal:** [2a80ecb](https://github.com/rafex/ether-deployment-hub/commit/2a80ecb)
-- **Próximos pasos:** Planificar documentación para 14 módulos restantes (155 archivos, 46%)
+- **Worktrees eliminados:** A, B, C, D, E (todos fusionados en main)
+- **Submódulos actualizados:** ether-jwt, ether-glowroot-jetty12, ether-http-security, ether-crypto, ether-jdbc, ether-json, ether-websocket-core, ether-websocket-jetty12
+- **Commit principal:** [8eaea2c](https://github.com/rafex/ether-deployment-hub/commit/8eaea2c)
+- **Próximos pasos:** Planificar documentación para 9 módulos restantes (117 archivos, 35%)
+
+## Módulos pendientes (9 módulos, 117 archivos)
+
+| Módulo | Archivos |
+|--------|----------|
+| ether-ai-core | 13 |
+| ether-ai-deepseek | 6 |
+| ether-ai-openai | 6 |
+| ether-database-core | 17 |
+| ether-database-postgres | 8 |
+| ether-http-client | 12 |
+| ether-http-core | 23 |
+| ether-observability-core | 16 |
+| ether-webhook | 16 |
