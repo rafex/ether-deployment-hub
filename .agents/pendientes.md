@@ -96,7 +96,7 @@
 - PR #8: Lote E ✅
 - PR #9: Lote G ✅
 - PR #10: Lote H ✅
-- PR #11: Lote I (en creación)
+- PR #11: Lote I (abierto)
 
 ### Submódulos (Documentación Individual)
 - ether-crypto: PR #2 ✅
@@ -107,6 +107,8 @@
 - ether-ai-core: PR #2 ✅
 - ether-ai-deepseek: PR #2 ✅
 - ether-ai-openai: PR #2 ✅
+- ether-observability-core: PR #2 (abierto, docs-javadoc)
+- ether-webhook: PR #2 (abierto, docs-javadoc)
 
 ## Estado del Trabajo
 
