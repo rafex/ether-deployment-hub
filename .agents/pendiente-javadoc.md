@@ -113,23 +113,23 @@
 
 | Archivo | Estado | Notas |
 |---------|--------|-------|
-| `DatabaseAccessException.java` | Pendiente |  |
-| `DatabaseClient.java` | Pendiente |  |
-| `ResultSetExtractor.java` | Pendiente |  |
-| `ResultSets.java` | Pendiente |  |
-| `RowMapper.java` | Pendiente |  |
-| `SqlBuilder.java` | Pendiente |  |
-| `SqlBuilderTest.java` | Pendiente | Archivo de test |
-| `SqlParameter.java` | Pendiente |  |
-| `SqlQuery.java` | Pendiente |  |
-| `StatementBinder.java` | Pendiente |  |
-| `TransactionCallback.java` | Pendiente |  |
-| `TransactionRunner.java` | Pendiente |  |
-| `package-info.java` | Pendiente | Documentación del paquete |
-| `package-info.java` | Pendiente | Documentación del paquete |
-| `package-info.java` | Pendiente | Documentación del paquete |
-| `package-info.java` | Pendiente | Documentación del paquete |
-| `package-info.java` | Pendiente | Documentación del paquete |
+| `DatabaseAccessException.java` | ✅ Completado |  |
+| `DatabaseClient.java` | ✅ Completado |  |
+| `ResultSetExtractor.java` | ✅ Completado |  |
+| `ResultSets.java` | ✅ Completado |  |
+| `RowMapper.java` | ✅ Completado |  |
+| `SqlBuilder.java` | ✅ Completado |  |
+| `SqlBuilderTest.java` | ✅ Completado | Archivo de test |
+| `SqlParameter.java` | ✅ Completado |  |
+| `SqlQuery.java` | ✅ Completado |  |
+| `StatementBinder.java` | ✅ Completado |  |
+| `TransactionCallback.java` | ✅ Completado |  |
+| `TransactionRunner.java` | ✅ Completado |  |
+| `package-info.java` | ✅ Completado | Documentación del paquete |
+| `package-info.java` | ✅ Completado | Documentación del paquete |
+| `package-info.java` | ✅ Completado | Documentación del paquete |
+| `package-info.java` | ✅ Completado | Documentación del paquete |
+| `package-info.java` | ✅ Completado | Documentación del paquete |
 
 **Total en ether-database-core:** 17 archivos
 
@@ -137,14 +137,14 @@
 
 | Archivo | Estado | Notas |
 |---------|--------|-------|
-| `PostgresErrorClassifier.java` | Pendiente |  |
-| `PostgresErrorClassifierTest.java` | Pendiente | Archivo de test |
-| `PostgresParameters.java` | Pendiente |  |
-| `PostgresParametersTest.java` | Pendiente | Archivo de test |
-| `PostgresSqlStates.java` | Pendiente |  |
-| `package-info.java` | Pendiente | Documentación del paquete |
-| `package-info.java` | Pendiente | Documentación del paquete |
-| `package-info.java` | Pendiente | Documentación del paquete |
+| `PostgresErrorClassifier.java` | ✅ Completado |  |
+| `PostgresErrorClassifierTest.java` | ✅ Completado | Archivo de test |
+| `PostgresParameters.java` | ✅ Completado |  |
+| `PostgresParametersTest.java` | ✅ Completado | Archivo de test |
+| `PostgresSqlStates.java` | ✅ Completado |  |
+| `package-info.java` | ✅ Completado | Documentación del paquete |
+| `package-info.java` | ✅ Completado | Documentación del paquete |
+| `package-info.java` | ✅ Completado | Documentación del paquete |
 
 **Total en ether-database-postgres:** 8 archivos
 
@@ -184,18 +184,18 @@
 
 | Archivo | Estado | Notas |
 |---------|--------|-------|
-| `DefaultEtherHttpClient.java` | Pendiente |  |
-| `DefaultEtherHttpClientTest.java` | Pendiente | Archivo de test |
-| `EtherHttpClient.java` | Pendiente |  |
-| `HttpClientConfig.java` | Pendiente |  |
-| `HttpClientConfigTest.java` | Pendiente | Archivo de test |
-| `HttpMethod.java` | Pendiente |  |
-| `HttpRequestSpec.java` | Pendiente |  |
-| `HttpResponseSpec.java` | Pendiente |  |
-| `package-info.java` | Pendiente | Documentación del paquete |
-| `package-info.java` | Pendiente | Documentación del paquete |
-| `package-info.java` | Pendiente | Documentación del paquete |
-| `package-info.java` | Pendiente | Documentación del paquete |
+| `DefaultEtherHttpClient.java` | ✅ Completado |  |
+| `DefaultEtherHttpClientTest.java` | ✅ Completado | Archivo de test |
+| `EtherHttpClient.java` | ✅ Completado |  |
+| `HttpClientConfig.java` | ✅ Completado |  |
+| `HttpClientConfigTest.java` | ✅ Completado | Archivo de test |
+| `HttpMethod.java` | ✅ Completado |  |
+| `HttpRequestSpec.java` | ✅ Completado |  |
+| `HttpResponseSpec.java` | ✅ Completado |  |
+| `package-info.java` | ✅ Completado | Documentación del paquete |
+| `package-info.java` | ✅ Completado | Documentación del paquete |
+| `package-info.java` | ✅ Completado | Documentación del paquete |
+| `package-info.java` | ✅ Completado | Documentación del paquete |
 
 **Total en ether-http-client:** 12 archivos
 
@@ -203,29 +203,29 @@
 
 | Archivo | Estado | Notas |
 |---------|--------|-------|
-| `AuthPolicy.java` | Pendiente |  |
-| `BuiltinResourcesTest.java` | Pendiente | Archivo de test |
-| `CodeBasedDomainErrorMapper.java` | Pendiente |  |
-| `DefaultErrorMapper.java` | Pendiente |  |
-| `DomainErrorMapper.java` | Pendiente |  |
-| `ErrorMapper.java` | Pendiente |  |
-| `HealthResource.java` | Pendiente |  |
-| `HelloResource.java` | Pendiente |  |
-| `HttpError.java` | Pendiente |  |
-| `HttpExchange.java` | Pendiente |  |
-| `HttpHandler.java` | Pendiente |  |
-| `HttpResource.java` | Pendiente |  |
-| `Middleware.java` | Pendiente |  |
-| `QuerySpec.java` | Pendiente |  |
-| `QuerySpecBuilder.java` | Pendiente |  |
-| `Route.java` | Pendiente |  |
-| `RouteMatch.java` | Pendiente |  |
-| `RouteMatcher.java` | Pendiente |  |
-| `RsqlNode.java` | Pendiente |  |
-| `RsqlOperator.java` | Pendiente |  |
-| `RsqlParser.java` | Pendiente |  |
-| `Sort.java` | Pendiente |  |
-| `package-info.java` | Pendiente | Documentación del paquete |
+| `AuthPolicy.java` | ✅ Completado |  |
+| `BuiltinResourcesTest.java` | ✅ Completado | Archivo de test |
+| `CodeBasedDomainErrorMapper.java` | ✅ Completado |  |
+| `DefaultErrorMapper.java` | ✅ Completado |  |
+| `DomainErrorMapper.java` | ✅ Completado |  |
+| `ErrorMapper.java` | ✅ Completado |  |
+| `HealthResource.java` | ✅ Completado |  |
+| `HelloResource.java` | ✅ Completado |  |
+| `HttpError.java` | ✅ Completado |  |
+| `HttpExchange.java` | ✅ Completado |  |
+| `HttpHandler.java` | ✅ Completado |  |
+| `HttpResource.java` | ✅ Completado |  |
+| `Middleware.java` | ✅ Completado |  |
+| `QuerySpec.java` | ✅ Completado |  |
+| `QuerySpecBuilder.java` | ✅ Completado |  |
+| `Route.java` | ✅ Completado |  |
+| `RouteMatch.java` | ✅ Completado |  |
+| `RouteMatcher.java` | ✅ Completado |  |
+| `RsqlNode.java` | ✅ Completado |  |
+| `RsqlOperator.java` | ✅ Completado |  |
+| `RsqlParser.java` | ✅ Completado |  |
+| `Sort.java` | ✅ Completado |  |
+| `package-info.java` | ✅ Completado | Documentación del paquete |
 
 **Total en ether-http-core:** 23 archivos
 
@@ -423,22 +423,22 @@
 
 | Archivo | Estado | Notas |
 |---------|--------|-------|
-| `ProbeAggregator.java` | Pendiente |  |
-| `ProbeAggregatorTest.java` | Pendiente | Archivo de test |
-| `ProbeCheck.java` | Pendiente |  |
-| `ProbeKind.java` | Pendiente |  |
-| `ProbeReport.java` | Pendiente |  |
-| `ProbeResult.java` | Pendiente |  |
-| `ProbeStatus.java` | Pendiente |  |
-| `RequestIdGenerator.java` | Pendiente |  |
-| `TimingRecorder.java` | Pendiente |  |
-| `TimingSample.java` | Pendiente |  |
-| `UuidRequestIdGenerator.java` | Pendiente |  |
-| `UuidRequestIdGeneratorTest.java` | Pendiente | Archivo de test |
-| `package-info.java` | Pendiente | Documentación del paquete |
-| `package-info.java` | Pendiente | Documentación del paquete |
-| `package-info.java` | Pendiente | Documentación del paquete |
-| `package-info.java` | Pendiente | Documentación del paquete |
+| `ProbeAggregator.java` | ✅ Completado |  |
+| `ProbeAggregatorTest.java` | ✅ Completado | Archivo de test |
+| `ProbeCheck.java` | ✅ Completado |  |
+| `ProbeKind.java` | ✅ Completado |  |
+| `ProbeReport.java` | ✅ Completado |  |
+| `ProbeResult.java` | ✅ Completado |  |
+| `ProbeStatus.java` | ✅ Completado |  |
+| `RequestIdGenerator.java` | ✅ Completado |  |
+| `TimingRecorder.java` | ✅ Completado |  |
+| `TimingSample.java` | ✅ Completado |  |
+| `UuidRequestIdGenerator.java` | ✅ Completado |  |
+| `UuidRequestIdGeneratorTest.java` | ✅ Completado | Archivo de test |
+| `package-info.java` | ✅ Completado | Documentación del paquete |
+| `package-info.java` | ✅ Completado | Documentación del paquete |
+| `package-info.java` | ✅ Completado | Documentación del paquete |
+| `package-info.java` | ✅ Completado | Documentación del paquete |
 
 **Total en ether-observability-core:** 16 archivos
 
@@ -446,22 +446,22 @@
 
 | Archivo | Estado | Notas |
 |---------|--------|-------|
-| `HmacWebhookSignerVerifier.java` | Pendiente |  |
-| `HmacWebhookSignerVerifierTest.java` | Pendiente | Archivo de test |
-| `WebhookDeliveryClient.java` | Pendiente |  |
-| `WebhookDeliveryClientTest.java` | Pendiente | Archivo de test |
-| `WebhookHeaders.java` | Pendiente |  |
-| `WebhookPayload.java` | Pendiente |  |
-| `WebhookSignature.java` | Pendiente |  |
-| `WebhookSigner.java` | Pendiente |  |
-| `WebhookVerificationResult.java` | Pendiente |  |
-| `WebhookVerifier.java` | Pendiente |  |
-| `package-info.java` | Pendiente | Documentación del paquete |
-| `package-info.java` | Pendiente | Documentación del paquete |
-| `package-info.java` | Pendiente | Documentación del paquete |
-| `package-info.java` | Pendiente | Documentación del paquete |
-| `package-info.java` | Pendiente | Documentación del paquete |
-| `package-info.java` | Pendiente | Documentación del paquete |
+| `HmacWebhookSignerVerifier.java` | ✅ Completado |  |
+| `HmacWebhookSignerVerifierTest.java` | ✅ Completado | Archivo de test |
+| `WebhookDeliveryClient.java` | ✅ Completado |  |
+| `WebhookDeliveryClientTest.java` | ✅ Completado | Archivo de test |
+| `WebhookHeaders.java` | ✅ Completado |  |
+| `WebhookPayload.java` | ✅ Completado |  |
+| `WebhookSignature.java` | ✅ Completado |  |
+| `WebhookSigner.java` | ✅ Completado |  |
+| `WebhookVerificationResult.java` | ✅ Completado |  |
+| `WebhookVerifier.java` | ✅ Completado |  |
+| `package-info.java` | ✅ Completado | Documentación del paquete |
+| `package-info.java` | ✅ Completado | Documentación del paquete |
+| `package-info.java` | ✅ Completado | Documentación del paquete |
+| `package-info.java` | ✅ Completado | Documentación del paquete |
+| `package-info.java` | ✅ Completado | Documentación del paquete |
+| `package-info.java` | ✅ Completado | Documentación del paquete |
 
 **Total en ether-webhook:** 16 archivos
 
