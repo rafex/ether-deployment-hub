@@ -4,7 +4,8 @@
 # Autor: Ether Deployment Hub
 # Fecha: $(date +%Y-%m-%d)
 
-set -e  # Salir en caso de error
+# No salir inmediatamente en caso de error para poder capturar todos los resultados
+set -e
 trap '' PIPE  # Ignorar SIGPIPE
 
 # Colores para output
@@ -12,7 +13,17 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
+CYAN='\033[0;36m'
 NC='\033[0m' # No Color
+
+# Contadores globales
+TOTAL_MODULES=0
+SUCCESS_MODULES=0
+FAILED_MODULES=0
+SKIPPED_MODULES=0
+
+# Array para almacenar módulos fallidos con sus errores
+declare -A FAILED_MODULES_LOG
 
 # Funciones de logging
 print_info() {
@@ -27,6 +38,14 @@ print_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
+print_warning() {
+    echo -e "${YELLOW}[WARNING]${NC} $1"
+}
+
+print_cyan() {
+    echo -e "${CYAN}$1${NC}"
+}
+
 # Función para resolver el directorio del módulo Maven
 resolve_module_dir() {
     local module_path="$1"
@@ -36,7 +55,7 @@ resolve_module_dir() {
     elif [ -x "$module_path/$module_path/mvnw" ] && [ -f "$module_path/$module_path/pom.xml" ]; then
         echo "$module_path/$module_path"
     else
-        print_error "No se pudo resolver el directorio del módulo '$module_path'"
+        echo "ERROR: No se pudo resolver el directorio del módulo '$module_path'" >&2
         return 1
     fi
 }
@@ -44,12 +63,16 @@ resolve_module_dir() {
 # Función para instalar un módulo
 install_module() {
     local module_name="$1"
+    local temp_log_file="/tmp/maven_build_${module_name}_$$.log"
     
-    print_info "Instalando $module_name..."
+    print_info "🔄 Instalando $module_name..."
     
     # Resolver directorio del módulo
     module_dir=$(resolve_module_dir "$module_name")
     if [ $? -ne 0 ]; then
+        ((TOTAL_MODULES++))
+        ((FAILED_MODULES++))
+        FAILED_MODULES_LOG["$module_name"]="No se pudo resolver el directorio del módulo"
         return 1
     fi
     
@@ -62,27 +85,117 @@ install_module() {
         export JAVA_HOME
     fi
     
-    # Ejecutar Maven
+    # Ejecutar Maven y capturar salida
     cd "$module_dir"
     if [ -x "./mvnw" ] && [ -f "./.mvn/wrapper/maven-wrapper.properties" ]; then
-        ./mvnw -B -ntp -DskipTests=true -Dgpg.skip=true clean install
+        ./mvnw -B -ntp -DskipTests=true -Dgpg.skip=true clean install > "$temp_log_file" 2>&1
     else
-        mvn -B -ntp -DskipTests=true -Dgpg.skip=true clean install
+        mvn -B -ntp -DskipTests=true -Dgpg.skip=true clean install > "$temp_log_file" 2>&1
     fi
     
-    if [ $? -eq 0 ]; then
-        print_success "$module_name instalado exitosamente"
+    local exit_code=$?
+    
+    ((TOTAL_MODULES++))
+    
+    if [ $exit_code -eq 0 ]; then
+        ((SUCCESS_MODULES++))
+        print_success "✅ $module_name instalado exitosamente"
+        rm -f "$temp_log_file"
         return 0
     else
-        print_error "Falló la instalación de $module_name"
+        ((FAILED_MODULES++))
+        print_error "❌ $module_name falló (código de salida: $exit_code)"
+        
+        # Extraer error relevante del log
+        local error_message=$(grep -A 5 "BUILD FAILURE\|ERROR\|FAILED" "$temp_log_file" | head -n 20)
+        if [ -z "$error_message" ]; then
+            error_message=$(tail -n 30 "$temp_log_file")
+        fi
+        
+        FAILED_MODULES_LOG["$module_name"]="$error_message"
+        
+        # Mostrar error en tiempo real si es el último módulo o si se desea
+        print_warning "   Detalle del error:"
+        echo -e "${RED}$error_message${NC}" | sed 's/^/   /'
+        
+        rm -f "$temp_log_file"
+        return 1
+    fi
+}
+
+# Función para imprimir resumen final
+print_summary() {
+    echo ""
+    echo "╔══════════════════════════════════════════════════════════════════╗"
+    echo "║                    RESUMEN DE COMPILACIÓN                        ║"
+    echo "╚══════════════════════════════════════════════════════════════════╝"
+    echo ""
+    
+    # Mostrar módulos exitosos
+    if [ $SUCCESS_MODULES -gt 0 ]; then
+        print_cyan "✅ MÓDULOS COMPILADOS CORRECTAMENTE ($SUCCESS_MODULES/$TOTAL_MODULES):"
+        echo "   ------------------------------------------------"
+        for module in "${modules[@]}"; do
+            if [[ ! " ${!FAILED_MODULES_LOG[@]} " =~ " ${module} " ]]; then
+                echo "   ✅ $module"
+            fi
+        done
+        echo ""
+    fi
+    
+    # Mostrar módulos fallidos
+    if [ $FAILED_MODULES -gt 0 ]; then
+        print_error "❌ MÓDULOS CON ERRORES ($FAILED_MODULES/$TOTAL_MODULES):"
+        echo "   ------------------------------------------------"
+        for module in "${!FAILED_MODULES_LOG[@]}"; do
+            echo "   ❌ $module"
+        done
+        echo ""
+        
+        # Mostrar detalles de errores
+        print_error "DETALLES DE ERRORES:"
+        echo "   ==================="
+        for module in "${!FAILED_MODULES_LOG[@]}"; do
+            echo ""
+            echo -e "${RED}❌ $module:${NC}"
+            echo "${FAILED_MODULES_LOG[$module]}" | sed 's/^/   /'
+            echo ""
+        done
+    fi
+    
+    # Estadísticas finales
+    echo "╔══════════════════════════════════════════════════════════════════╗"
+    echo "║                     ESTADÍSTICAS FINALES                         ║"
+    echo "╠══════════════════════════════════════════════════════════════════╣"
+    printf "║  %-30s %4d  ║\n" "Total de módulos:" "$TOTAL_MODULES"
+    printf "║  %-30s %4d  ║\n" "✅ Compilados correctamente:" "$SUCCESS_MODULES"
+    printf "║  %-30s %4d  ║\n" "❌ Con errores:" "$FAILED_MODULES"
+    echo "╚══════════════════════════════════════════════════════════════════╝"
+    echo ""
+    
+    if [ $FAILED_MODULES -eq 0 ]; then
+        print_success "🎉 ¡Todos los módulos se compilaron exitosamente!"
+        return 0
+    else
+        print_error "⚠️  Algunos módulos no se pudieron compilar. Revisa los errores anteriores."
         return 1
     fi
 }
 
 # Función principal
 main() {
-    print_info "=== INICIANDO INSTALACIÓN DE TODOS LOS MÓDULOS ==="
-    print_info "Orden: parent → config → crypto → database-core → jdbc → database-postgres → json → jwt → observability-core → http-core → http-security → http-problem → http-openapi → http-client → logging-core → ai-core → ai-openai → ai-deepseek → websocket-core → http-jetty12 → websocket-jetty12 → webhook → glowroot-jetty12"
+    echo ""
+    print_info "╔══════════════════════════════════════════════════════════════════╗"
+    print_info "║         INICIANDO INSTALACIÓN DE TODOS LOS MÓDULOS              ║"
+    print_info "╚══════════════════════════════════════════════════════════════════╝"
+    echo ""
+    print_info "Orden de compilación:"
+    print_cyan "   parent → config → crypto → database-core → jdbc → database-postgres"
+    print_cyan "   → json → jwt → observability-core → http-core → http-security"
+    print_cyan "   → http-problem → http-openapi → http-client → logging-core"
+    print_cyan "   → ai-core → ai-openai → ai-deepseek → websocket-core"
+    print_cyan "   → http-jetty12 → websocket-jetty12 → webhook → glowroot-jetty12"
+    echo ""
     
     # Array de módulos en orden estricto de dependencias
     local modules=(
@@ -113,13 +226,15 @@ main() {
     
     # Instalar cada módulo
     for module in "${modules[@]}"; do
-        if ! install_module "$module"; then
-            print_error "La instalación falló en el módulo: $module"
-            exit 1
-        fi
+        install_module "$module"
     done
     
-    print_success "Todos los módulos instalados exitosamente en el repositorio local de Maven"
+    # Imprimir resumen
+    print_summary
+    exit_code=$?
+    
+    echo ""
+    exit $exit_code
 }
 
 # Ejecutar función principal
