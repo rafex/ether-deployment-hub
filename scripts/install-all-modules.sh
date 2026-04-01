@@ -26,6 +26,9 @@ SKIPPED_MODULES=0
 ERROR_LOG_FILE="/tmp/maven_build_errors_$$.log"
 > "$ERROR_LOG_FILE"  # Limpiar archivo
 
+# Guardar directorio raíz del repositorio
+REPO_ROOT=$(pwd)
+
 # Funciones de logging
 print_info() {
     echo -e "${BLUE}[INFO]${NC} $1"
@@ -50,13 +53,15 @@ print_cyan() {
 # Función para resolver el directorio del módulo Maven
 resolve_module_dir() {
     local module_path="$1"
+    local full_path="$REPO_ROOT/$module_path"
     
-    if [ -x "$module_path/mvnw" ] && [ -f "$module_path/pom.xml" ]; then
-        echo "$module_path"
-    elif [ -x "$module_path/$module_path/mvnw" ] && [ -f "$module_path/$module_path/pom.xml" ]; then
-        echo "$module_path/$module_path"
+    if [ -x "$full_path/mvnw" ] && [ -f "$full_path/pom.xml" ]; then
+        echo "$full_path"
+    elif [ -x "$full_path/$module_path/mvnw" ] && [ -f "$full_path/$module_path/pom.xml" ]; then
+        echo "$full_path/$module_path"
     else
         echo "ERROR: No se pudo resolver el directorio del módulo '$module_path'" >&2
+        echo "  Buscando en: $full_path" >&2
         return 1
     fi
 }
@@ -91,7 +96,16 @@ install_module() {
     fi
     
     # Ejecutar Maven y capturar salida
-    cd "$module_dir"
+    # Cambiar al directorio del módulo
+    cd "$module_dir" || {
+        ((TOTAL_MODULES++))
+        ((FAILED_MODULES++))
+        echo "MODULE:$module_name" >> "$ERROR_LOG_FILE"
+        echo "ERROR:No se pudo cambiar al directorio $module_dir" >> "$ERROR_LOG_FILE"
+        echo "END_ERROR" >> "$ERROR_LOG_FILE"
+        return 1
+    }
+    
     if [ -x "./mvnw" ] && [ -f "./.mvn/wrapper/maven-wrapper.properties" ]; then
         ./mvnw -B -ntp -DskipTests=true -Dgpg.skip=true clean install > "$temp_log_file" 2>&1
     else
@@ -99,6 +113,11 @@ install_module() {
     fi
     
     local exit_code=$?
+    
+    # Volver al directorio raíz del repositorio
+    cd "$REPO_ROOT" || {
+        print_warning "No se pudo volver al directorio raíz del repositorio"
+    }
     
     ((TOTAL_MODULES++))
     
