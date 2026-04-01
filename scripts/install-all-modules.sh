@@ -5,7 +5,7 @@
 # Fecha: $(date +%Y-%m-%d)
 
 # No salir inmediatamente en caso de error para poder capturar todos los resultados
-set -e
+set +e  # Desactivar salida inmediata para capturar todos los resultados
 trap '' PIPE  # Ignorar SIGPIPE
 
 # Colores para output
@@ -22,8 +22,9 @@ SUCCESS_MODULES=0
 FAILED_MODULES=0
 SKIPPED_MODULES=0
 
-# Array para almacenar módulos fallidos con sus errores
-declare -A FAILED_MODULES_LOG
+# Archivo temporal para errores
+ERROR_LOG_FILE="/tmp/maven_build_errors_$$.log"
+> "$ERROR_LOG_FILE"  # Limpiar archivo
 
 # Funciones de logging
 print_info() {
@@ -69,10 +70,14 @@ install_module() {
     
     # Resolver directorio del módulo
     module_dir=$(resolve_module_dir "$module_name")
-    if [ $? -ne 0 ]; then
+    local resolve_exit=$?
+    
+    if [ $resolve_exit -ne 0 ]; then
         ((TOTAL_MODULES++))
         ((FAILED_MODULES++))
-        FAILED_MODULES_LOG["$module_name"]="No se pudo resolver el directorio del módulo"
+        echo "MODULE:$module_name" >> "$ERROR_LOG_FILE"
+        echo "ERROR:No se pudo resolver el directorio del módulo" >> "$ERROR_LOG_FILE"
+        echo "END_ERROR" >> "$ERROR_LOG_FILE"
         return 1
     fi
     
@@ -112,7 +117,10 @@ install_module() {
             error_message=$(tail -n 30 "$temp_log_file")
         fi
         
-        FAILED_MODULES_LOG["$module_name"]="$error_message"
+        # Guardar error en archivo de log
+        echo "MODULE:$module_name" >> "$ERROR_LOG_FILE"
+        echo "ERROR:$error_message" >> "$ERROR_LOG_FILE"
+        echo "END_ERROR" >> "$ERROR_LOG_FILE"
         
         # Mostrar error en tiempo real si es el último módulo o si se desea
         print_warning "   Detalle del error:"
@@ -135,8 +143,10 @@ print_summary() {
     if [ $SUCCESS_MODULES -gt 0 ]; then
         print_cyan "✅ MÓDULOS COMPILADOS CORRECTAMENTE ($SUCCESS_MODULES/$TOTAL_MODULES):"
         echo "   ------------------------------------------------"
+        
+        # Leer módulos exitosos (los que no están en el log de errores)
         for module in "${modules[@]}"; do
-            if [[ ! " ${!FAILED_MODULES_LOG[@]} " =~ " ${module} " ]]; then
+            if ! grep -q "MODULE:$module" "$ERROR_LOG_FILE"; then
                 echo "   ✅ $module"
             fi
         done
@@ -147,20 +157,47 @@ print_summary() {
     if [ $FAILED_MODULES -gt 0 ]; then
         print_error "❌ MÓDULOS CON ERRORES ($FAILED_MODULES/$TOTAL_MODULES):"
         echo "   ------------------------------------------------"
-        for module in "${!FAILED_MODULES_LOG[@]}"; do
-            echo "   ❌ $module"
-        done
+        
+        # Leer módulos fallidos del archivo de log
+        local current_module=""
+        while IFS= read -r line; do
+            if [[ "$line" == MODULE:* ]]; then
+                current_module="${line#MODULE:}"
+                echo "   ❌ $current_module"
+            fi
+        done < "$ERROR_LOG_FILE"
         echo ""
         
         # Mostrar detalles de errores
         print_error "DETALLES DE ERRORES:"
         echo "   ==================="
-        for module in "${!FAILED_MODULES_LOG[@]}"; do
-            echo ""
-            echo -e "${RED}❌ $module:${NC}"
-            echo "${FAILED_MODULES_LOG[$module]}" | sed 's/^/   /'
-            echo ""
-        done
+        
+        local current_module=""
+        local error_content=""
+        while IFS= read -r line; do
+            if [[ "$line" == MODULE:* ]]; then
+                # Mostrar error anterior si existe
+                if [ -n "$current_module" ] && [ -n "$error_content" ]; then
+                    echo ""
+                    echo -e "${RED}❌ $current_module:${NC}"
+                    echo "$error_content" | sed 's/^/   /'
+                fi
+                current_module="${line#MODULE:}"
+                error_content=""
+            elif [[ "$line" == ERROR:* ]]; then
+                error_content="${line#ERROR:}"
+            elif [[ "$line" == "END_ERROR" ]]; then
+                # Mostrar error actual
+                if [ -n "$current_module" ] && [ -n "$error_content" ]; then
+                    echo ""
+                    echo -e "${RED}❌ $current_module:${NC}"
+                    echo "$error_content" | sed 's/^/   /'
+                fi
+                current_module=""
+                error_content=""
+            fi
+        done < "$ERROR_LOG_FILE"
+        echo ""
     fi
     
     # Estadísticas finales
@@ -172,6 +209,9 @@ print_summary() {
     printf "║  %-30s %4d  ║\n" "❌ Con errores:" "$FAILED_MODULES"
     echo "╚══════════════════════════════════════════════════════════════════╝"
     echo ""
+    
+    # Limpiar archivo de errores
+    rm -f "$ERROR_LOG_FILE"
     
     if [ $FAILED_MODULES -eq 0 ]; then
         print_success "🎉 ¡Todos los módulos se compilaron exitosamente!"
@@ -198,7 +238,7 @@ main() {
     echo ""
     
     # Array de módulos en orden estricto de dependencias
-    local modules=(
+    modules=(
         "ether-parent"
         "ether-config"
         "ether-crypto"
