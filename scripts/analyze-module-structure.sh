@@ -1,141 +1,144 @@
 #!/bin/bash
 
-# Script para analizar la estructura de módulos Maven en el repositorio
-# Muestra la ubicación real de cada módulo, distinguiendo entre:
-# - Submódulos de Git (dentro del repo principal)
-# - Repositorios individuales (submódulos externos)
+# Script para encontrar y mostrar la ubicación exacta de los módulos Maven
+# Objetivo: Encontrar el pom.xml y mostrar la estructura de árbol donde se encuentra
 
 BASE_DIR="/Users/rafex/repository/github/rafex/ether/ether-deployment-hub"
 
 echo "======================================================"
-echo "ANÁLISIS DE ESTRUCTURA DE MÓDULOS MAVEN"
+echo "UBICACIÓN DE MÓDULOS MAVEN"
 echo "======================================================"
 echo ""
-
-echo "📂 ESTRUCTURA DEL REPOSITORIO RAÍZ:"
-echo "-----------------------------------"
-ls -1 "$BASE_DIR" | grep -E "^ether-" | head -10
-echo "  ... (y más módulos)"
+echo "Objetivo: Encontrar el archivo pom.xml de cada módulo"
 echo ""
-
-echo "🔍 ANÁLISIS POR MÓDULO:"
-echo "======================================================"
-echo ""
-
-# Función para analizar un módulo
-analyze_module() {
-    local module_name="$1"
-    local module_path="$2"
-    
-    echo "📦 MÓDULO: $module_name"
-    echo "   Ruta: $module_path"
-    
-    # Verificar si es un submódulo de Git
-    if [ -f "$module_path/.git" ]; then
-        local git_content=$(cat "$module_path/.git")
-        if [[ "$git_content" == gitdir:* ]]; then
-            echo "   Tipo: 🏷️  SUBMÓDULO DE GIT (apunta a $git_content)"
-        else
-            echo "   Tipo: 📁 DIRECTORIO GIT"
-        fi
-    elif [ -d "$module_path/.git" ]; then
-        echo "   Tipo: 📁 REPOSITORIO GIT COMPLETO"
-    else
-        echo "   Tipo: 📁 DIRECTORIO LOCAL"
-    fi
-    
-    # Buscar el pom.xml (solo en ubicaciones estándar)
-    local pom_path=""
-    if [ -f "$module_path/pom.xml" ]; then
-        pom_path="$module_path/pom.xml"
-        echo "   Maven POM: ✅ Encontrado en raíz del módulo"
-        echo "   Ubicación POM: $pom_path"
-    elif [ -f "$module_path/ether-$module_name/pom.xml" ]; then
-        pom_path="$module_path/ether-$module_name/pom.xml"
-        echo "   Maven POM: ✅ Encontrado en subdirectorio ether-$module_name"
-        echo "   Ubicación POM: $pom_path"
-    else
-        # Buscar solo en src/ (no en target/)
-        local pom_search=$(find "$module_path" -path "*/target" -prune -o -name "pom.xml" -type f -print 2>/dev/null | head -1)
-        if [ -n "$pom_search" ]; then
-            pom_path="$pom_search"
-            echo "   Maven POM: ⚠️  Encontrado en subdirectorio"
-            echo "   Ubicación POM: $pom_path"
-        else
-            echo "   Maven POM: ❌ No encontrado"
-        fi
-    fi
-    
-    # Verificar si es POM parent
-    if [ -n "$pom_path" ] && [ -f "$pom_path" ]; then
-        # Usar sed en lugar de grep -oP (que no está disponible)
-        local packaging=$(sed -n 's/.*<packaging>\([^<]*\)<\/packaging>.*/\1/p' "$pom_path" 2>/dev/null | head -1)
-        if [ -z "$packaging" ]; then
-            packaging="jar"  # Valor por defecto si no se encuentra
-        fi
-        
-        if [ "$packaging" = "pom" ]; then
-            echo "   Packaging: 📦 POM (parent)"
-        else
-            echo "   Packaging: 📦 $packaging"
-        fi
-    fi
-    
-    # Verificar archivos Java (excluyendo target/)
-    local java_count=0
-    if [ -d "$module_path/src" ]; then
-        java_count=$(find "$module_path/src" -name "*.java" -type f 2>/dev/null | wc -l | tr -d ' ')
-        echo "   Archivos Java: $java_count"
-    elif [ -d "$module_path/ether-$module_name/src" ]; then
-        java_count=$(find "$module_path/ether-$module_name/src" -name "*.java" -type f 2>/dev/null | wc -l | tr -d ' ')
-        echo "   Archivos Java: $java_count"
-    else
-        # Buscar recursivamente (excluyendo target/)
-        java_count=$(find "$module_path" -path "*/target" -prune -o -name "*.java" -type f -print 2>/dev/null | wc -l | tr -d ' ')
-        if [ "$java_count" -gt 0 ]; then
-            echo "   Archivos Java: $java_count (en subdirectorios)"
-        else
-            echo "   Archivos Java: 0"
-        fi
-    fi
-    
-    # Verificar si hay archivos de licencia (buscar en todas las ubicaciones)
-    local license_found=false
-    if [ -f "$module_path/LICENSE" ]; then
-        license_found=true
-    elif [ -f "$module_path/ether-$module_name/LICENSE" ]; then
-        license_found=true
-    elif [ -f "$module_path/LICENSE.txt" ]; then
-        license_found=true
-    elif [ -f "$module_path/ether-$module_name/LICENSE.txt" ]; then
-        license_found=true
-    fi
-    
-    if [ "$license_found" = true ]; then
-        echo "   Licencia: ✅ Presente"
-    else
-        echo "   Licencia: ⚠️  No encontrada (usar repo raíz)"
-    fi
-    
-    echo ""
-}
 
 # Analizar cada módulo
 for module_dir in "$BASE_DIR"/ether-*; do
-    if [ -d "$module_dir" ]; then
-        module_name=$(basename "$module_dir")
-        analyze_module "$module_name" "$module_dir"
+    if [ ! -d "$module_dir" ]; then
+        continue
     fi
+    
+    module_name=$(basename "$module_dir")
+    
+    echo "═══════════════════════════════════════════════════════════"
+    echo "MÓDULO: $module_name"
+    echo "═══════════════════════════════════════════════════════════"
+    
+    # Buscar el pom.xml en las ubicaciones conocidas
+    pom_path=""
+    
+    # Opción 1: En el subdirectorio interno ether-<modulo>
+    # Primero verificar si hay un subdirectorio con el mismo nombre
+    internal_dir="$module_dir/$(ls -1 "$module_dir" | grep "^$module_name$" | head -1)"
+    
+    if [ -d "$internal_dir" ] && [ -f "$internal_dir/pom.xml" ]; then
+        pom_path="$internal_dir/pom.xml"
+        echo ""
+        echo "📦 ESTRUCTURA DE ARCHIVOS:"
+        echo ""
+        echo "$module_name/"
+        echo "├── $module_name/"
+        echo "│   ├── pom.xml  ✅ (MÓDULO MAVEN ENCONTRADO)"
+        echo "│   ├── src/"
+        
+        # Contar archivos Java
+        if [ -d "$internal_dir/src" ]; then
+            java_count=$(find "$internal_dir/src" -name "*.java" -type f 2>/dev/null | wc -l | tr -d ' ')
+            echo "│   │   └── java/  ($java_count archivos)"
+        fi
+        
+        # Verificar LICENSE en el directorio padre
+        if [ -f "$module_dir/LICENSE" ]; then
+            echo "│   └── ... (otros archivos)"
+            echo "│"
+            echo "└── LICENSE  (en directorio padre)"
+        else
+            echo "│   └── ... (otros archivos)"
+            echo "│"
+            echo "└── LICENSE  ❌ (no encontrado)"
+        fi
+        
+    # Opción 2: En el directorio raíz del módulo
+    elif [ -f "$module_dir/pom.xml" ]; then
+        pom_path="$module_dir/pom.xml"
+        echo ""
+        echo "📦 ESTRUCTURA DE ARCHIVOS:"
+        echo ""
+        echo "$module_name/"
+        echo "├── pom.xml  ✅ (MÓDULO MAVEN ENCONTRADO)"
+        echo "├── src/"
+        
+        # Contar archivos Java
+        if [ -d "$module_dir/src" ]; then
+            java_count=$(find "$module_dir/src" -name "*.java" -type f 2>/dev/null | wc -l | tr -d ' ')
+            echo "│   └── java/  ($java_count archivos)"
+        fi
+        
+        # Verificar LICENSE
+        if [ -f "$module_dir/LICENSE" ]; then
+            echo "└── LICENSE"
+        else
+            echo "└── LICENSE  ❌ (no encontrado)"
+        fi
+        
+    else
+        echo ""
+        echo "❌ NO SE ENCONTRÓ EL MÓDULO MAVEN (pom.xml)"
+        echo ""
+        echo "Estructura encontrada:"
+        ls -1 "$module_dir" 2>/dev/null | head -10
+    fi
+    
+    # Mostrar información del módulo Maven encontrado
+    if [ -n "$pom_path" ]; then
+        echo ""
+        echo "📍 UBICACIÓN EXACTA DEL MÓDULO MAVEN:"
+        echo "   $pom_path"
+        echo ""
+        
+        # Leer información del POM
+        # Buscar el artifactId del proyecto (después de <parent>)
+        artifact_id=$(sed -n '/<\/parent>/,/<\/project>/p' "$pom_path" | grep -m 1 "<artifactId>" | sed 's/.*<artifactId>\([^<]*\)<\/artifactId>.*/\1/' 2>/dev/null)
+        version=$(sed -n '/<\/parent>/,/<\/project>/p' "$pom_path" | grep -m 1 "<version>" | sed 's/.*<version>\([^<]*\)<\/version>.*/\1/' 2>/dev/null)
+        packaging=$(sed -n '/<\/parent>/,/<\/project>/p' "$pom_path" | grep -m 1 "<packaging>" | sed 's/.*<packaging>\([^<]*\)<\/packaging>.*/\1/' 2>/dev/null)
+        
+        if [ -n "$artifact_id" ]; then
+            echo "📦 Artifact ID: $artifact_id"
+        fi
+        
+        if [ -n "$version" ]; then
+            echo "🏷️  Version: $version"
+        fi
+        
+        if [ -n "$packaging" ]; then
+            echo "📦 Packaging: $packaging"
+        elif [ -n "$artifact_id" ]; then
+            echo "📦 Packaging: jar (por defecto)"
+        fi
+    fi
+    
+    echo ""
+    echo ""
 done
 
 echo "======================================================"
 echo "RESUMEN"
 echo "======================================================"
 echo ""
-echo "Leyenda:"
-echo "  🏷️  SUBMÓDULO DE GIT - Apunta a repo externo via .git"
-echo "  📁 REPOSITORIO GIT COMPLETO - Repo independiente"
-echo "  📦 POM - Módulo parent de Maven"
-echo "  📦 jar - Módulo compilable de Maven"
+echo "Estructura típica encontrada:"
+echo ""
+echo "  ether-<modulo>/"
+echo "  ├── ether-<modulo>/  ← Directorio interno con el código real"
+echo "  │   ├── pom.xml     ← Archivo Maven (MÓDULO MAVEN)"
+echo "  │   ├── src/        ← Código fuente"
+echo "  │   └── ..."
+echo "  └── LICENSE         ← Licencia (en el directorio padre)"
+echo ""
+echo "O también:"
+echo ""
+echo "  ether-<modulo>/"
+echo "  ├── pom.xml         ← Archivo Maven (MÓDULO MAVEN)"
+echo "  ├── src/            ← Código fuente"
+echo "  └── LICENSE         ← Licencia"
 echo ""
 echo "Uso: ./scripts/analyze-module-structure.sh"
