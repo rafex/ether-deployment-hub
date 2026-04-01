@@ -222,53 +222,8 @@ validate-main-build: install-all
 ##        → websocket-core → http-jetty12 → websocket-jetty12 → webhook
 ##        → glowroot-jetty12
 install-all:
-	@echo "==> Installing ether-parent"
-	@$(call install_local_module,ether-parent)
-	@echo "==> Installing ether-config"
-	@$(call install_local_module,ether-config)
-	@echo "==> Installing ether-crypto"
-	@$(call install_local_module,ether-crypto)
-	@echo "==> Installing ether-database-core"
-	@$(call install_local_module,ether-database-core)
-	@echo "==> Installing ether-jdbc"
-	@$(call install_local_module,ether-jdbc)
-	@echo "==> Installing ether-database-postgres"
-	@$(call install_local_module,ether-database-postgres)
-	@echo "==> Installing ether-json"
-	@$(call install_local_module,ether-json)
-	@echo "==> Installing ether-jwt"
-	@$(call install_local_module,ether-jwt)
-	@echo "==> Installing ether-observability-core"
-	@$(call install_local_module,ether-observability-core)
-	@echo "==> Installing ether-http-core"
-	@$(call install_local_module,ether-http-core)
-	@echo "==> Installing ether-http-security"
-	@$(call install_local_module,ether-http-security)
-	@echo "==> Installing ether-http-problem"
-	@$(call install_local_module,ether-http-problem)
-	@echo "==> Installing ether-http-openapi"
-	@$(call install_local_module,ether-http-openapi)
-	@echo "==> Installing ether-http-client"
-	@$(call install_local_module,ether-http-client)
-	@echo "==> Installing ether-logging-core"
-	@$(call install_local_module,ether-logging-core)
-	@echo "==> Installing ether-ai-core"
-	@$(call install_local_module,ether-ai-core)
-	@echo "==> Installing ether-ai-openai"
-	@$(call install_local_module,ether-ai-openai)
-	@echo "==> Installing ether-ai-deepseek"
-	@$(call install_local_module,ether-ai-deepseek)
-	@echo "==> Installing ether-websocket-core"
-	@$(call install_local_module,ether-websocket-core)
-	@echo "==> Installing ether-http-jetty12"
-	@$(call install_local_module,ether-http-jetty12)
-	@echo "==> Installing ether-websocket-jetty12"
-	@$(call install_local_module,ether-websocket-jetty12)
-	@echo "==> Installing ether-webhook"
-	@$(call install_local_module,ether-webhook)
-	@echo "==> Installing ether-glowroot-jetty12"
-	@$(call install_local_module,ether-glowroot-jetty12)
-	@echo "All modules installed to local Maven repository."
+	@echo "==> Installing all modules..."
+	@./scripts/install-all-modules.sh
 
 ## sync-manifest: synchronize releases/manifest.json against Maven Central
 sync-manifest:
