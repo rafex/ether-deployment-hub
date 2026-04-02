@@ -43,6 +43,9 @@ jobs:
       level4: ${{ steps.plan.outputs.level4 }}
       level5: ${{ steps.plan.outputs.level5 }}
       level6: ${{ steps.plan.outputs.level6 }}
+      level7: ${{ steps.plan.outputs.level7 }}
+      level8: ${{ steps.plan.outputs.level8 }}
+      level9: ${{ steps.plan.outputs.level9 }}
 
     steps:
       - name: Checkout repo
@@ -102,7 +105,7 @@ jobs:
           echo "Deploy levels:"
           echo "$LEVELS" | jq -r '.levels | to_entries[] | "  L\(.key): \(.value | join(", "))"'
           level_count=$(echo "$LEVELS" | jq '.levels | length')
-          for i in 0 1 2 3 4 5 6; do
+          for i in 0 1 2 3 4 5 6 7 8 9; do
             if [ "$i" -lt "$level_count" ]; then
               arr=$(echo "$LEVELS" | jq -c ".levels[$i]")
             else
@@ -205,7 +208,7 @@ jobs:
       MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
       GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
 
-  # ── L6: overflow from L4/L5 split or deepest deps ────────────────────────
+  # ── L6 ───────────────────────────────────────────────────────────────────
   deploy-level-6:
     needs: [release-plan, deploy-level-5]
     if: ${{ needs.release-plan.outputs.level6 != '[]' && (needs.deploy-level-5.result == 'success' || needs.deploy-level-5.result == 'skipped') && (github.event_name != 'workflow_dispatch' || inputs.run_deploy == true) }}
@@ -219,16 +222,56 @@ jobs:
       MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
       GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
 
+  # ── L7 ───────────────────────────────────────────────────────────────────
+  deploy-level-7:
+    needs: [release-plan, deploy-level-6]
+    if: ${{ needs.release-plan.outputs.level7 != '[]' && (needs.deploy-level-6.result == 'success' || needs.deploy-level-6.result == 'skipped') && (github.event_name != 'workflow_dispatch' || inputs.run_deploy == true) }}
+    uses: ./.github/workflows/deploy-one-level.yml
+    with:
+      modules_json: ${{ needs.release-plan.outputs.level7 }}
+      level_index: 7
+    secrets:
+      OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+      OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+      MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+      GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
+
+  # ── L8 ───────────────────────────────────────────────────────────────────
+  deploy-level-8:
+    needs: [release-plan, deploy-level-7]
+    if: ${{ needs.release-plan.outputs.level8 != '[]' && (needs.deploy-level-7.result == 'success' || needs.deploy-level-7.result == 'skipped') && (github.event_name != 'workflow_dispatch' || inputs.run_deploy == true) }}
+    uses: ./.github/workflows/deploy-one-level.yml
+    with:
+      modules_json: ${{ needs.release-plan.outputs.level8 }}
+      level_index: 8
+    secrets:
+      OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+      OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+      MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+      GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
+
+  # ── L9 ───────────────────────────────────────────────────────────────────
+  deploy-level-9:
+    needs: [release-plan, deploy-level-8]
+    if: ${{ needs.release-plan.outputs.level9 != '[]' && (needs.deploy-level-8.result == 'success' || needs.deploy-level-8.result == 'skipped') && (github.event_name != 'workflow_dispatch' || inputs.run_deploy == true) }}
+    uses: ./.github/workflows/deploy-one-level.yml
+    with:
+      modules_json: ${{ needs.release-plan.outputs.level9 }}
+      level_index: 9
+    secrets:
+      OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+      OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+      MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+      GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
+
   # ────────────────────────────────────────────────────────────────────────────
   # Update manifest — runs after all Maven Central levels complete.
-  # GitHub Packages deploy is handled by a separate workflow
-  # (publish-java-modules-gh-pkg.yml) triggered via workflow_run.
   # ────────────────────────────────────────────────────────────────────────────
   update-manifest:
     needs:
       - release-plan
-      - deploy-level-6
-    if: ${{ needs.release-plan.outputs.selected_count != '0' && (needs.deploy-level-6.result == 'success' || needs.deploy-level-6.result == 'skipped') }}
+      - deploy-level-9
+    if: ${{ needs.release-plan.outputs.selected_count != '0' && (needs.deploy-level-9.result == 'success' || needs.deploy-level-9.result == 'skipped') }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
