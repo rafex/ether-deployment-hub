@@ -40,6 +40,9 @@ jobs:
       level7: ${{ steps.plan.outputs.level7 }}
       level8: ${{ steps.plan.outputs.level8 }}
       level9: ${{ steps.plan.outputs.level9 }}
+      level10: ${{ steps.plan.outputs.level10 }}
+      level11: ${{ steps.plan.outputs.level11 }}
+      level12: ${{ steps.plan.outputs.level12 }}
 
     steps:
       - name: Checkout repo (shallow — scripts and releases/ only)
@@ -88,7 +91,7 @@ jobs:
           echo "Deploy levels:"
           echo "$LEVELS" | jq -r '.levels | to_entries[] | "  L\(.key): \(.value | join(", "))"'
           level_count=$(echo "$LEVELS" | jq '.levels | length')
-          for i in 0 1 2 3 4 5 6 7 8 9; do
+          for i in 0 1 2 3 4 5 6 7 8 9 10 11 12; do
             if [ "$i" -lt "$level_count" ]; then
               arr=$(echo "$LEVELS" | jq -c ".levels[$i]")
             else
@@ -222,6 +225,42 @@ jobs:
     with:
       modules_json: ${{ needs.setup.outputs.level9 }}
       level_index: 9
+      maven_central_run_id: ${{ needs.setup.outputs.maven_central_run_id }}
+    secrets:
+      MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+      GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
+
+  deploy-gh-packages-level-10:
+    needs: [setup, deploy-gh-packages-level-9]
+    if: ${{ needs.setup.outputs.level10 != '[]' && (needs.deploy-gh-packages-level-9.result == 'success' || needs.deploy-gh-packages-level-9.result == 'skipped') }}
+    uses: ./.github/workflows/deploy-github-packages-one-level.yml
+    with:
+      modules_json: ${{ needs.setup.outputs.level10 }}
+      level_index: 10
+      maven_central_run_id: ${{ needs.setup.outputs.maven_central_run_id }}
+    secrets:
+      MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+      GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
+
+  deploy-gh-packages-level-11:
+    needs: [setup, deploy-gh-packages-level-10]
+    if: ${{ needs.setup.outputs.level11 != '[]' && (needs.deploy-gh-packages-level-10.result == 'success' || needs.deploy-gh-packages-level-10.result == 'skipped') }}
+    uses: ./.github/workflows/deploy-github-packages-one-level.yml
+    with:
+      modules_json: ${{ needs.setup.outputs.level11 }}
+      level_index: 11
+      maven_central_run_id: ${{ needs.setup.outputs.maven_central_run_id }}
+    secrets:
+      MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+      GPG_PRIVATE_KEY_B64: ${{ secrets.GPG_PRIVATE_KEY_B64 }}
+
+  deploy-gh-packages-level-12:
+    needs: [setup, deploy-gh-packages-level-11]
+    if: ${{ needs.setup.outputs.level12 != '[]' && (needs.deploy-gh-packages-level-11.result == 'success' || needs.deploy-gh-packages-level-11.result == 'skipped') }}
+    uses: ./.github/workflows/deploy-github-packages-one-level.yml
+    with:
+      modules_json: ${{ needs.setup.outputs.level12 }}
+      level_index: 12
       maven_central_run_id: ${{ needs.setup.outputs.maven_central_run_id }}
     secrets:
       MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}

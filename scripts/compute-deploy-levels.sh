@@ -28,7 +28,7 @@
 set -euo pipefail
 
 PLAN_PATH="${1:?Usage: $0 <release-plan.json> [max-per-level]}"
-MAX_LEVEL_SIZE="${2:-3}"
+MAX_LEVEL_SIZE="${2:-2}"
 
 if [ ! -f "$PLAN_PATH" ]; then
   echo "Release plan not found: $PLAN_PATH" >&2
