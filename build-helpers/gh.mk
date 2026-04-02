@@ -33,36 +33,46 @@ gh-logs: gh-check
 	fi
 	@gh run view "$(RUN_ID)" --log
 
-## release-plan-ci: trigger Generate Release Plan workflow via gh
-release-plan-ci: gh-check
-	@echo "Triggering Generate Release Plan workflow..."
-	@if [ -n "$(BASE_REF)" ] || [ -n "$(HEAD_REF)" ]; then \
-		gh workflow run "Generate Release Plan" \
-			$(if $(BASE_REF),-f base_ref=$(BASE_REF),) \
-			$(if $(HEAD_REF),-f head_ref=$(HEAD_REF),); \
-	else \
-		gh workflow run "Generate Release Plan"; \
+## _last-deploy-ref: resolve BASE_REF — explicit > last manifest commit > error
+_last-deploy-ref:
+	$(eval _RESOLVED_BASE := $(or \
+		$(BASE_REF), \
+		$(shell git log --oneline -- releases/manifest.json 2>/dev/null | head -1 | cut -d' ' -f1)))
+	@if [ -z "$(_RESOLVED_BASE)" ]; then \
+		echo "Error: could not determine BASE_REF. Pass BASE_REF=<sha> explicitly."; \
+		exit 1; \
 	fi
+	@echo "BASE_REF → $(_RESOLVED_BASE)$(if $(BASE_REF), (explicit), (last manifest commit))"
+
+## release-plan-ci: trigger Generate Release Plan workflow via gh
+## Uses last manifest-update commit as BASE_REF if not specified.
+release-plan-ci: gh-check _last-deploy-ref
+	@echo "Triggering Generate Release Plan workflow..."
+	@gh workflow run "Generate Release Plan" \
+		-f base_ref=$(_RESOLVED_BASE) \
+		$(if $(HEAD_REF),-f head_ref=$(HEAD_REF),)
 	@echo "Latest Generate Release Plan run:"
 	@gh run list --workflow "Generate Release Plan" --limit 1
 
-## publish-plan-ci: trigger Publish Java Modules - Maven Central with run_deploy=false (dry run)
-publish-plan-ci: gh-check
+## publish-plan-ci: dry run — shows what would be deployed without publishing
+## Uses last manifest-update commit as BASE_REF if not specified.
+publish-plan-ci: gh-check _last-deploy-ref
 	@echo "Triggering Publish Java Modules - Maven Central (run_deploy=false)..."
 	@gh workflow run "Publish Java Modules - Maven Central" \
 		-f run_deploy=false \
-		$(if $(BASE_REF),-f base_ref=$(BASE_REF),) \
+		-f base_ref=$(_RESOLVED_BASE) \
 		$(if $(HEAD_REF),-f head_ref=$(HEAD_REF),)
 	@echo "Latest Publish Java Modules - Maven Central run:"
 	@gh run list --workflow "Publish Java Modules - Maven Central" --limit 1
 
-## publish-ci: trigger Publish Java Modules - Maven Central with run_deploy=true (real deploy)
-## GitHub Packages deploy will be triggered automatically via workflow_run on success.
-publish-ci: gh-check
+## publish-ci: deploy all changed modules to Maven Central since last release.
+## BASE_REF defaults to the last commit that updated releases/manifest.json.
+## Override: make publish-ci BASE_REF=<sha>
+publish-ci: gh-check _last-deploy-ref
 	@echo "Triggering Publish Java Modules - Maven Central (run_deploy=true)..."
 	@gh workflow run "Publish Java Modules - Maven Central" \
 		-f run_deploy=true \
-		$(if $(BASE_REF),-f base_ref=$(BASE_REF),) \
+		-f base_ref=$(_RESOLVED_BASE) \
 		$(if $(HEAD_REF),-f head_ref=$(HEAD_REF),)
 	@echo "Latest Publish Java Modules - Maven Central run:"
 	@gh run list --workflow "Publish Java Modules - Maven Central" --limit 1
