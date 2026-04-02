@@ -175,7 +175,7 @@
     "groupId": "dev.rafex.ether.websocket",
     "artifactId": "ether-websocket-core",
     "deployed": true,
-    "latestVersion": "9.0.0",
+    "latestVersion": "9.0.1",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.websocket/ether-websocket-core"
   },
