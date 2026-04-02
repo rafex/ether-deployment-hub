@@ -4,7 +4,7 @@
     "groupId": "dev.rafex.ether.parent",
     "artifactId": "ether-parent",
     "deployed": true,
-    "latestVersion": "9.0.3",
+    "latestVersion": "9.0.4",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.parent/ether-parent"
   },
@@ -139,7 +139,7 @@
     "groupId": "dev.rafex.ether.ai",
     "artifactId": "ether-ai-core",
     "deployed": true,
-    "latestVersion": "9.1.0",
+    "latestVersion": "9.2.0",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.ai/ether-ai-core"
   },
