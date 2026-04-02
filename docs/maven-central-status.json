@@ -31,7 +31,7 @@
     "groupId": "dev.rafex.ether.database",
     "artifactId": "ether-database-core",
     "deployed": true,
-    "latestVersion": "9.0.1",
+    "latestVersion": "9.0.2",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.database/ether-database-core"
   },
@@ -58,7 +58,7 @@
     "groupId": "dev.rafex.ether.json",
     "artifactId": "ether-json",
     "deployed": true,
-    "latestVersion": "9.0.0",
+    "latestVersion": "9.0.1",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.json/ether-json"
   },
@@ -85,7 +85,7 @@
     "groupId": "dev.rafex.ether.http",
     "artifactId": "ether-http-core",
     "deployed": true,
-    "latestVersion": "9.0.0",
+    "latestVersion": "9.0.1",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.http/ether-http-core"
   },
@@ -94,7 +94,7 @@
     "groupId": "dev.rafex.ether.http",
     "artifactId": "ether-http-security",
     "deployed": true,
-    "latestVersion": "9.0.0",
+    "latestVersion": "9.0.1",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.http/ether-http-security"
   },
@@ -130,7 +130,7 @@
     "groupId": "dev.rafex.ether.logging",
     "artifactId": "ether-logging-core",
     "deployed": true,
-    "latestVersion": "9.0.0",
+    "latestVersion": "9.0.1",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.logging/ether-logging-core"
   },
