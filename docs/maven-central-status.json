@@ -76,7 +76,7 @@
     "groupId": "dev.rafex.ether.observability",
     "artifactId": "ether-observability-core",
     "deployed": true,
-    "latestVersion": "9.0.0",
+    "latestVersion": "9.0.1",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.observability/ether-observability-core"
   },
