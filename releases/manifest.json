@@ -43,7 +43,7 @@
       "groupId": "dev.rafex.ether.parent",
       "artifactId": "ether-parent",
       "currentVersion": "9.5.5",
-      "published": false,
+      "published": true,
       "usesParent": false,
       "dependencies": [],
       "internalDependencyProperties": {},
@@ -57,7 +57,7 @@
       "groupId": "dev.rafex.ether.config",
       "artifactId": "ether-config",
       "currentVersion": "9.5.5",
-      "published": false,
+      "published": true,
       "usesParent": true,
       "dependencies": [
         "ether-parent"
@@ -73,7 +73,7 @@
       "groupId": "dev.rafex.ether.crypto",
       "artifactId": "ether-crypto",
       "currentVersion": "9.5.5",
-      "published": false,
+      "published": true,
       "usesParent": true,
       "dependencies": [
         "ether-parent"
@@ -89,7 +89,7 @@
       "groupId": "dev.rafex.ether.database",
       "artifactId": "ether-database-core",
       "currentVersion": "9.5.5",
-      "published": false,
+      "published": true,
       "usesParent": true,
       "dependencies": [
         "ether-parent"
@@ -105,7 +105,7 @@
       "groupId": "dev.rafex.ether.jdbc",
       "artifactId": "ether-jdbc",
       "currentVersion": "9.5.5",
-      "published": false,
+      "published": true,
       "usesParent": true,
       "dependencies": [
         "ether-parent",
@@ -124,7 +124,7 @@
       "groupId": "dev.rafex.ether.database",
       "artifactId": "ether-database-postgres",
       "currentVersion": "9.5.5",
-      "published": false,
+      "published": true,
       "usesParent": true,
       "dependencies": [
         "ether-parent",
@@ -143,7 +143,7 @@
       "groupId": "dev.rafex.ether.json",
       "artifactId": "ether-json",
       "currentVersion": "9.5.5",
-      "published": false,
+      "published": true,
       "usesParent": true,
       "dependencies": [
         "ether-parent"
@@ -159,7 +159,7 @@
       "groupId": "dev.rafex.ether.jwt",
       "artifactId": "ether-jwt",
       "currentVersion": "9.5.5",
-      "published": false,
+      "published": true,
       "usesParent": true,
       "dependencies": [
         "ether-parent",
@@ -178,7 +178,7 @@
       "groupId": "dev.rafex.ether.observability",
       "artifactId": "ether-observability-core",
       "currentVersion": "9.5.5",
-      "published": false,
+      "published": true,
       "usesParent": true,
       "dependencies": [
         "ether-parent"
@@ -194,7 +194,7 @@
       "groupId": "dev.rafex.ether.http",
       "artifactId": "ether-http-core",
       "currentVersion": "9.5.5",
-      "published": false,
+      "published": true,
       "usesParent": true,
       "dependencies": [
         "ether-parent"
@@ -210,7 +210,7 @@
       "groupId": "dev.rafex.ether.http",
       "artifactId": "ether-http-security",
       "currentVersion": "9.5.5",
-      "published": false,
+      "published": true,
       "usesParent": true,
       "dependencies": [
         "ether-parent"
@@ -226,7 +226,7 @@
       "groupId": "dev.rafex.ether.http",
       "artifactId": "ether-http-problem",
       "currentVersion": "9.5.5",
-      "published": false,
+      "published": true,
       "usesParent": true,
       "dependencies": [
         "ether-parent",
@@ -247,7 +247,7 @@
       "groupId": "dev.rafex.ether.http",
       "artifactId": "ether-http-openapi",
       "currentVersion": "9.5.5",
-      "published": false,
+      "published": true,
       "usesParent": true,
       "dependencies": [
         "ether-parent",
@@ -266,7 +266,7 @@
       "groupId": "dev.rafex.ether.http",
       "artifactId": "ether-http-client",
       "currentVersion": "9.5.5",
-      "published": false,
+      "published": true,
       "usesParent": true,
       "dependencies": [
         "ether-parent",
@@ -285,7 +285,7 @@
       "groupId": "dev.rafex.ether.logging",
       "artifactId": "ether-logging-core",
       "currentVersion": "9.5.5",
-      "published": false,
+      "published": true,
       "usesParent": true,
       "dependencies": [
         "ether-parent"
@@ -301,7 +301,7 @@
       "groupId": "dev.rafex.ether.ai",
       "artifactId": "ether-ai-core",
       "currentVersion": "9.5.5",
-      "published": false,
+      "published": true,
       "usesParent": true,
       "dependencies": [
         "ether-parent"
@@ -317,7 +317,7 @@
       "groupId": "dev.rafex.ether.ai",
       "artifactId": "ether-ai-openai",
       "currentVersion": "9.5.5",
-      "published": false,
+      "published": true,
       "usesParent": true,
       "dependencies": [
         "ether-parent",
@@ -338,7 +338,7 @@
       "groupId": "dev.rafex.ether.ai",
       "artifactId": "ether-ai-deepseek",
       "currentVersion": "9.5.5",
-      "published": false,
+      "published": true,
       "usesParent": true,
       "dependencies": [
         "ether-parent",
@@ -359,7 +359,7 @@
       "groupId": "dev.rafex.ether.http",
       "artifactId": "ether-http-jetty12",
       "currentVersion": "9.5.5",
-      "published": false,
+      "published": true,
       "usesParent": true,
       "dependencies": [
         "ether-parent",
@@ -388,7 +388,7 @@
       "groupId": "dev.rafex.ether.websocket",
       "artifactId": "ether-websocket-core",
       "currentVersion": "9.5.5",
-      "published": false,
+      "published": true,
       "usesParent": true,
       "dependencies": [
         "ether-parent"
@@ -404,7 +404,7 @@
       "groupId": "dev.rafex.ether.websocket",
       "artifactId": "ether-websocket-jetty12",
       "currentVersion": "9.5.5",
-      "published": false,
+      "published": true,
       "usesParent": true,
       "dependencies": [
         "ether-parent",
@@ -423,7 +423,7 @@
       "groupId": "dev.rafex.ether.webhook",
       "artifactId": "ether-webhook",
       "currentVersion": "9.5.5",
-      "published": false,
+      "published": true,
       "usesParent": true,
       "dependencies": [
         "ether-parent",
@@ -444,7 +444,7 @@
       "groupId": "dev.rafex.ether.glowroot",
       "artifactId": "ether-glowroot-jetty12",
       "currentVersion": "9.5.5",
-      "published": false,
+      "published": true,
       "usesParent": true,
       "dependencies": [
         "ether-parent",
