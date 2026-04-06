@@ -75,6 +75,16 @@ jobs:
         with:
           distribution: temurin
           java-version: '25'
+          overwrite-settings: false   # deploy-to-github-packages.sh gestiona su propio settings.xml
+
+      - name: Clear stale Maven metadata caches
+        shell: bash
+        run: |
+          # Elimina marcadores .lastUpdated que cachean fallos de descarga previos.
+          # setup-java puede restaurar un cache con 403s cacheados de Maven Central
+          # que impiden la resolución de descriptores de plugins.
+          find "${HOME}/.m2/repository" -name "*.lastUpdated" -delete 2>/dev/null || true
+          echo "Stale .lastUpdated markers cleared."
 
       - name: Import GPG private key
         env:
