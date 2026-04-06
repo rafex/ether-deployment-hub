@@ -154,6 +154,23 @@ jobs:
           for m in "${fail_modules[@]}"; do echo "      • $m"; done
           echo "════════════════════════════════════════════════════════"
 
+          # Write deploy results (always — even on partial failure)
+          results_file="${RUNNER_TEMP}/deploy-results-level-${{ inputs.level_index }}.json"
+          {
+            printf '{"level":%d,"deployed":[' "${{ inputs.level_index }}"
+            first=true
+            for entry in "${ok_modules[@]}" "${skip_modules[@]}"; do
+              # entry format: "module-name (version)"
+              name="${entry% (*}"
+              version="${entry##*(}"; version="${version%)}"
+              $first || printf ','
+              printf '{"name":"%s","version":"%s"}' "$name" "$version"
+              first=false
+            done
+            printf ']}\n'
+          } > "$results_file"
+          echo "Deploy results written to $results_file"
+
           if $level_failed; then
             echo "ERROR: One or more modules failed in level ${{ inputs.level_index }}."
             exit 1
@@ -209,4 +226,22 @@ jobs:
         with:
           name: maven-artifacts-level-${{ inputs.level_index }}
           path: ${{ runner.temp }}/maven-artifacts-level-${{ inputs.level_index }}/
+          if-no-files-found: warn
+
+      - name: Write deploy results for partial manifest sync
+        if: always()
+        shell: bash
+        run: |
+          results_file="${RUNNER_TEMP}/deploy-results-level-${{ inputs.level_index }}.json"
+          if [ ! -f "$results_file" ]; then
+            echo '{"level":${{ inputs.level_index }},"deployed":[]}' > "$results_file"
+          fi
+          cat "$results_file"
+
+      - name: Upload deploy results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: deploy-results-level-${{ inputs.level_index }}
+          path: ${{ runner.temp }}/deploy-results-level-${{ inputs.level_index }}.json
           if-no-files-found: warn

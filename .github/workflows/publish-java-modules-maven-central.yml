@@ -355,3 +355,70 @@ jobs:
           git add releases/manifest.json
           git commit -m "release: update manifest after publish"
           git push origin main
+
+  # ────────────────────────────────────────────────────────────────────────────
+  # Partial manifest sync — runs when update-manifest did not succeed.
+  # Downloads per-level deploy results and updates the manifest with whatever
+  # was actually deployed, so the next run knows where to continue.
+  # ────────────────────────────────────────────────────────────────────────────
+  sync-partial-manifest:
+    needs:
+      - release-plan
+      - deploy-level-0
+      - deploy-level-1
+      - deploy-level-2
+      - deploy-level-3
+      - deploy-level-4
+      - deploy-level-5
+      - deploy-level-6
+      - deploy-level-7
+      - deploy-level-8
+      - deploy-level-9
+      - deploy-level-10
+      - deploy-level-11
+      - deploy-level-12
+      - update-manifest
+    if: >-
+      ${{ always()
+          && needs.release-plan.result == 'success'
+          && needs.release-plan.outputs.selected_count != '0'
+          && needs.update-manifest.result != 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Download all deploy results
+        uses: actions/download-artifact@v8
+        with:
+          pattern: deploy-results-level-*
+          path: deploy-results
+          merge-multiple: false
+
+      - name: Update manifest from partial deploy results
+        shell: bash
+        run: |
+          chmod +x ./scripts/update-manifest-partial.sh
+          echo "Deploy result files found:"
+          find deploy-results -name '*.json' | sort || echo "  (none)"
+          ./scripts/update-manifest-partial.sh \
+            ./releases/manifest.json \
+            ./deploy-results
+
+      - name: Commit and push partial manifest update
+        shell: bash
+        run: |
+          if git diff --quiet releases/manifest.json; then
+            echo "No manifest changes — nothing to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add releases/manifest.json
+          git commit -m "release: partial manifest sync after pipeline failure"
+          git push origin main
