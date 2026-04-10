@@ -468,8 +468,8 @@
     {
       "name": "ether-archetype",
       "path": "ether-archetype",
-      "projectDir": "ether-archetype",
-      "pomPath": "ether-archetype/pom.xml",
+      "projectDir": "ether-archetype/ether-archetype",
+      "pomPath": "ether-archetype/ether-archetype/pom.xml",
       "groupId": "dev.rafex.ether",
       "artifactId": "ether-hexagonal-archetype",
       "currentVersion": "1.0.0",
@@ -484,8 +484,8 @@
     {
       "name": "ether-brain",
       "path": "ether-brain",
-      "projectDir": "ether-brain",
-      "pomPath": "ether-brain/pom.xml",
+      "projectDir": "ether-brain/ether-brain",
+      "pomPath": "ether-brain/ether-brain/pom.xml",
       "groupId": "dev.rafex.etherbrain",
       "artifactId": "ether-brain-parent",
       "currentVersion": "0.1.0",
