@@ -205,19 +205,34 @@ jobs:
               '.modules[] | select(.name == $m) | .artifactId' "./releases/manifest.json")
 
             group_path="${group_id//./\/}"
-            src="${M2_REPO}/${group_path}/${artifact_id}/${version}"
-            dst="${STAGING}/${group_path}/${artifact_id}/${version}"
-            mkdir -p "$dst"
 
-            # Copy POM + JARs (skip GPG signatures and checksums — GH Packages
-            # will re-sign with its own key via deploy-to-github-packages.sh).
-            for f in \
-              "${artifact_id}-${version}.pom" \
-              "${artifact_id}-${version}.jar" \
-              "${artifact_id}-${version}-sources.jar" \
-              "${artifact_id}-${version}-javadoc.jar"; do
-              [ -f "${src}/${f}" ] && cp "${src}/${f}" "${dst}/${f}" && \
-                echo "  [STAGED] ${f}" || true
+            # Helper: stage POM + JARs for one artifactId under the group path.
+            stage_artifact() {
+              local aid="$1"
+              local s="${M2_REPO}/${group_path}/${aid}/${version}"
+              local d="${STAGING}/${group_path}/${aid}/${version}"
+              mkdir -p "$d"
+              # Copy POM + JARs (skip GPG signatures and checksums — GH Packages
+              # will re-sign with its own key via deploy-to-github-packages.sh).
+              for f in \
+                "${aid}-${version}.pom" \
+                "${aid}-${version}.jar" \
+                "${aid}-${version}-sources.jar" \
+                "${aid}-${version}-javadoc.jar"; do
+                [ -f "${s}/${f}" ] && cp "${s}/${f}" "${d}/${f}" && \
+                  echo "  [STAGED] ${f}" || true
+              done
+            }
+
+            stage_artifact "$artifact_id"
+
+            # For multi-module projects, also stage each sub-artifact so that
+            # GitHub Packages receives the full set of JARs (not just the parent POM).
+            mapfile -t sub_artifacts < <(jq -r --arg m "$module" \
+              '.modules[] | select(.name == $m) | .subArtifacts // [] | .[]' \
+              "./releases/manifest.json")
+            for sub_id in "${sub_artifacts[@]}"; do
+              stage_artifact "$sub_id"
             done
           done
 

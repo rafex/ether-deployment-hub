@@ -191,6 +191,11 @@ while IFS= read -r module_json; do
   artifact_id=$(printf '%s' "$manifest_entry" | jq -r '.artifactId')
   version=$(printf '%s'     "$module_json"    | jq -r '.nextVersion')
 
+  # Collect sub-artifacts for multi-module projects (e.g. ether-brain submodules).
+  # subArtifacts share the same groupId and version as the parent artifact.
+  mapfile -t sub_artifact_ids < <(printf '%s' "$manifest_entry" \
+    | jq -r '.subArtifacts // [] | .[]')
+
   log_file="$LOG_DIR/gh-${name}.log"
   echo "  [GH START] ${name} ${group_id}:${artifact_id}:${version}"
 
@@ -199,6 +204,10 @@ while IFS= read -r module_json; do
 
   (
     deploy_module "$name" "$group_id" "$artifact_id" "$version"
+    # Deploy each sub-artifact (same group + version, different artifactId)
+    for sub_id in "${sub_artifact_ids[@]}"; do
+      deploy_module "${name}/${sub_id}" "$group_id" "$sub_id" "$version"
+    done
     # Release token regardless of exit status so next waiter can proceed
     printf . >&"$SEM_FD"
   ) >"$log_file" 2>&1 &

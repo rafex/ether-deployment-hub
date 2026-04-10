@@ -495,7 +495,16 @@
         "ether-parent"
       ],
       "internalDependencyProperties": {},
-      "dependencyReleaseImpact": "patch"
+      "dependencyReleaseImpact": "patch",
+      "subArtifacts": [
+        "ether-brain-common",
+        "ether-brain-ports",
+        "ether-brain-core",
+        "ether-brain-infra-memory",
+        "ether-brain-tools-local",
+        "ether-brain-bootstrap",
+        "ether-brain-transport-cli"
+      ]
     }
   ]
 }
