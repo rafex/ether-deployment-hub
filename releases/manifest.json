@@ -25,7 +25,9 @@
     "ether-http-jetty12",
     "ether-websocket-jetty12",
     "ether-webhook",
-    "ether-glowroot-jetty12"
+    "ether-glowroot-jetty12",
+    "ether-archetype",
+    "ether-brain"
   ],
   "releasePolicy": {
     "conventionalCommits": true,
@@ -461,6 +463,38 @@
         "ether-websocket-core": "ether-websocket-core.version",
         "ether-websocket-jetty12": "ether-websocket-jetty12.version"
       },
+      "dependencyReleaseImpact": "patch"
+    },
+    {
+      "name": "ether-archetype",
+      "path": "ether-archetype",
+      "projectDir": "ether-archetype",
+      "pomPath": "ether-archetype/pom.xml",
+      "groupId": "dev.rafex.ether",
+      "artifactId": "ether-hexagonal-archetype",
+      "currentVersion": "1.0.0",
+      "published": false,
+      "usesParent": true,
+      "dependencies": [
+        "ether-parent"
+      ],
+      "internalDependencyProperties": {},
+      "dependencyReleaseImpact": "patch"
+    },
+    {
+      "name": "ether-brain",
+      "path": "ether-brain",
+      "projectDir": "ether-brain",
+      "pomPath": "ether-brain/pom.xml",
+      "groupId": "dev.rafex.etherbrain",
+      "artifactId": "ether-brain-parent",
+      "currentVersion": "0.1.0",
+      "published": false,
+      "usesParent": true,
+      "dependencies": [
+        "ether-parent"
+      ],
+      "internalDependencyProperties": {},
       "dependencyReleaseImpact": "patch"
     }
   ]
