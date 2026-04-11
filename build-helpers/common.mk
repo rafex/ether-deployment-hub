@@ -27,6 +27,8 @@ ARTIFACTORY_BASE_URL_ARG := $(if $(ARTIFACTORY_BASE_URL),-Dartifactory.base-url=
 # Optional override for Sonatype Central publish wait strategy (e.g. validated|published)
 CENTRAL_WAIT_UNTIL ?=
 CENTRAL_WAIT_UNTIL_ARG := $(if $(CENTRAL_WAIT_UNTIL),-Dcentral.waitUntil=$(CENTRAL_WAIT_UNTIL),)
+# Extra arguments appended to the mvn deploy command (e.g. -pl !module to exclude modules)
+DEPLOY_EXTRA_ARGS ?=
 
 # Control whether to skip tests: true or false
 SKIP_TESTS ?= false
@@ -194,7 +196,7 @@ build: sync-pom-versions set-version
 ## deploy: write settings and set version, then deploy using profile $(DEPLOY_PROFILE) (in $(PROJECT_DIR))
 deploy: validate-submodule-refs write-settings sync-pom-versions set-version update-license-headers
 	@echo "Deploying version $(FINAL_VERSION)..."
-	@$(call run_mvnw,clean $(PRE_DEPLOY_GOALS) deploy $(DEPLOY_PROFILE_ARG) $(ARTIFACTORY_BASE_URL_ARG) $(CENTRAL_WAIT_UNTIL_ARG) -DskipTests=$(SKIP_TESTS) -Dgpg.skip=false -Dmaven.deploy.skip=$(MAVEN_DEPLOY_SKIP))
+	@$(call run_mvnw,clean $(PRE_DEPLOY_GOALS) deploy $(DEPLOY_PROFILE_ARG) $(ARTIFACTORY_BASE_URL_ARG) $(CENTRAL_WAIT_UNTIL_ARG) $(DEPLOY_EXTRA_ARGS) -DskipTests=$(SKIP_TESTS) -Dgpg.skip=false -Dmaven.deploy.skip=$(MAVEN_DEPLOY_SKIP))
 	@echo "Reverting POM changes after deploy..."
 	@$(call run_mvnw,versions:revert)
 
