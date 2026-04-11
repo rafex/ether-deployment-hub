@@ -121,7 +121,8 @@ jobs:
                 FORCE_EXACT_VERSION=true \
                 SYNC_FROM_REPO=false \
                 SKIP_TESTS=false \
-                AUTO_UPDATE_LICENSE_HEADERS=true
+                AUTO_UPDATE_LICENSE_HEADERS=true \
+                CENTRAL_WAIT_UNTIL=validated
             ) >"$log_file" 2>&1; then
               echo "  [OK]   $module ($next_version)"
               ok_modules+=("$module ($next_version)")
