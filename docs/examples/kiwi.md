@@ -1,34 +1,17 @@
-# Ejemplo: Kiwi — API REST con arquitectura hexagonal
+# Ejemplo práctico: Kiwi usando Ether en producción
 
-**Kiwi** es una API REST construida sobre el ecosistema Ether con arquitectura hexagonal estricta.
-Gestiona usuarios, objetos geoespaciales, roles y autenticación JWT.
-Este documento muestra los patrones de integración reales usados en el proyecto.
+**Kiwi** es una API REST real construida sobre Ether. Este documento toma su implementación como referencia para mostrar patrones prácticos de uso, especialmente en `ether-http-jetty12`.
+
+El objetivo no es describir Kiwi por dentro, sino enseñar cómo construir con Ether:
+
+1. Un servidor HTTP con Jetty 12.
+2. Un endpoint real con rutas, request/response y manejo de errores.
+3. Trazabilidad por request con `logger`, `requestId` y contexto.
+4. Observabilidad con health probes y Glowroot.
 
 ## Dependencias Ether utilizadas
 
 ```xml
-<!-- Todas con groupId de su módulo correspondiente -->
-<dependency>
-  <groupId>dev.rafex.ether.config</groupId>
-  <artifactId>ether-config</artifactId>
-</dependency>
-<dependency>
-  <groupId>dev.rafex.ether.di</groupId>
-  <artifactId>ether-di</artifactId>
-  <version>1.0.0</version>
-</dependency>
-<dependency>
-  <groupId>dev.rafex.ether.jwt</groupId>
-  <artifactId>ether-jwt</artifactId>
-</dependency>
-<dependency>
-  <groupId>dev.rafex.ether.database</groupId>
-  <artifactId>ether-database-core</artifactId>
-</dependency>
-<dependency>
-  <groupId>dev.rafex.ether.jdbc</groupId>
-  <artifactId>ether-jdbc</artifactId>
-</dependency>
 <dependency>
   <groupId>dev.rafex.ether.http</groupId>
   <artifactId>ether-http-jetty12</artifactId>
@@ -38,317 +21,337 @@ Este documento muestra los patrones de integración reales usados en el proyecto
   <artifactId>ether-http-security</artifactId>
 </dependency>
 <dependency>
+  <groupId>dev.rafex.ether.jwt</groupId>
+  <artifactId>ether-jwt</artifactId>
+</dependency>
+<dependency>
+  <groupId>dev.rafex.ether.observability</groupId>
+  <artifactId>ether-observability-core</artifactId>
+</dependency>
+<dependency>
   <groupId>dev.rafex.ether.glowroot</groupId>
   <artifactId>ether-glowroot-jetty12</artifactId>
 </dependency>
 ```
 
----
+## Arquitectura aplicada en Kiwi
 
-## Estructura de módulos Maven
-
-```
-kiwi-parent/
-├── kiwi-common/           ← tipos compartidos, config
-├── kiwi-ports/            ← interfaces de repositorios y servicios
-├── kiwi-core/             ← casos de uso del dominio
-├── kiwi-infra-postgres/   ← implementaciones con ether-jdbc
-├── kiwi-bootstrap/        ← contenedor DI (usa ether-di)
-├── kiwi-transport-jetty/  ← servidor HTTP (usa ether-http-jetty12)
-└── kiwi-architecture-tests/ ← reglas ArchUnit
+```text
+main/App
+  -> bootstrap/container
+  -> KiwiServer
+     -> registro de rutas
+     -> políticas de autenticación
+     -> middlewares
+     -> JettyServerFactory
+        -> servidor embebido listo para atender requests
 ```
 
----
+En Kiwi, la capa HTTP queda encapsulada en `kiwi-transport-jetty`, mientras que dominio, repositorios y configuración permanecen fuera del transporte. Ese es el patrón recomendado cuando se usa Ether.
 
-## 1. Punto de entrada (`App.java`)
+## Caso práctico 1: levantar un servidor con `ether-http-jetty12`
 
-El `main` es mínimo: configura el entorno, arranca el contenedor con `Bootstrap` y delega al servidor.
+Kiwi construye el servidor en `KiwiServer`. El patrón importante es:
+
+1. Crear `JsonCodec`.
+2. Registrar rutas.
+3. Registrar middlewares.
+4. Convertir esas definiciones a `JettyRouteRegistry`.
+5. Crear el servidor con `JettyServerFactory`.
+
+### Patrón real usado por Kiwi
 
 ```java
-public class App {
-    public static void main(String[] args) throws Exception {
-        Locale.setDefault(Locale.ROOT);
-        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+public final class KiwiServer {
 
-        configureLogging(args);
-
-        try (var runtime = KiwiBootstrap.start()) {       // (1) Bootstrap
-            KiwiServer.start(runtime.container());        // (2) Servidor HTTP
-            // server.join() bloquea aquí hasta SIGTERM
-        }
-        // El try-with-resources invoca runtime.close() → cierra DataSource, etc.
-    }
-}
-```
-
----
-
-## 2. Contenedor de dependencias (`KiwiBootstrap` + `KiwiContainer`)
-
-### Bootstrap
-
-Antes de publicar `ether-di`, Kiwi implementó sus propias clases `Lazy`, `Closer` y un
-`KiwiBootstrap` ad-hoc. Esos tres bloques son exactamente lo que `ether-di` exporta ahora.
-
-Con `ether-di` el bootstrap se reduce a:
-
-```java
-// Con ether-di
-var runtime = Bootstrap.start(
-    KiwiContainer::new,   // factory
-    KiwiContainer::warmup // warmup: falla rápido si la DB no responde
-);
-```
-
-El `KiwiBootstrap` original hacía exactamente eso de forma manual:
-
-```java
-public final class KiwiBootstrap {
-
-    public static KiwiRuntime start() {
-        return start(new KiwiContainer(), true);
+    public static void start(KiwiContainer container, KiwiConfig config, List<KiwiModule> modules)
+            throws Exception {
+        var runner = createRunner(container, config, modules);
+        runner.start();
+        runner.await();
     }
 
-    public static KiwiRuntime start(KiwiContainer container, boolean warmup) {
-        var closer = new Closer();
+    private static JettyServerRunner createRunner(
+            KiwiContainer container,
+            KiwiConfig config,
+            List<KiwiModule> modules
+    ) {
+        var jsonCodec = JacksonJsonCodec.defaultCodec();
+        var jwt = new KiwiJwtService(
+            config.jwt().issuer(),
+            config.jwt().audience(),
+            config.jwt().secret()
+        );
+        var context = new ModuleContext(container, config, jwt);
 
-        if (warmup) {
-            container.warmup();           // falla rápido si la DB no responde
+        var routeRegistry = new RouteRegistry();
+        var authPolicyRegistry = new AuthPolicyRegistry();
+        var middlewareRegistry = new MiddlewareRegistry();
+
+        for (var module : modules) {
+            module.registerRoutes(routeRegistry, context);
+            module.registerAuthPolicies(authPolicyRegistry, context);
+            module.registerMiddlewares(middlewareRegistry, context);
         }
 
-        // Registra el DataSource para cerrar en shutdown
-        var ds = container.dataSource();
-        if (ds instanceof AutoCloseable ac) {
-            closer.register(ac);
+        var etherRoutes = new JettyRouteRegistry();
+        for (var route : routeRegistry.routes()) {
+            etherRoutes.add(route.pathSpec(), route.handler());
         }
 
-        var rt = new KiwiRuntime(container, closer);
-        Runtime.getRuntime().addShutdownHook(new Thread(rt::close, "kiwi-shutdown"));
-        return rt;
-    }
-}
-```
+        var etherMiddlewares = new ArrayList<JettyMiddleware>();
+        for (var middleware : middlewareRegistry.middlewares()) {
+            etherMiddlewares.add(middleware::wrap);
+        }
 
-### Contenedor (`KiwiContainer`)
-
-El contenedor cablea el grafo de dependencias con `Lazy<T>`:
-cada componente se inicializa solo cuando se accede por primera vez.
-
-```java
-public final class KiwiContainer {
-
-    private final Lazy<KiwiConfig>          config;
-    private final Lazy<DataSource>          dataSource;
-    private final Lazy<DatabaseClient>      databaseClient;
-    private final Lazy<UserRepository>      userRepository;
-    private final Lazy<AuthService>         authService;
-    // ... más Lazy<T> para cada servicio/repositorio
-
-    public KiwiContainer(Overrides overrides) {
-        // Cada Lazy toma un Supplier; "select" permite inyectar overrides para tests
-        config         = new Lazy<>(select(overrides.config(), KiwiConfig::load));
-        dataSource     = new Lazy<>(select(overrides.dataSource(), () -> Db.dataSource()));
-        databaseClient = new Lazy<>(() -> Db.databaseClient());
-
-        userRepository = new Lazy<>(select(overrides.userRepository(),
-                             () -> new UserRepositoryImpl(databaseClient())));
-        authService    = new Lazy<>(select(overrides.authService(),
-                             () -> new AuthServiceImpl(userRepository(), passwordHasher())));
-        // ...
-    }
-
-    /** Warmup: toca todos los nodos para fallar rápido en startup. */
-    public void warmup() {
-        config(); dataSource(); databaseClient();
-        userRepository(); authService();
-        // ...
-    }
-}
-```
-
-### Override para tests
-
-```java
-// En un test de integración se puede reemplazar cualquier componente:
-var container = new KiwiContainer(
-    KiwiContainer.Overrides.builder()
-        .dataSource(() -> testDataSource)
-        .build()
-);
-```
-
----
-
-## 3. Base de datos (`ether-jdbc` + HikariCP)
-
-### Inicialización del pool
-
-```java
-public final class Db {
-
-    private static volatile HikariDataSource DS;
-    private static volatile DatabaseClient   CLIENT;
-
-    public static synchronized void init(DatabaseConfig config) {
-        if (DS != null) return; // idempotente
-
-        var hikari = new HikariConfig();
-        hikari.setJdbcUrl(config.url());
-        hikari.setUsername(config.user());
-        hikari.setPassword(config.password());
-        hikari.setMaximumPoolSize(config.maxPoolSize());
-        hikari.setPoolName("kiwi-pool");
-        // caché de prepared statements PostgreSQL
-        hikari.addDataSourceProperty("preparedStatementCacheQueries", "256");
-
-        DS     = new HikariDataSource(hikari);
-        CLIENT = new JdbcDatabaseClient(DS);   // ether-jdbc
-    }
-
-    public static DatabaseClient databaseClient() {
-        ensureInitialized();
-        return CLIENT;
-    }
-}
-```
-
-### Repositorio con `DatabaseClient`
-
-```java
-public class UserRepositoryImpl implements UserRepository {
-
-    private final DatabaseClient db;
-
-    @Override
-    public void createUser(UUID userId, String username, byte[] passwordHash, ...) {
-        db.execute(new SqlQuery("""
-            INSERT INTO users (user_id, username, password_hash, ...)
-            VALUES (?, ?, ?, ...)
-            """,
-            List.of(
-                SqlParameter.of(userId),
-                SqlParameter.text(username),
-                SqlParameter.of(passwordHash)
-            )
-        ));
-    }
-
-    @Override
-    public Optional<UserRow> findByUsername(String username) {
-        return db.queryOne(
-            new SqlQuery("SELECT * FROM users WHERE username = ?",
-                         List.of(SqlParameter.text(username))),
-            rs -> new UserRow(
-                ResultSets.getUuid(rs, "user_id"),
-                rs.getString("username"),
-                rs.getBytes("password_hash")
-            )
+        var etherConfig = JettyServerConfig.fromEnv();
+        return JettyServerFactory.create(
+            etherConfig,
+            etherRoutes,
+            jsonCodec,
+            null,
+            List.of(),
+            etherMiddlewares
         );
     }
 }
 ```
 
----
+### Qué aporta este enfoque
 
-## 4. JWT (`ether-jwt`)
+| Pieza | Función |
+|---|---|
+| `JettyRouteRegistry` | Centraliza el mapeo `path -> handler` |
+| `JettyServerConfig.fromEnv()` | Externaliza puerto y configuración del servidor |
+| `JettyServerFactory.create(...)` | Construye el runner Jetty sin acoplar la app al bootstrap HTTP |
+| `KiwiModule` | Permite agregar endpoints, auth y middlewares por módulos |
 
-### Configuración y emisión
+### Versión mínima recomendada para una app nueva
 
 ```java
-public final class KiwiJwtService {
+var jsonCodec = JacksonJsonCodec.defaultCodec();
+var routes = new JettyRouteRegistry();
+routes.add("/hello", new HelloHandler());
 
-    private final TokenIssuer  issuer;
-    private final TokenVerifier verifier;
+var config = JettyServerConfig.fromEnv();
+var runner = JettyServerFactory.create(
+    config,
+    routes,
+    jsonCodec,
+    null,
+    List.of(),
+    List.of()
+);
 
-    public KiwiJwtService(String iss, String aud, String secret) {
-        var keyProvider = KeyProvider.hmac(secret);           // ether-jwt
-        var config = JwtConfig.builder(keyProvider)
-            .expectedIssuer(iss)
-            .expectedAudience(aud)
-            .build();
-
-        this.issuer   = new DefaultTokenIssuer(config);
-        this.verifier = new DefaultTokenVerifier(config);
-    }
-
-    /** Emite un token de usuario con roles y TTL. */
-    public String mint(String sub, Collection<String> roles, long ttlSeconds) {
-        var spec = TokenSpec.builder()
-            .subject(sub)
-            .issuer(iss).audience(aud)
-            .issuedAt(Instant.now())
-            .ttl(Duration.ofSeconds(ttlSeconds))
-            .roles(roles.toArray(String[]::new))
-            .tokenType(TokenType.USER)
-            .build();
-        return issuer.issue(spec);
-    }
-
-    /** Verifica el token y devuelve el contexto de autenticación. */
-    public VerifyResult verify(String token, long nowEpochSeconds) {
-        var result = verifier.verify(token, Instant.ofEpochSecond(nowEpochSeconds));
-        if (!result.ok()) return VerifyResult.bad(result.code());
-        return VerifyResult.ok(toContext(result.claims().orElseThrow()));
-    }
-}
+runner.start();
+runner.await();
 ```
 
----
+## Caso práctico 2: registrar endpoints de forma modular
 
-## 5. Servidor HTTP (`ether-http-jetty12`)
+Kiwi no mete todo en `main`. Usa un módulo HTTP que concentra:
 
-### Registro modular de rutas, auth y middlewares
+1. Las rutas.
+2. Qué endpoints son públicos.
+3. Qué middlewares se aplican.
+
+### Registro real de rutas
 
 ```java
 public final class DefaultKiwiModule implements KiwiModule {
 
     @Override
-    public void registerRoutes(RouteRegistry routes, ModuleContext ctx) {
-        var c   = ctx.container();
-        var jwt = ctx.jwtService();
+    public void registerRoutes(RouteRegistry routes, ModuleContext context) {
+        var container = context.container();
+        var jwt = context.jwtService();
 
-        routes.add("/health",     new EnhancedHealthHandler(c.dataSource()));
-        routes.add("/auth/login", new LoginHandler(jwt, c.authService(), ctx.config().jwt()));
-        routes.add("/objects/*",  new ObjectHandler(c.objectService()));
-        routes.add("/locations/*", new LocationHandler(c.locationService()));
-    }
-
-    @Override
-    public void registerAuthPolicies(AuthPolicyRegistry auth, ModuleContext ctx) {
-        // Rutas públicas (sin JWT)
-        auth.publicPath("POST", "/auth/login");
-        auth.publicPath("GET",  "/health");
-
-        // Rutas protegidas (requieren JWT válido)
-        auth.protectedPrefix("/objects/*");
-        auth.protectedPrefix("/locations/*");
-    }
-
-    @Override
-    public void registerMiddlewares(MiddlewareRegistry mw, ModuleContext ctx) {
-        // APM con Glowroot (ether-glowroot-jetty12)
-        var glowroot = GlowrootJettyHandler.builder()
-            .healthPath("/health")
-            .requestIdHeader("X-Request-Id", true)
-            .defaultSlowThreshold(2_000L)
-            .build();
-        mw.add(glowroot::wrap);
+        routes.add("/hello", new HelloHandler());
+        routes.add("/health", new EnhancedHealthHandler(container.dataSource()));
+        routes.add("/auth/login", new LoginHandler(jwt, container.authService(), context.config().jwt()));
+        routes.add("/auth/token", new TokenHandler(jwt, container.appClientAuthService(), context.config().jwt()));
+        routes.add("/objects/*", new ObjectHandler(container.objectService()));
+        routes.add("/locations/*", new LocationHandler(container.locationService()));
+        routes.add("/admin/app-clients", new CreateAppClientHandler(container.appClientAuthService()));
+        routes.add("/*", new NotFoundHandler());
     }
 }
 ```
 
-### Middleware JWT integrado en el servidor
+### Cuándo conviene este patrón
+
+Este estilo funciona bien cuando:
+
+- Quieres separar transporte de dominio.
+- Tienes muchos endpoints y no quieres un `main` monolítico.
+- Necesitas poder agregar módulos nuevos sin reescribir el servidor.
+
+## Caso práctico 3: crear un endpoint HTTP con `NonBlockingResourceHandler`
+
+Kiwi usa `NonBlockingResourceHandler` como base para handlers REST. El patrón es:
+
+1. Definir `basePath()`.
+2. Declarar `routes()`.
+3. Implementar `get/post/patch/delete`.
+4. Responder con `JettyApiResponses` o `JettyApiErrorResponses`.
+
+### Endpoint simple: `/hello`
 
 ```java
-// En KiwiServer.createRunner()
+public class HelloHandler extends NonBlockingResourceHandler {
+
+    private static final JsonCodec JSON_CODEC = JsonUtils.codec();
+    private static final JettyApiResponses RESPONSES = new JettyApiResponses(JSON_CODEC);
+
+    public HelloHandler() {
+        super(JSON_CODEC);
+    }
+
+    @Override
+    protected String basePath() {
+        return "/hello";
+    }
+
+    @Override
+    protected List<Route> routes() {
+        return List.of(Route.of("/", Set.of("GET")));
+    }
+
+    @Override
+    public boolean get(HttpExchange x) {
+        var jx = (JettyHttpExchange) x;
+        var name = queryParam(jx, "name");
+        var message = name == null ? "Hello!!" : "Hello!! " + name.trim();
+        RESPONSES.ok(jx.response(), jx.callback(), Map.of("message", message));
+        return true;
+    }
+}
+```
+
+### Qué muestra este ejemplo
+
+| Patrón | Uso |
+|---|---|
+| `basePath()` | Define el recurso base |
+| `routes()` | Restringe métodos y subrutas |
+| `JettyHttpExchange` | Da acceso a request, response y callback de Jetty |
+| `JettyApiResponses` | Estandariza respuestas JSON |
+
+## Caso práctico 4: endpoint con body, validación y error mapping
+
+El ejemplo de `LocationHandler` es útil porque muestra el flujo típico de una API de negocio:
+
+1. Leer JSON del request.
+2. Validar campos.
+3. Invocar el servicio de dominio.
+4. Traducir errores de negocio a HTTP.
+5. Registrar logs útiles.
+
+### Patrón real de Kiwi
+
+```java
+public class LocationHandler extends NonBlockingResourceHandler {
+
+    private static final JsonCodec JSON_CODEC = JsonUtils.codec();
+    private static final JettyApiErrorResponses ERRORS = new JettyApiErrorResponses(JSON_CODEC);
+
+    private final LocationService service;
+
+    @Override
+    protected String basePath() {
+        return "/locations";
+    }
+
+    @Override
+    protected List<Route> routes() {
+        return List.of(Route.of("/", Set.of("POST")));
+    }
+
+    @Override
+    public boolean post(HttpExchange x) {
+        Log.info(getClass(), "Handling location creation request");
+        return create((JettyHttpExchange) x);
+    }
+
+    private boolean create(JettyHttpExchange x) {
+        try {
+            var req = JSON_CODEC.readValue(
+                Request.asInputStream(x.request()),
+                CreateLocationRequest.class
+            );
+
+            if (req.name() == null || req.name().isBlank()) {
+                ERRORS.badRequest(x.response(), x.callback(), "name is required");
+                return true;
+            }
+
+            var locationId = UUID.randomUUID();
+            service.create(locationId, req.name().trim(), null);
+
+            x.json(201, "{\"location_id\":\"" + locationId + "\"}");
+            return true;
+
+        } catch (KiwiError e) {
+            var mapped = KiwiErrorHttpMapper.map(e, "location.create");
+            ERRORS.error(
+                x.response(),
+                x.callback(),
+                mapped.status(),
+                mapped.error(),
+                mapped.code(),
+                mapped.message(),
+                x.path()
+            );
+            return true;
+
+        } catch (Exception e) {
+            Log.debug(getClass(), "Error creating location: {}", e.getMessage());
+            ERRORS.internalServerError(x.response(), x.callback(), "internal_error");
+            return true;
+        }
+    }
+}
+```
+
+### Recomendaciones prácticas
+
+- Valida pronto y responde `400` antes de tocar dominio o base de datos.
+- Mantén el handler delgado: parsing HTTP + traducción de errores.
+- Deja la lógica de negocio en servicios (`LocationService`, `ObjectService`, etc.).
+- Usa un mapper HTTP para no dispersar códigos y mensajes de error por todos los handlers.
+
+## Caso práctico 5: proteger rutas con JWT en `ether-http-jetty12`
+
+Kiwi conecta `ether-jwt` con `JettyAuthHandler`. El servidor aplica la verificación como middleware y luego marca rutas públicas o protegidas.
+
+### Políticas de autenticación
+
+```java
+@Override
+public void registerAuthPolicies(AuthPolicyRegistry authPolicies, ModuleContext context) {
+    authPolicies.publicPath("POST", "/admin/users");
+    authPolicies.publicPath("POST", "/auth/login");
+    authPolicies.publicPath("POST", "/auth/token");
+    authPolicies.publicPath("GET", "/hello");
+    authPolicies.publicPath("GET", "/health");
+
+    authPolicies.protectedPrefix("/objects/*");
+    authPolicies.protectedPrefix("/locations/*");
+    authPolicies.protectedPrefix("/admin/app-clients");
+}
+```
+
+### Middleware JWT
+
+```java
 etherMiddlewares.add(next -> {
     var auth = new JettyAuthHandler(next, (token, epochSeconds) -> {
-        var result = jwt.verify(token, epochSeconds);
-        if (!result.ok()) return TokenVerificationResult.failed(result.code());
-        return TokenVerificationResult.ok(result.ctx());
+        var verification = jwt.verify(token, epochSeconds);
+        if (!verification.ok()) {
+            return TokenVerificationResult.failed(verification.code());
+        }
+        return TokenVerificationResult.ok(verification.ctx());
     }, jsonCodec);
 
-    // Aplica las políticas registradas por los módulos
     for (var policy : authPolicyRegistry.policies()) {
         if (policy.type() == AuthPolicy.Type.PUBLIC_PATH) {
             auth.publicPath(policy.method(), policy.pathSpec());
@@ -360,66 +363,219 @@ etherMiddlewares.add(next -> {
 });
 ```
 
----
+### Resultado
 
-## 6. Seguridad (`ether-http-security`)
+Con este patrón:
+
+- `/health` y `/hello` quedan públicos.
+- `/objects/*` y `/locations/*` exigen token válido.
+- La verificación no contamina cada handler.
+
+## Caso práctico 6: trazabilidad con logger, `requestId` y contexto
+
+Una parte importante de Kiwi es que la trazabilidad no depende solo del APM. También usa logging estructurado a través de Ether y MDC con SLF4J.
+
+### Wrapper de logging usado por Kiwi
 
 ```java
-// CORS permisivo para desarrollo; en producción usar CorsPolicy.builder()
-var cors       = CorsPolicy.permissive();
-var secHeaders = SecurityHeadersPolicy.defaults();
+public final class Log {
 
-middlewares.add(next -> new Handler.Wrapper(next) {
-    @Override
-    public boolean handle(Request request, Response response, Callback callback) {
-        var origin = Request.getHeaders(request).get("Origin");
-        cors.responseHeaders(origin)
-            .forEach((k, v) -> response.getHeaders().add(k, v));
-        secHeaders.headers()
-            .forEach((k, v) -> response.getHeaders().add(k, v));
-        return super.handle(request, response, callback);
+    public static final String MDC_REQUEST_ID = "requestId";
+    public static final String MDC_USER_ID = "userId";
+
+    public static void info(Class<?> clazz, String msg, Object... args) {
+        EtherLog.info(clazz, msg, args);
     }
+
+    public static void debug(Class<?> clazz, String msg, Object... args) {
+        EtherLog.debug(clazz, msg, args);
+    }
+
+    public static void error(Class<?> clazz, Throwable t, String msg, Object... args) {
+        EtherLog.error(clazz, t, msg, args);
+    }
+
+    public static void withRequestContext(String requestId, String userId, Runnable task) {
+        try {
+            if (requestId != null) MDC.put(MDC_REQUEST_ID, requestId);
+            if (userId != null) MDC.put(MDC_USER_ID, userId);
+            task.run();
+        } finally {
+            if (requestId != null) MDC.remove(MDC_REQUEST_ID);
+            if (userId != null) MDC.remove(MDC_USER_ID);
+        }
+    }
+}
+```
+
+### Cómo se conecta con la capa HTTP
+
+En Kiwi, `GlowrootJettyHandler` genera o propaga `X-Request-Id`:
+
+```java
+var glowroot = GlowrootJettyHandler.builder()
+    .healthPath("/health")
+    .requestIdHeader("X-Request-Id", true)
+    .defaultSlowThreshold(2_000L)
+    .build();
+```
+
+Eso permite que cada request tenga una identidad estable. El patrón recomendado para una aplicación Ether es:
+
+1. Leer el request id desde el middleware HTTP.
+2. Guardarlo en MDC.
+3. Agregar `userId` cuando la autenticación ya resolvió el principal.
+4. Emitir logs de negocio con ese contexto.
+
+### Ejemplo recomendado de uso en handlers o servicios
+
+```java
+Log.withRequestContext(requestId, userId, () -> {
+    Log.info(getClass(), "Creating location {}", locationId);
+    service.create(locationId, name, parentId);
 });
 ```
 
----
+### Beneficio operativo
 
-## Flujo completo de arranque
+Con `requestId` en headers, logs y trazas:
+
+- Puedes seguir una llamada de extremo a extremo.
+- Puedes correlacionar fallos reportados por clientes.
+- Puedes unir el log de aplicación con Glowroot usando el mismo identificador.
+
+## Caso práctico 7: observabilidad con `ether-observability-core`
+
+Kiwi no usa un `/health` vacío. Construye un endpoint que combina estado global, probes y métricas JVM.
+
+### Handler real de health
+
+```java
+public class EnhancedHealthHandler extends NonBlockingResourceHandler {
+
+    private final List<ProbeCheck> probes;
+
+    public EnhancedHealthHandler(DataSource dataSource) {
+        super(JSON_CODEC);
+        this.probes = List.of(
+            dbProbe(dataSource),
+            memoryProbe(),
+            cpuProbe(),
+            diskProbe(),
+            applicationProbe()
+        );
+    }
+
+    @Override
+    public boolean get(HttpExchange x) {
+        var jx = (JettyHttpExchange) x;
+        var report = ProbeAggregator.aggregate(ProbeKind.HEALTH, probes);
+        var status = report.status();
+
+        var body = new LinkedHashMap<String, Object>();
+        body.put("service", "kiwi");
+        body.put("status", status.name());
+        body.put("timestamp", Instant.now().toString());
+
+        int httpStatus = status == ProbeStatus.DOWN ? 503 : 200;
+        RESPONSES.json(jx.response(), jx.callback(), httpStatus, body);
+        return true;
+    }
+}
+```
+
+### Qué revisar en este patrón
+
+| Probe | Qué valida |
+|---|---|
+| `dbProbe` | conectividad y validez del `DataSource` |
+| `memoryProbe` | presión de heap |
+| `cpuProbe` | carga de CPU |
+| `diskProbe` | espacio disponible |
+| `applicationProbe` | estado general del proceso |
+
+### Recomendación
+
+Usa `ProbeAggregator` para separar chequeos operativos del transporte HTTP. Así puedes evolucionar la política de salud sin reescribir el endpoint.
+
+## Caso práctico 8: APM y trazas con `ether-glowroot-jetty12`
+
+Kiwi incorpora Glowroot como middleware del servidor y como agente en runtime.
+
+### Middleware HTTP
+
+```java
+var glowroot = GlowrootJettyHandler.builder()
+    .healthPath("/health")
+    .requestIdHeader("X-Request-Id", true)
+    .defaultSlowThreshold(2_000L)
+    .build();
+
+middlewares.add(glowroot::wrap);
+```
+
+### Runtime del proceso
+
+```sh
+exec java \
+  -XX:+UseContainerSupport \
+  -XX:MaxRAMPercentage=70.0 \
+  -XX:+ExitOnOutOfMemoryError \
+  $JAVA_OPTS \
+  -javaagent:/app/glowroot/glowroot.jar \
+  -jar /app/app.jar
+```
+
+### Qué gana la aplicación
+
+- Captura de requests lentos.
+- Request id propagado por header.
+- Trazas correlacionadas por endpoint.
+- Instrumentación adicional por configuración Glowroot.
+
+En el caso de Kiwi, además existe configuración local en `backend/java/observability/glowroot/config.json` para afinar reglas de captura y thresholds.
+
+## Flujo completo de una request
 
 ```mermaid
 sequenceDiagram
-    participant M as main()
-    participant B as KiwiBootstrap
-    participant C as KiwiContainer
-    participant DB as Db (HikariCP)
-    participant S as KiwiServer
+    participant C as Cliente
+    participant J as Jetty
+    participant M as Middleware Glowroot/Auth
+    participant H as Handler Ether
+    participant S as Servicio
+    participant DB as Base de datos
 
-    M->>B: start()
-    B->>C: new KiwiContainer()
-    B->>C: warmup()
-    C->>DB: dataSource() → init HikariCP
-    C->>DB: databaseClient() → JdbcDatabaseClient
-    C-->>B: container listo
-    B->>B: register DataSource en Closer
-    B->>B: addShutdownHook("kiwi-shutdown")
-    B-->>M: KiwiRuntime(container, closer)
-    M->>S: start(container)
-    S->>S: registra rutas, auth, middlewares
-    S->>S: JettyServer.start() → escucha en :8080
-    Note over M,S: SIGTERM / Ctrl+C
-    M->>B: runtime.close()
-    B->>DB: DataSource.close() → cierra pool
+    C->>J: HTTP request + X-Request-Id
+    J->>M: request
+    M->>M: propaga requestId / valida JWT
+    M->>H: entrega HttpExchange
+    H->>H: parsea body, valida input, loguea
+    H->>S: invoca caso de uso
+    S->>DB: consulta o comando
+    DB-->>S: resultado
+    S-->>H: respuesta de negocio
+    H-->>C: JSON + status HTTP
 ```
 
----
+## Guía rápida para replicar el patrón en otra app Ether
 
-## Lecciones aprendidas
+1. Crea un módulo de transporte que registre rutas, auth y middlewares.
+2. Usa `JettyRouteRegistry` para mapear handlers.
+3. Implementa cada recurso con `NonBlockingResourceHandler`.
+4. Devuelve JSON con `JettyApiResponses` y errores con `JettyApiErrorResponses`.
+5. Aísla JWT en un middleware con `JettyAuthHandler`.
+6. Propaga `X-Request-Id` y colócalo en MDC para correlación.
+7. Expón `/health` con `ProbeAggregator`.
+8. Si necesitas APM, envuelve el servidor con `GlowrootJettyHandler`.
 
-| Decisión | Por qué |
+## Lecciones de Kiwi aplicables a Ether
+
+| Decisión | Motivo |
 |---|---|
-| `Lazy<T>` para cada dependencia | Startup rápido; los componentes no usados nunca se inicializan |
-| `warmup()` explícito | Falla en startup en lugar de en la primera petición real |
-| `Bootstrap` + `Closer` | El DataSource se cierra limpiamente en SIGTERM sin código extra |
-| Módulos (`KiwiModule`) | Permite añadir grupos de rutas/auth/middlewares sin tocar el servidor |
-| Un solo `DatabaseClient` por app | HikariCP gestiona el pool; `JdbcDatabaseClient` es stateless |
-| `SecurityHeadersPolicy.defaults()` | CSP, X-Frame-Options, HSTS gratis desde ether-http-security |
+| Modularizar rutas con `KiwiModule` | evita un servidor rígido y facilita evolución |
+| Mantener handlers delgados | reduce acoplamiento entre HTTP y negocio |
+| Centralizar auth en middleware | elimina validaciones repetidas por endpoint |
+| Usar `requestId` desde el borde HTTP | mejora soporte, debugging y correlación |
+| Separar health probes del handler | permite observabilidad más rica sin ensuciar transporte |
+| Instrumentar Jetty con Glowroot | da trazabilidad operativa sin rehacer la app |

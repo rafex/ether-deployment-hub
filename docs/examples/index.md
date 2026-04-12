@@ -3,11 +3,19 @@
 Esta sección muestra cómo los módulos de **Ether** se integran en proyectos de producción.
 Cada ejemplo está basado en código real, no en fragmentos inventados.
 
+En particular, los ejemplos priorizan patrones prácticos de:
+
+- arranque de servidores HTTP,
+- construcción de endpoints,
+- seguridad,
+- logging,
+- trazabilidad y observabilidad.
+
 ## Proyectos de ejemplo
 
 | Proyecto | Descripción | Módulos usados |
 |---|---|---|
-| [Kiwi](kiwi.md) | API REST con hexagonal, JWT, PostgreSQL y APM | ether-config, ether-di, ether-jwt, ether-jdbc, ether-http-jetty12, ether-http-security, ether-glowroot-jetty12 |
+| [Kiwi](kiwi.md) | Casos prácticos de servidor Jetty, endpoints, JWT, logging, health checks y APM | ether-config, ether-di, ether-jwt, ether-jdbc, ether-http-jetty12, ether-http-security, ether-glowroot-jetty12 |
 
 ---
 
