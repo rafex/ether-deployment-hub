@@ -27,7 +27,8 @@
     "ether-webhook",
     "ether-glowroot-jetty12",
     "ether-archetype",
-    "ether-brain"
+    "ether-brain",
+    "ether-di"
   ],
   "releasePolicy": {
     "conventionalCommits": true,
@@ -146,6 +147,22 @@
       "artifactId": "ether-json",
       "currentVersion": "9.5.5",
       "published": true,
+      "usesParent": true,
+      "dependencies": [
+        "ether-parent"
+      ],
+      "internalDependencyProperties": {},
+      "dependencyReleaseImpact": "patch"
+    },
+    {
+      "name": "ether-di",
+      "path": "ether-di",
+      "projectDir": "ether-di/ether-di",
+      "pomPath": "ether-di/ether-di/pom.xml",
+      "groupId": "dev.rafex.ether.di",
+      "artifactId": "ether-di",
+      "currentVersion": "1.0.0",
+      "published": false,
       "usesParent": true,
       "dependencies": [
         "ether-parent"

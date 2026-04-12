@@ -97,3 +97,6 @@
 	path = ether-brain
 	url = git@github.com:rafex/ether-brain.git
 	branch = main
+[submodule "ether-di"]
+	path = ether-di
+	url = git@github.com:rafex/ether-di.git
