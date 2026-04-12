@@ -69,7 +69,8 @@ cp "$DOXYFILE_PATH" "$TEMP_DOXYFILE"
   for p in "${INPUT_PATHS[@]}"; do
     echo "  $p \\"
   done
-  echo "  README.md"
+  echo "  README.md \\"
+  echo "  docs/examples"
 } >> "$TEMP_DOXYFILE"
 
 cd "$ROOT_DIR"
