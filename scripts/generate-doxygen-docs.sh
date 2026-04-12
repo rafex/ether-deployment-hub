@@ -14,7 +14,18 @@ build_input_paths() {
   if command -v jq >/dev/null 2>&1 && [ -f "$ROOT_DIR/releases/manifest.json" ]; then
     while IFS= read -r project_dir; do
       [ -n "$project_dir" ] || continue
-      candidates+=("$project_dir/src/main/java")
+      local top_src="$project_dir/src/main/java"
+      if [ -d "$ROOT_DIR/$top_src" ]; then
+        # Single-module project: source lives directly under projectDir
+        candidates+=("$top_src")
+      else
+        # Multi-module project: scan one level deep for child module sources
+        while IFS= read -r -d '' child_src; do
+          local rel="${child_src#$ROOT_DIR/}"
+          candidates+=("$rel")
+        done < <(find "$ROOT_DIR/$project_dir" -mindepth 2 -maxdepth 3 \
+                   -type d -name java -path "*/src/main/java" -print0 2>/dev/null)
+      fi
     done < <(jq -r '.modules[].projectDir // empty' "$ROOT_DIR/releases/manifest.json")
   else
     candidates+=(
@@ -29,10 +40,12 @@ build_input_paths() {
     )
   fi
 
+  # Deduplicate while preserving order
+  local seen=()
   for rel in "${candidates[@]}"; do
-    if [ -d "$ROOT_DIR/$rel" ]; then
-      printf '%s\n' "$rel"
-    fi
+    local dup=false
+    for s in "${seen[@]+"${seen[@]}"}"; do [[ "$s" == "$rel" ]] && dup=true && break; done
+    $dup || { seen+=("$rel"); printf '%s\n' "$rel"; }
   done
 }
 

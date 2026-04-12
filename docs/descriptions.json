@@ -24,6 +24,15 @@
     "ether-websocket-core": "Transport-agnostic WebSocket contracts: Session, MessageHandler, frame types",
     "ether-websocket-jetty12": "Jetty 12-based WebSocket server implementation of ether-websocket-core",
     "ether-webhook": "Webhook delivery, signing (HMAC-SHA256), and signature verification support",
-    "ether-glowroot-jetty12": "Glowroot APM instrumentation plugin for Jetty 12 — zero code modification required"
+    "ether-glowroot-jetty12": "Glowroot APM instrumentation plugin for Jetty 12 — zero code modification required",
+    "ether-hexagonal-archetype": "Maven archetype that scaffolds a hexagonal architecture multi-module project ready to use with the Ether framework",
+    "ether-brain-parent": "Parent POM for the ether-brain multi-module agent runtime",
+    "ether-brain-common": "Shared value objects, domain events, and utilities for ether-brain modules",
+    "ether-brain-ports": "Port interfaces (input/output) for the AI agent hexagonal architecture",
+    "ether-brain-core": "Core agent domain: Agent, AgentContext, memory and reasoning use-cases",
+    "ether-brain-infra-memory": "In-memory implementations of ether-brain-ports for local development and testing",
+    "ether-brain-tools-local": "Built-in tool registry with file-system, shell, and math tools for local agents",
+    "ether-brain-bootstrap": "Wiring module: assembles a runnable agent from core + infra + tools + transport",
+    "ether-brain-transport-cli": "CLI transport adapter for ether-brain — run agents interactively from the terminal"
   }
 }
