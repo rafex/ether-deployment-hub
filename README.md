@@ -31,15 +31,6 @@
 | ether-websocket-jetty12 | ![ether-websocket-jetty12](https://img.shields.io/maven-central/v/dev.rafex.ether.websocket/ether-websocket-jetty12) | dev.rafex.ether.websocket | ether-websocket-jetty12 | si |
 | ether-webhook | ![ether-webhook](https://img.shields.io/maven-central/v/dev.rafex.ether.webhook/ether-webhook) | dev.rafex.ether.webhook | ether-webhook | si |
 | ether-glowroot-jetty12 | ![ether-glowroot-jetty12](https://img.shields.io/maven-central/v/dev.rafex.ether.glowroot/ether-glowroot-jetty12) | dev.rafex.ether.glowroot | ether-glowroot-jetty12 | si |
-| ether-hexagonal-archetype | ![ether-hexagonal-archetype](https://img.shields.io/maven-central/v/dev.rafex.ether/ether-hexagonal-archetype) | dev.rafex.ether | ether-hexagonal-archetype | si |
-| ether-brain-parent | ![ether-brain-parent](https://img.shields.io/maven-central/v/dev.rafex.etherbrain/ether-brain-parent) | dev.rafex.etherbrain | ether-brain-parent | no |
-| ether-brain-common | ![ether-brain-common](https://img.shields.io/maven-central/v/dev.rafex.etherbrain/ether-brain-common) | dev.rafex.etherbrain | ether-brain-common | no |
-| ether-brain-ports | ![ether-brain-ports](https://img.shields.io/maven-central/v/dev.rafex.etherbrain/ether-brain-ports) | dev.rafex.etherbrain | ether-brain-ports | no |
-| ether-brain-core | ![ether-brain-core](https://img.shields.io/maven-central/v/dev.rafex.etherbrain/ether-brain-core) | dev.rafex.etherbrain | ether-brain-core | no |
-| ether-brain-infra-memory | ![ether-brain-infra-memory](https://img.shields.io/maven-central/v/dev.rafex.etherbrain/ether-brain-infra-memory) | dev.rafex.etherbrain | ether-brain-infra-memory | no |
-| ether-brain-tools-local | ![ether-brain-tools-local](https://img.shields.io/maven-central/v/dev.rafex.etherbrain/ether-brain-tools-local) | dev.rafex.etherbrain | ether-brain-tools-local | no |
-| ether-brain-bootstrap | ![ether-brain-bootstrap](https://img.shields.io/maven-central/v/dev.rafex.etherbrain/ether-brain-bootstrap) | dev.rafex.etherbrain | ether-brain-bootstrap | no |
-| ether-brain-transport-cli | ![ether-brain-transport-cli](https://img.shields.io/maven-central/v/dev.rafex.etherbrain/ether-brain-transport-cli) | dev.rafex.etherbrain | ether-brain-transport-cli | no |
 
 ### JSON de estado
 
@@ -100,14 +91,6 @@ graph TD
         GLW[ether-glowroot-jetty12<br/>Instrumentación Glowroot APM]
     end
 
-    subgraph Agentes["Agentes de IA — ether-brain"]
-        BRAIN[ether-brain-bootstrap<br/>Ensamblaje completo del agente]
-    end
-
-    subgraph Arranque["Arranque rápido"]
-        ARC[ether-hexagonal-archetype<br/>Maven archetype hexagonal]
-    end
-
     P --> CFG & DBC & JSON & OBS & HC & SEC & WSC
     DBC --> JDBC & PG
     JSON --> JWT & PROB & OAI & CLI
@@ -119,8 +102,6 @@ graph TD
     WSC --> WSJ
     HJ --> GLW
     WSJ --> GLW
-    P --> BRAIN
-    P --> ARC
 ```
 
 ---
@@ -439,70 +420,6 @@ var glowroot = GlowrootJettyHandler.builder()
 
 // Se registra como JettyMiddleware — una sola línea en tu server setup
 List.of(glowroot::wrap)
-```
-
----
-
-### Arranque rápido
-
-#### [`ether-hexagonal-archetype`](ether-archetype/README.md)
-
-Archetype Maven que genera un proyecto multi-módulo con arquitectura hexagonal listo para usar con el ecosistema Ether.
-
-```xml
-<!-- groupId: dev.rafex.ether  |  artifactId: ether-hexagonal-archetype -->
-```
-
-```bash
-mvn archetype:generate \
-  -DarchetypeGroupId=dev.rafex.ether \
-  -DarchetypeArtifactId=ether-hexagonal-archetype \
-  -DarchetypeVersion=1.0.0 \
-  -DgroupId=com.example \
-  -DartifactId=my-service \
-  -Dversion=1.0.0-SNAPSHOT \
-  -DinteractiveMode=false
-```
-
-El proyecto generado incluye los módulos: `common`, `ports`, `core`, `infra-postgres`, `transport-jetty`, `tools`, `bootstrap` y `architecture-tests`.
-
----
-
-### Agentes de IA
-
-#### [`ether-brain`](ether-brain/README.md)
-
-Runtime de agentes de IA para Java 21 con arquitectura hexagonal. Permite construir agentes autónomos con memoria, herramientas y múltiples transportes sin acoplarse a ningún proveedor de IA.
-
-```xml
-<!-- groupId: dev.rafex.etherbrain -->
-<dependency>
-  <groupId>dev.rafex.etherbrain</groupId>
-  <artifactId>ether-brain-bootstrap</artifactId>
-  <version>0.1.0</version>
-</dependency>
-```
-
-Módulos del ecosistema ether-brain:
-
-| ArtifactId | Descripción |
-|---|---|
-| `ether-brain-common` | Value objects, eventos y utilidades compartidas |
-| `ether-brain-ports` | Interfaces de entrada/salida (arquitectura hexagonal) |
-| `ether-brain-core` | Dominio del agente: Agent, AgentContext, casos de uso |
-| `ether-brain-infra-memory` | Implementaciones en memoria para desarrollo y tests |
-| `ether-brain-tools-local` | Herramientas integradas: filesystem, shell, calculadora |
-| `ether-brain-bootstrap` | Módulo de ensamblaje: conecta core + infra + tools + transport |
-| `ether-brain-transport-cli` | Transporte CLI — ejecuta agentes desde la terminal |
-
-```java
-var agent = AgentBootstrap.builder()
-    .withMemory(new InMemoryAgentMemory())
-    .withTools(LocalToolRegistry.defaults())
-    .withTransport(new CliTransport())
-    .build();
-
-agent.run();
 ```
 
 ---
