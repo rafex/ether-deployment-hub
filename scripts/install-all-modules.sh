@@ -249,16 +249,18 @@ main() {
     print_info "╚══════════════════════════════════════════════════════════════════╝"
     echo ""
     print_info "Orden de compilación:"
-    print_cyan "   parent → config → crypto → database-core → jdbc → database-postgres"
+    print_cyan "   parent → di → config → crypto → database-core → jdbc → database-postgres"
     print_cyan "   → json → jwt → observability-core → http-core → http-security"
-    print_cyan "   → http-problem → http-openapi → http-client → logging-core"
+    print_cyan "   → http-problem → http-openapi → http-client → logging-core → brain"
     print_cyan "   → ai-core → ai-openai → ai-deepseek → websocket-core"
     print_cyan "   → http-jetty12 → websocket-jetty12 → webhook → glowroot-jetty12"
+    print_cyan "   → archetype"
     echo ""
     
     # Array de módulos en orden estricto de dependencias
     modules=(
         "ether-parent"
+        "ether-di"
         "ether-config"
         "ether-crypto"
         "ether-database-core"
@@ -273,6 +275,7 @@ main() {
         "ether-http-openapi"
         "ether-http-client"
         "ether-logging-core"
+        "ether-brain"
         "ether-ai-core"
         "ether-ai-openai"
         "ether-ai-deepseek"
@@ -281,6 +284,7 @@ main() {
         "ether-websocket-jetty12"
         "ether-webhook"
         "ether-glowroot-jetty12"
+        "ether-archetype"
     )
     
     # Instalar cada módulo

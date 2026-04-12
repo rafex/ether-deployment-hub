@@ -1,13 +1,13 @@
 .PHONY: compile validate-main-build install-all sync-manifest release-plan validate-release-plan deploy \
-        compile-ether-parent compile-ether-config compile-ether-crypto compile-ether-database-core \
+        compile-ether-parent compile-ether-di compile-ether-config compile-ether-crypto compile-ether-database-core \
         compile-ether-jdbc compile-ether-database-postgres compile-ether-json compile-ether-jwt \
-        compile-ether-observability-core compile-ether-logging-core compile-ether-ai-core \
+        compile-ether-observability-core compile-ether-logging-core compile-ether-brain compile-ether-ai-core \
         compile-ether-ai-openai compile-ether-ai-deepseek \
         compile-ether-http-core compile-ether-http-jetty12 \
         compile-ether-http-security compile-ether-http-problem \
         compile-ether-http-openapi compile-ether-http-client \
         compile-ether-websocket-core compile-ether-websocket-jetty12 \
-        compile-ether-webhook compile-ether-glowroot-jetty12
+        compile-ether-webhook compile-ether-glowroot-jetty12 compile-ether-archetype
 
 define resolve_module_dir
   module_path="$(1)"; \
@@ -61,6 +61,11 @@ endef
 compile-ether-parent:
 	@$(call compile_local_module,ether-parent)
 
+## compile-ether-di: install parent and compile ether-di
+compile-ether-di:
+	@$(call install_local_module,ether-parent)
+	@$(call compile_local_module,ether-di)
+
 ## compile-ether-config: install parent and compile config
 compile-ether-config:
 	@$(call install_local_module,ether-parent)
@@ -108,6 +113,12 @@ compile-ether-observability-core:
 compile-ether-logging-core:
 	@$(call install_local_module,ether-parent)
 	@$(call compile_local_module,ether-logging-core)
+
+## compile-ether-brain: install parent+logging-core and compile ether-brain (multi-module)
+compile-ether-brain:
+	@$(call install_local_module,ether-parent)
+	@$(call install_local_module,ether-logging-core)
+	@$(call compile_local_module,ether-brain)
 
 ## compile-ether-ai-core: install parent and compile ai-core
 compile-ether-ai-core:
@@ -198,14 +209,19 @@ compile-ether-glowroot-jetty12:
 	@$(call install_local_module,ether-websocket-jetty12)
 	@$(call compile_local_module,ether-glowroot-jetty12)
 
+## compile-ether-archetype: install parent and compile ether-hexagonal-archetype
+compile-ether-archetype:
+	@$(call install_local_module,ether-parent)
+	@$(call compile_local_module,ether-archetype)
+
 ## compile: compile all modules in dependency order
-compile: compile-ether-parent compile-ether-config compile-ether-crypto compile-ether-database-core \
+compile: compile-ether-parent compile-ether-di compile-ether-config compile-ether-crypto compile-ether-database-core \
          compile-ether-jdbc compile-ether-database-postgres compile-ether-json compile-ether-jwt \
          compile-ether-observability-core compile-ether-http-core compile-ether-http-security \
          compile-ether-http-problem compile-ether-http-openapi compile-ether-http-client \
-         compile-ether-logging-core compile-ether-ai-core compile-ether-ai-openai compile-ether-ai-deepseek \
+         compile-ether-logging-core compile-ether-brain compile-ether-ai-core compile-ether-ai-openai compile-ether-ai-deepseek \
          compile-ether-websocket-core compile-ether-http-jetty12 compile-ether-websocket-jetty12 \
-         compile-ether-webhook compile-ether-glowroot-jetty12
+         compile-ether-webhook compile-ether-glowroot-jetty12 compile-ether-archetype
 	@echo "Compiled all modules in dependency order."
 
 ## validate-main-build: install all modules in strict dependency order (mvn clean install -DskipTests)
@@ -216,11 +232,11 @@ validate-main-build: install-all
 	@echo "Local compile validation completed."
 
 ## install-all: mvn clean install for every module in strict dependency order
-## Order: parent → config → crypto → database-core → jdbc → database-postgres → json → jwt → observability-core → http-core
-##        → http-security → http-problem → http-openapi → http-client → logging-core
+## Order: parent → di → config → crypto → database-core → jdbc → database-postgres → json → jwt → observability-core → http-core
+##        → http-security → http-problem → http-openapi → http-client → logging-core → brain
 ##        → ai-core → ai-openai → ai-deepseek
 ##        → websocket-core → http-jetty12 → websocket-jetty12 → webhook
-##        → glowroot-jetty12
+##        → glowroot-jetty12 → archetype
 install-all:
 	@echo "==> Installing all modules..."
 	@./scripts/install-all-modules.sh
