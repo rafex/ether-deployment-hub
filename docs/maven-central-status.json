@@ -4,7 +4,7 @@
     "groupId": "dev.rafex.ether.parent",
     "artifactId": "ether-parent",
     "deployed": true,
-    "latestVersion": "9.6.0",
+    "latestVersion": "9.6.1",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.parent/ether-parent"
   },
@@ -162,15 +162,6 @@
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.ai/ether-ai-deepseek"
   },
   {
-    "module": "ether-http-jetty12",
-    "groupId": "dev.rafex.ether.http",
-    "artifactId": "ether-http-jetty12",
-    "deployed": true,
-    "latestVersion": "9.5.5",
-    "lastUpdatedUtc": "",
-    "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.http/ether-http-jetty12"
-  },
-  {
     "module": "ether-websocket-core",
     "groupId": "dev.rafex.ether.websocket",
     "artifactId": "ether-websocket-core",
@@ -178,6 +169,15 @@
     "latestVersion": "9.5.5",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.websocket/ether-websocket-core"
+  },
+  {
+    "module": "ether-http-jetty12",
+    "groupId": "dev.rafex.ether.http",
+    "artifactId": "ether-http-jetty12",
+    "deployed": true,
+    "latestVersion": "9.5.5",
+    "lastUpdatedUtc": "",
+    "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.http/ether-http-jetty12"
   },
   {
     "module": "ether-websocket-jetty12",
@@ -205,5 +205,32 @@
     "latestVersion": "9.5.5",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.glowroot/ether-glowroot-jetty12"
+  },
+  {
+    "module": "ether-archetype",
+    "groupId": "dev.rafex.ether",
+    "artifactId": "ether-hexagonal-archetype",
+    "deployed": true,
+    "latestVersion": "1.0.1",
+    "lastUpdatedUtc": "",
+    "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether/ether-hexagonal-archetype"
+  },
+  {
+    "module": "ether-brain",
+    "groupId": "dev.rafex.etherbrain",
+    "artifactId": "ether-brain-parent",
+    "deployed": true,
+    "latestVersion": "0.1.0",
+    "lastUpdatedUtc": "",
+    "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.etherbrain/ether-brain-parent"
+  },
+  {
+    "module": "ether-di",
+    "groupId": "dev.rafex.ether.di",
+    "artifactId": "ether-di",
+    "deployed": true,
+    "latestVersion": "1.0.0",
+    "lastUpdatedUtc": "",
+    "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.di/ether-di"
   }
 ]

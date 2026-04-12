@@ -5,39 +5,41 @@ ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 OUT_DIR="$ROOT_DIR/docs"
 JSON_FILE="$OUT_DIR/maven-central-status.json"
 TABLE_FILE="$OUT_DIR/maven-central-status-table.md"
+MANIFEST_FILE="$ROOT_DIR/releases/manifest.json"
 
 mkdir -p "$OUT_DIR"
 
-MODULES=(
-  "ether-parent|dev.rafex.ether.parent|ether-parent"
-  "ether-config|dev.rafex.ether.config|ether-config"
-  "ether-crypto|dev.rafex.ether.crypto|ether-crypto"
-  "ether-database-core|dev.rafex.ether.database|ether-database-core"
-  "ether-jdbc|dev.rafex.ether.jdbc|ether-jdbc"
-  "ether-database-postgres|dev.rafex.ether.database|ether-database-postgres"
-  "ether-json|dev.rafex.ether.json|ether-json"
-  "ether-jwt|dev.rafex.ether.jwt|ether-jwt"
-  "ether-observability-core|dev.rafex.ether.observability|ether-observability-core"
-  "ether-http-core|dev.rafex.ether.http|ether-http-core"
-  "ether-http-security|dev.rafex.ether.http|ether-http-security"
-  "ether-http-problem|dev.rafex.ether.http|ether-http-problem"
-  "ether-http-openapi|dev.rafex.ether.http|ether-http-openapi"
-  "ether-http-client|dev.rafex.ether.http|ether-http-client"
-  "ether-logging-core|dev.rafex.ether.logging|ether-logging-core"
-  "ether-ai-core|dev.rafex.ether.ai|ether-ai-core"
-  "ether-ai-openai|dev.rafex.ether.ai|ether-ai-openai"
-  "ether-ai-deepseek|dev.rafex.ether.ai|ether-ai-deepseek"
-  "ether-http-jetty12|dev.rafex.ether.http|ether-http-jetty12"
-  "ether-websocket-core|dev.rafex.ether.websocket|ether-websocket-core"
-  "ether-websocket-jetty12|dev.rafex.ether.websocket|ether-websocket-jetty12"
-  "ether-webhook|dev.rafex.ether.webhook|ether-webhook"
-  "ether-glowroot-jetty12|dev.rafex.ether.glowroot|ether-glowroot-jetty12"
-)
+if [ ! -f "$MANIFEST_FILE" ]; then
+  echo "Manifest not found: $MANIFEST_FILE" >&2
+  exit 1
+fi
 
 TMP_JSON="$(mktemp)"
 echo "[]" > "$TMP_JSON"
+ROWS_FILE="$(mktemp)"
+trap 'rm -f "$TMP_JSON" "$ROWS_FILE"' EXIT
 
-for row in "${MODULES[@]}"; do
+jq -r '.deployOrder[]?' "$MANIFEST_FILE" | while IFS= read -r name; do
+  jq -r --arg name "$name" '
+    .modules[]
+    | select(.name == $name)
+    | [.name, .groupId, .artifactId]
+    | join("|")
+  ' "$MANIFEST_FILE"
+done > "$ROWS_FILE"
+
+jq -r '
+  . as $root
+  | ($root.deployOrder // []) as $order
+  | $root.modules[]
+  | .name as $name
+  | select(($order | index($name)) == null)
+  | [.name, .groupId, .artifactId]
+  | join("|")
+' "$MANIFEST_FILE" >> "$ROWS_FILE"
+
+while IFS= read -r row; do
+  [ -n "$row" ] || continue
   IFS="|" read -r module group artifact <<< "$row"
 
   group_path="$(echo "$group" | tr '.' '/')"
@@ -82,7 +84,7 @@ for row in "${MODULES[@]}"; do
     }]' "$TMP_JSON" > "${TMP_JSON}.next"
 
   mv "${TMP_JSON}.next" "$TMP_JSON"
-done
+done < "$ROWS_FILE"
 
 mv "$TMP_JSON" "$JSON_FILE"
 

@@ -26,11 +26,14 @@
 | ether-ai-core | ![ether-ai-core](https://img.shields.io/maven-central/v/dev.rafex.ether.ai/ether-ai-core) | dev.rafex.ether.ai | ether-ai-core | si |
 | ether-ai-openai | ![ether-ai-openai](https://img.shields.io/maven-central/v/dev.rafex.ether.ai/ether-ai-openai) | dev.rafex.ether.ai | ether-ai-openai | si |
 | ether-ai-deepseek | ![ether-ai-deepseek](https://img.shields.io/maven-central/v/dev.rafex.ether.ai/ether-ai-deepseek) | dev.rafex.ether.ai | ether-ai-deepseek | si |
-| ether-http-jetty12 | ![ether-http-jetty12](https://img.shields.io/maven-central/v/dev.rafex.ether.http/ether-http-jetty12) | dev.rafex.ether.http | ether-http-jetty12 | si |
 | ether-websocket-core | ![ether-websocket-core](https://img.shields.io/maven-central/v/dev.rafex.ether.websocket/ether-websocket-core) | dev.rafex.ether.websocket | ether-websocket-core | si |
+| ether-http-jetty12 | ![ether-http-jetty12](https://img.shields.io/maven-central/v/dev.rafex.ether.http/ether-http-jetty12) | dev.rafex.ether.http | ether-http-jetty12 | si |
 | ether-websocket-jetty12 | ![ether-websocket-jetty12](https://img.shields.io/maven-central/v/dev.rafex.ether.websocket/ether-websocket-jetty12) | dev.rafex.ether.websocket | ether-websocket-jetty12 | si |
 | ether-webhook | ![ether-webhook](https://img.shields.io/maven-central/v/dev.rafex.ether.webhook/ether-webhook) | dev.rafex.ether.webhook | ether-webhook | si |
 | ether-glowroot-jetty12 | ![ether-glowroot-jetty12](https://img.shields.io/maven-central/v/dev.rafex.ether.glowroot/ether-glowroot-jetty12) | dev.rafex.ether.glowroot | ether-glowroot-jetty12 | si |
+| ether-archetype | ![ether-archetype](https://img.shields.io/maven-central/v/dev.rafex.ether/ether-hexagonal-archetype) | dev.rafex.ether | ether-hexagonal-archetype | si |
+| ether-brain | ![ether-brain](https://img.shields.io/maven-central/v/dev.rafex.etherbrain/ether-brain-parent) | dev.rafex.etherbrain | ether-brain-parent | si |
+| ether-di | ![ether-di](https://img.shields.io/maven-central/v/dev.rafex.ether.di/ether-di) | dev.rafex.ether.di | ether-di | si |
 
 ### JSON de estado
 
