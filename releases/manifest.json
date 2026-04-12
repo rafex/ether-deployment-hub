@@ -63,7 +63,8 @@
       "published": true,
       "usesParent": true,
       "dependencies": [
-        "ether-parent"
+        "ether-parent",
+        "ether-logging-core"
       ],
       "internalDependencyProperties": {},
       "dependencyReleaseImpact": "patch"

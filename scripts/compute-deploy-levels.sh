@@ -28,7 +28,7 @@
 set -euo pipefail
 
 PLAN_PATH="${1:?Usage: $0 <release-plan.json> [max-per-level]}"
-MAX_LEVEL_SIZE="${2:-2}"
+MAX_LEVEL_SIZE="${2:-5}"
 
 if [ ! -f "$PLAN_PATH" ]; then
   echo "Release plan not found: $PLAN_PATH" >&2
@@ -43,6 +43,8 @@ with open(sys.argv[1]) as f:
     plan = json.load(f)
 
 max_level_size = int(sys.argv[2])
+preferred_order = plan.get("deployOrder") or [m["name"] for m in plan.get("modules", [])]
+preferred_index = {name: idx for idx, name in enumerate(preferred_order)}
 
 # Only modules that are actually being released
 releasable = [
@@ -68,13 +70,16 @@ remaining = set(dep_map.keys())
 
 while remaining:
     # Modules whose all deps are already assigned
-    current_level = sorted(
+    current_level = [
         name for name in remaining
         if all(d in assigned for d in dep_map[name])
-    )
+    ]
     if not current_level:
-        # Safety valve: cycle or unresolvable — dump all remaining
-        current_level = sorted(remaining)
+        # Safety valve: cycle or unresolvable — dump all remaining while still
+        # preserving the manifest/release-plan preferred deploy order.
+        current_level = list(remaining)
+
+    current_level.sort(key=lambda name: (preferred_index.get(name, len(preferred_index)), name))
 
     level_idx = len(topo_levels)
     for name in current_level:
