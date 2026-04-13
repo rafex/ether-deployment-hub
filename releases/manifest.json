@@ -504,7 +504,7 @@
       "path": "ether-brain",
       "projectDir": "ether-brain/ether-brain",
       "pomPath": "ether-brain/ether-brain/pom.xml",
-      "groupId": "dev.rafex.etherbrain",
+      "groupId": "dev.rafex.ether.brain",
       "artifactId": "ether-brain-parent",
       "currentVersion": "0.1.0",
       "published": true,

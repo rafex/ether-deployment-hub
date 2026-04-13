@@ -217,12 +217,12 @@
   },
   {
     "module": "ether-brain",
-    "groupId": "dev.rafex.etherbrain",
+    "groupId": "dev.rafex.ether.brain",
     "artifactId": "ether-brain-parent",
     "deployed": true,
-    "latestVersion": "0.1.0",
+    "latestVersion": "0.1.1",
     "lastUpdatedUtc": "",
-    "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.etherbrain/ether-brain-parent"
+    "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.brain/ether-brain-parent"
   },
   {
     "module": "ether-di",

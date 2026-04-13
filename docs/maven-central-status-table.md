@@ -24,5 +24,5 @@
 | ether-webhook | ![ether-webhook](https://img.shields.io/maven-central/v/dev.rafex.ether.webhook/ether-webhook) | dev.rafex.ether.webhook | ether-webhook | si |
 | ether-glowroot-jetty12 | ![ether-glowroot-jetty12](https://img.shields.io/maven-central/v/dev.rafex.ether.glowroot/ether-glowroot-jetty12) | dev.rafex.ether.glowroot | ether-glowroot-jetty12 | si |
 | ether-archetype | ![ether-archetype](https://img.shields.io/maven-central/v/dev.rafex.ether/ether-hexagonal-archetype) | dev.rafex.ether | ether-hexagonal-archetype | si |
-| ether-brain | ![ether-brain](https://img.shields.io/maven-central/v/dev.rafex.etherbrain/ether-brain-parent) | dev.rafex.etherbrain | ether-brain-parent | si |
+| ether-brain | ![ether-brain](https://img.shields.io/maven-central/v/dev.rafex.ether.brain/ether-brain-parent) | dev.rafex.ether.brain | ether-brain-parent | si |
 | ether-di | ![ether-di](https://img.shields.io/maven-central/v/dev.rafex.ether.di/ether-di) | dev.rafex.ether.di | ether-di | si |
