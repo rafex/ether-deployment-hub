@@ -56,7 +56,7 @@ while IFS= read -r module; do
     continue
   fi
 
-  group_path="${group_id//./\/}"
+  group_path="$(printf '%s' "$group_id" | tr '.' '/')"
   jar_base="${REPO_URL%/}/${group_path}/${artifact_id}/${current_version}/${artifact_id}-${current_version}"
 
   # Fetch SHA-1 from Central (available without authentication)

@@ -9,7 +9,7 @@ fi
 repo_base_url="$1"
 group_id="$2"
 artifact_id="$3"
-group_path="${group_id//./\/}"
+group_path="$(printf '%s' "$group_id" | tr '.' '/')"
 metadata_url="${repo_base_url%/}/${group_path}/${artifact_id}/maven-metadata.xml"
 
 metadata="$(curl -fsSL "$metadata_url")"
