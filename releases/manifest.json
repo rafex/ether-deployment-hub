@@ -507,7 +507,7 @@
       "groupId": "dev.rafex.ether.brain",
       "artifactId": "ether-brain-parent",
       "currentVersion": "0.1.1",
-      "published": true,
+      "published": false,
       "usesParent": true,
       "dependencies": [
         "ether-parent"
