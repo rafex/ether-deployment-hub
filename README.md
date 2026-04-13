@@ -66,6 +66,7 @@ Solo Java 21, Jetty 12 y las partes que realmente necesitas.
 graph TD
     subgraph Fundación
         P[ether-parent<br/>BOM + POM padre]
+        DI[ether-di<br/>Lazy, Closer, Bootstrap]
     end
 
     subgraph Contratos["Contratos — APIs puras sin implementación"]
@@ -153,6 +154,29 @@ graph LR
 ---
 
 ## Módulos
+
+### 💉 Inyección de dependencias
+
+#### [`ether-di`](ether-di/README.md)
+Bloques de construcción para DI explícita en Java 21+: `Lazy<T>` (inicialización perezosa thread-safe), `Closer` (cierre LIFO de recursos) y `Bootstrap` (arranque con warmup y shutdown hook). Sin reflexión, sin anotaciones, compatible con GraalVM native-image.
+
+```java
+// Contenedor de dependencias en Java puro
+public class AppContainer implements AutoCloseable {
+    private final Closer closer = new Closer();
+    private final Lazy<DataSource> db = new Lazy<>(() ->
+            closer.register(DataSourceFactory.create(config.get())));
+    private final Lazy<UserService> service = new Lazy<>(() ->
+            new UserServiceImpl(db.get()));
+
+    @Override public void close() { closer.close(); }
+}
+
+// Arranque con warmup y shutdown graceful
+Bootstrap.start(AppContainer::new, AppContainer::warmup);
+```
+
+---
 
 ### 🏗 Fundación
 
@@ -423,6 +447,19 @@ var glowroot = GlowrootJettyHandler.builder()
 
 // Se registra como JettyMiddleware — una sola línea en tu server setup
 List.of(glowroot::wrap)
+```
+
+---
+
+### 🧠 Agentes IA
+
+#### [`ether-brain`](ether-brain/README.md)
+Runtime hexagonal para agentes de IA en Java 21. Define puertos (`ether-brain-ports`), lógica de agente (`ether-brain-core`), memoria in-process, herramientas locales (filesystem, shell) y transporte CLI. Se monta sobre `ether-ai-core` para llamadas a LLMs.
+
+```java
+// Agente listo para correr desde terminal
+Bootstrap.start(BrainContainer::new, BrainContainer::warmup);
+// → Agente interactivo vía CLI con memoria y herramientas locales
 ```
 
 ---
