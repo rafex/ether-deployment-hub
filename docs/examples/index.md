@@ -11,6 +11,12 @@ En particular, los ejemplos priorizan patrones prácticos de:
 - logging,
 - trazabilidad y observabilidad.
 
+## Guías por módulo
+
+| Guía | Descripción |
+|---|---|
+| [ether-di](ether-di.md) | Lazy, Closer y Bootstrap — DI explícita sin reflexión ni anotaciones |
+
 ## Proyectos de ejemplo
 
 | Proyecto | Descripción | Módulos usados |

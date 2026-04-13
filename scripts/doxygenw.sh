@@ -19,10 +19,20 @@ fi
 build_input_paths() {
   local -a candidates=()
   if command -v jq >/dev/null 2>&1 && [ -f "$ROOT_DIR/releases/manifest.json" ]; then
+    # Java source paths — from projectDir
     while IFS= read -r project_dir; do
       [ -n "$project_dir" ] || continue
       candidates+=("$project_dir/src/main/java")
     done < <(jq -r '.modules[].projectDir // empty' "$ROOT_DIR/releases/manifest.json")
+
+    # Module README files — from top-level path (submodule root)
+    while IFS= read -r module_path; do
+      [ -n "$module_path" ] || continue
+      local readme="$module_path/README.md"
+      if [ -f "$ROOT_DIR/$readme" ]; then
+        candidates+=("$readme")
+      fi
+    done < <(jq -r '.modules[].path // empty' "$ROOT_DIR/releases/manifest.json")
   else
     candidates+=(
       "ether-parent/ether-parent/src/main/java"
