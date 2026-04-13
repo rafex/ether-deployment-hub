@@ -16,6 +16,10 @@ En particular, los ejemplos priorizan patrones prácticos de:
 | Guía | Descripción |
 |---|---|
 | [ether-di](ether-di.md) | Lazy, Closer y Bootstrap — DI explícita sin reflexión ni anotaciones |
+| [ether-logging-core](ether-logging-core.md) | EtherLog, LoggingConfigurator, LogLevels — logging sobre JUL sin dependencias |
+| [ether-ai-core](ether-ai-core.md) | AiChatModel, AiMessage, AiChatRequest/Response — contratos GenAI provider-agnostic |
+| [ether-ai-openai](ether-ai-openai.md) | OpenAiConfig, OpenAiChatModel — adapter para GPT-4o y Azure OpenAI |
+| [ether-ai-deepseek](ether-ai-deepseek.md) | DeepSeekConfig, DeepSeekChatModel — adapter para DeepSeek-Chat y DeepSeek-Reasoner |
 
 ## Proyectos de ejemplo
 
