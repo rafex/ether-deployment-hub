@@ -506,8 +506,8 @@
       "pomPath": "ether-brain/ether-brain/pom.xml",
       "groupId": "dev.rafex.ether.brain",
       "artifactId": "ether-brain-parent",
-      "currentVersion": "0.1.1",
-      "published": true,
+      "currentVersion": "0.1.0",
+      "published": false,
       "usesParent": true,
       "dependencies": [
         "ether-parent"

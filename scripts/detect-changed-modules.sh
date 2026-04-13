@@ -14,6 +14,21 @@ if [ ! -f "$MANIFEST_PATH" ]; then
   exit 1
 fi
 
+# Validate that BASE_REF and HEAD_REF are reachable before running git diff.
+# Without this check, an invalid ref causes git to silently produce no output
+# inside a `while < <()` loop (process substitution errors are not propagated
+# through set -euo pipefail), which makes detect-changed-modules return 0
+# changed files and the release pipeline skips every deploy job.
+if ! git -C "$ROOT_DIR" rev-parse --verify "$BASE_REF" >/dev/null 2>&1; then
+  echo "ERROR: BASE_REF '$BASE_REF' is not a valid git ref in this repository." >&2
+  echo "  Tip: run 'git log --oneline -5' to find a valid SHA or tag." >&2
+  exit 1
+fi
+if ! git -C "$ROOT_DIR" rev-parse --verify "$HEAD_REF" >/dev/null 2>&1; then
+  echo "ERROR: HEAD_REF '$HEAD_REF' is not a valid git ref in this repository." >&2
+  exit 1
+fi
+
 CHANGED_FILES=()
 while IFS= read -r file; do
   CHANGED_FILES+=("$file")

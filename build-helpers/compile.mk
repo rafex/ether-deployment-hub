@@ -1,4 +1,4 @@
-.PHONY: compile validate-main-build install-all sync-manifest release-plan validate-release-plan deploy \
+.PHONY: compile validate-main-build install-all sync-manifest verify-central release-plan validate-release-plan deploy \
         compile-ether-parent compile-ether-di compile-ether-config compile-ether-crypto compile-ether-database-core \
         compile-ether-jdbc compile-ether-database-postgres compile-ether-json compile-ether-jwt \
         compile-ether-observability-core compile-ether-logging-core compile-ether-brain compile-ether-ai-core \
@@ -246,6 +246,12 @@ sync-manifest:
 	@echo "Synchronizing manifest from Maven Central..."
 	@./scripts/sync-manifest-from-central.sh
 
+## verify-central: check that all published modules exist on Maven Central (SHA-1 probe)
+verify-central:
+	@echo "Verifying published artifacts against Maven Central..."
+	@chmod +x ./scripts/verify-central-artifacts.sh
+	@./scripts/verify-central-artifacts.sh
+
 ## release-plan: generate release plan artifacts for BASE_REF..HEAD_REF (defaults handled by script)
 release-plan:
 	@echo "Generating release plan..."
@@ -262,6 +268,6 @@ validate-release-plan:
 	@./scripts/validate-release-plan-against-central.sh
 
 ## deploy: prepare hub artifacts and validations before triggering GitHub Actions publish workflow
-deploy: sync-manifest validate-main-build release-plan validate-release-plan
+deploy: sync-manifest verify-central validate-main-build release-plan validate-release-plan
 	@echo "Deploy preparation completed."
 	@echo "Next step: trigger GitHub Actions with 'make publish-ci' or run the Publish Java Modules workflow manually."
