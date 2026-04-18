@@ -93,6 +93,7 @@
 [submodule "ether-archetype"]
 	path = ether-archetype
 	url = git@github.com:rafex/ether-archetype.git
+	branch = main
 [submodule "ether-brain"]
 	path = ether-brain
 	url = git@github.com:rafex/ether-brain.git
@@ -100,3 +101,8 @@
 [submodule "ether-di"]
 	path = ether-di
 	url = git@github.com:rafex/ether-di.git
+	branch = main
+[submodule "ether-database-sqlite"]
+	path = ether-database-sqlite
+	url = git@github.com:rafex/ether-database-sqlite.git
+	branch = main
