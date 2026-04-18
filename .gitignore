@@ -32,3 +32,6 @@ session-ses_*.md
 
 # opencode — base de datos de worktrees (generada, no committear)
 .opencode/worktrees.db
+
+# opencode — worktrees (generados, no committear)
+.opencode/worktrees.log
