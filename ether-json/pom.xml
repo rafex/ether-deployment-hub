@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>dev.rafex.ether.parent</groupId>
+		<artifactId>ether-parent</artifactId>
+		<version>9.5.5-SNAPSHOT</version>
+		<relativePath>../../ether-parent/ether-parent/pom.xml</relativePath>
+	</parent>
+
+	<groupId>dev.rafex.ether.json</groupId>
+	<artifactId>ether-json</artifactId>
+	<version>9.5.5-SNAPSHOT</version>
+
+	<packaging>jar</packaging>
+	<name>${project.artifactId}</name>
+
+	<url>https://rafex.dev/ether/json</url>
+
+	<description>
+		Librería ligera para serialización y deserialización JSON en Java basada
+		en Jackson. Incluye API de codec extensible, soporte para tipos
+		genéricos, utilidades para JsonNode, operaciones con
+		String/bytes/streams
+		y validación opcional con JSON Schema.
+	</description>
+
+	<licenses>
+		<license>
+			<name>MIT License</name>
+			<url>https://opensource.org/license/mit/</url>
+			<distribution>repo</distribution>
+			<comments>Copyright (c) 2025 Raúl Eduardo González Argote</comments>
+		</license>
+	</licenses>
+
+	<issueManagement>
+		<system>GitHub Issues</system>
+		<url>https://github.com/rafex/ether-json/issues</url>
+	</issueManagement>
+
+	<developers>
+		<developer>
+			<name>Raúl Eduardo González Argote</name>
+			<email>rafex@rafex.dev</email>
+			<organization>dev.rafex</organization>
+			<organizationUrl>https://rafex.dev</organizationUrl>
+		</developer>
+	</developers>
+
+	<scm>
+		<connection>scm:git:https://github.com/rafex/ether-json.git</connection>
+		<developerConnection>scm:git:https://github.com/rafex/ether-json.git</developerConnection>
+		<url>https://github.com/rafex/ether-json</url>
+	</scm>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	</properties>
+
+	<dependencies>
+		<!-- Núcleo de databind: serialización/deserialización -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+		</dependency>
+
+		<!-- Core: streaming JSON -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+		</dependency>
+
+		<!-- Anotaciones Jackson -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+		</dependency>
+
+		<!-- (Opcional) Soporte para java.time (JSR-310) -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-jsr310</artifactId>
+		</dependency>
+
+		<!-- Validación opcional de JSON Schema -->
+		<dependency>
+			<groupId>com.networknt</groupId>
+			<artifactId>json-schema-validator</artifactId>
+		</dependency>
+
+		<!-- Test -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<finalName>${project.name}</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>flatten-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+</project>
