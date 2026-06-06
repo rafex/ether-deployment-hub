@@ -79,7 +79,7 @@ show-env:
 	@echo "ARTIFACTORY_BASE_URL='$(ARTIFACTORY_BASE_URL)'"
 	@echo "MAVEN_GPG_PASSPHRASE length='$(shell printf '%s' "$(MAVEN_GPG_PASSPHRASE)" | wc -c)'"
 
-.PHONY: show-env write-settings validate-submodule-refs sync-pom-versions set-version update-license-headers build deploy show-version valid-version
+.PHONY: show-env write-settings validate-source-refs validate-submodule-refs validate-subtree-source-refs sync-pom-versions set-version update-license-headers build deploy show-version valid-version
 
 #
 # Raw Git tag, or default "0.0.0"
@@ -131,6 +131,21 @@ write-settings:
 validate-submodule-refs:
 	@ROOT_DIR="$$(git rev-parse --show-superproject-working-tree 2>/dev/null || git rev-parse --show-toplevel)"; \
 	"$$ROOT_DIR/scripts/validate-submodule-remote-refs.sh"
+
+## validate-subtree-source-refs: ensure subtree source SHAs recorded by the hub exist in remote repos
+validate-subtree-source-refs:
+	@ROOT_DIR="$$(git rev-parse --show-superproject-working-tree 2>/dev/null || git rev-parse --show-toplevel)"; \
+	"$$ROOT_DIR/scripts/validate-subtree-source-refs.sh"
+
+## validate-source-refs: validate module source refs for the current hub layout
+validate-source-refs:
+	@ROOT_DIR="$$(git rev-parse --show-superproject-working-tree 2>/dev/null || git rev-parse --show-toplevel)"; \
+	if [ -f "$$ROOT_DIR/.gitmodules" ]; then \
+		"$$ROOT_DIR/scripts/validate-submodule-remote-refs.sh"; \
+	fi; \
+	if [ -f "$$ROOT_DIR/releases/subtrees.json" ]; then \
+		"$$ROOT_DIR/scripts/validate-subtree-source-refs.sh"; \
+	fi
 
 ## set-version: update project version in POM based on Git tag (in $(PROJECT_DIR))
 set-version:
@@ -194,7 +209,7 @@ build: sync-pom-versions set-version
 	@$(call run_mvnw,clean verify)
 
 ## deploy: write settings and set version, then deploy using profile $(DEPLOY_PROFILE) (in $(PROJECT_DIR))
-deploy: validate-submodule-refs write-settings sync-pom-versions set-version update-license-headers
+deploy: validate-source-refs write-settings sync-pom-versions set-version update-license-headers
 	@echo "Deploying version $(FINAL_VERSION)..."
 	@$(call run_mvnw,clean $(PRE_DEPLOY_GOALS) deploy $(DEPLOY_PROFILE_ARG) $(ARTIFACTORY_BASE_URL_ARG) $(CENTRAL_WAIT_UNTIL_ARG) $(DEPLOY_EXTRA_ARGS) -DskipTests=$(SKIP_TESTS) -Dgpg.skip=false -Dmaven.deploy.skip=$(MAVEN_DEPLOY_SKIP))
 	@echo "Reverting POM changes after deploy..."

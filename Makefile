@@ -3,11 +3,20 @@ include build-helpers/compile.mk
 include build-helpers/gh.mk
 include build-helpers/docs.mk
 
-.PHONY: help validate-submodule-refs
+.PHONY: help validate-source-refs validate-submodule-refs validate-subtree-source-refs
+
+## validate-source-refs: verify module source SHAs exist in remotes
+validate-source-refs:
+	@if [ -f ./.gitmodules ]; then ./scripts/validate-submodule-remote-refs.sh; fi
+	@if [ -f ./releases/subtrees.json ]; then ./scripts/validate-subtree-source-refs.sh; fi
 
 ## validate-submodule-refs: verify hub submodule SHAs exist in remotes
 validate-submodule-refs:
 	@./scripts/validate-submodule-remote-refs.sh
+
+## validate-subtree-source-refs: verify recorded subtree source SHAs exist in remotes
+validate-subtree-source-refs:
+	@./scripts/validate-subtree-source-refs.sh
 
 ## help: show this help message
 help:
@@ -25,7 +34,9 @@ help:
 	@echo "  make submodules-clean     - Reset all submodules (loses changes)"
 	@echo "  make submodules-all       - Run complete workflow"
 	@echo "  make submodules-pull      - Pull all submodules and update parent"
+	@echo "  make validate-source-refs    - Verify module source SHAs exist in remotes"
 	@echo "  make validate-submodule-refs - Verify hub submodule SHAs exist in remotes"
+	@echo "  make validate-subtree-source-refs - Verify recorded subtree source SHAs exist in remotes"
 	@echo "  make submodules-help      - Detailed submodule help"
 	@echo ""
 	@echo "Documentation:"
