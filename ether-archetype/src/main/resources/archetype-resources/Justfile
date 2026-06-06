@@ -1,0 +1,126 @@
+# Justfile for ${rootArtifactId}
+# Task runner — orchestrates dev workflow, delegates builds to make
+# Install just: https://github.com/casey/just
+#
+# Responsibility split:
+#   make  → build system  (compile, test, package, quality)
+#   just  → task runner   (run, docker, db, dev lifecycle)
+#   just CAN call make; make must NOT call just
+
+# ── Variables ─────────────────────────────────────────────────────────────────
+
+app     := "${rootArtifactId}"
+version := "${version}"
+jar     := app + "-transport-jetty/target/" + app + "-transport-jetty-" + version + "-jar-with-dependencies.jar"
+image   := app + ":" + version
+port    := env_var_or_default("PORT", "8080")
+
+# ── Default ───────────────────────────────────────────────────────────────────
+
+[private]
+default:
+    @just --list --unsorted
+
+# ── Dev lifecycle ─────────────────────────────────────────────────────────────
+
+# Build and run the application
+run: _package
+    java -jar {{jar}}
+
+# Run with DEBUG log level
+run-debug: _package
+    java -jar {{jar}} --log=DEBUG
+
+# Run with a custom log level  (e.g.: just run-log WARN)
+run-log level: _package
+    java -jar {{jar}} --log={{level}}
+
+# Watch for Java changes and restart (requires entr: brew install entr)
+watch:
+    find . -name "*.java" -not -path "*/target/*" | entr -r just run
+
+# ── Docker ────────────────────────────────────────────────────────────────────
+
+# Build the Docker image
+docker-build: _package
+    docker build -t {{image}} .
+
+# Run the Docker container  (reads .env if present)
+docker-run:
+    docker run --rm \
+        -p {{port}}:{{port}} \
+        $([ -f .env ] && echo "--env-file .env" || true) \
+        {{image}}
+
+# Start all services defined in docker-compose.yml
+up:
+    docker compose up -d
+
+# Stop all services
+down:
+    docker compose down
+
+# Restart a specific service  (e.g.: just restart app)
+restart service="app":
+    docker compose restart {{service}}
+
+# Follow container logs  (e.g.: just logs app)
+logs service="app":
+    docker compose logs -f {{service}}
+
+# ── Database ──────────────────────────────────────────────────────────────────
+
+# Apply database migrations
+migrate:
+    @echo "TODO: configure migration tool (Flyway or Liquibase)"
+    @echo "  Example: ./mvnw flyway:migrate"
+
+# Seed the database with development data
+seed:
+    @echo "TODO: implement seed script in {{app}}-tools"
+
+# Open a PostgreSQL interactive shell
+db-shell:
+    psql {{ env_var_or_default("DB_URL", "postgresql://localhost:5432/appdb") }}
+
+# ── CI helpers ────────────────────────────────────────────────────────────────
+
+# Full CI pipeline: quality checks + tests
+ci:
+    make quality
+
+# Check for dependency vulnerabilities (needs NVD_API_KEY env var)
+security:
+    make quality
+
+# ── Build (delegates to make) ─────────────────────────────────────────────────
+
+# Compile all modules
+build:
+    make build
+
+# Run unit tests
+test:
+    make test
+
+# Remove build artifacts
+clean:
+    make clean
+
+# Apply code formatting
+fmt:
+    make format
+
+# Check formatting without modifying
+fmt-check:
+    make format-check
+
+# Install all modules to local Maven repo (skips tests)
+install:
+    make install
+
+# ── Internal ──────────────────────────────────────────────────────────────────
+
+[private]
+_package:
+    make package
