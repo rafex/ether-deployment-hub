@@ -195,6 +195,12 @@ Basado en `releases/manifest.json` y `MAX_LEVEL_SIZE=5`, el orden actual es:
 | `make gh-watch RUN_ID=<id>` | Observa un run específico |
 | `make gh-logs RUN_ID=<id>` | Logs de un run específico |
 
+## Flujo operativo
+
+La operativa para sincronizar subtrees, subir cambios a repos fuente y disparar
+despliegues desde el hub esta documentada en
+[`docs/subtree-deployment-workflow.md`](subtree-deployment-workflow.md).
+
 ## Stack de Documentación (Fase 1)
 
 - Doxygen + Graphviz para documentación API Java
