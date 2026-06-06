@@ -2,7 +2,7 @@
 PROJECT_DIR         := ether-database-sqlite
 PROJECT_GROUP_ID    := dev.rafex.ether.database
 PROJECT_ARTIFACT_ID := ether-database-sqlite
-DEPENDENCY_COORDS   := ether-database-core.version=dev.rafex.ether.database:ether-database-core
+DEPENDENCY_COORDS   := ether-database-core.version=dev.rafex.ether.database:ether-database-core ether-jdbc.version=dev.rafex.ether.jdbc:ether-jdbc
 
 # Include shared build logic
 include ../build-helpers/common.mk

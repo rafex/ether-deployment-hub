@@ -1,6 +1,6 @@
 .PHONY: compile validate-main-build install-all sync-manifest verify-central release-plan validate-release-plan deploy \
         compile-ether-parent compile-ether-di compile-ether-config compile-ether-crypto compile-ether-database-core \
-        compile-ether-jdbc compile-ether-database-postgres compile-ether-json compile-ether-jwt \
+        compile-ether-jdbc compile-ether-database-postgres compile-ether-database-sqlite compile-ether-json compile-ether-jwt \
         compile-ether-observability-core compile-ether-logging-core compile-ether-brain compile-ether-ai-core \
         compile-ether-ai-openai compile-ether-ai-deepseek \
         compile-ether-http-core compile-ether-http-jetty12 \
@@ -92,6 +92,13 @@ compile-ether-database-postgres:
 	@$(call install_local_module,ether-parent)
 	@$(call install_local_module,ether-database-core)
 	@$(call compile_local_module,ether-database-postgres)
+
+## compile-ether-database-sqlite: install parent+database-core+jdbc and compile database-sqlite
+compile-ether-database-sqlite:
+	@$(call install_local_module,ether-parent)
+	@$(call install_local_module,ether-database-core)
+	@$(call install_local_module,ether-jdbc)
+	@$(call compile_local_module,ether-database-sqlite)
 
 ## compile-ether-json: install parent and compile json
 compile-ether-json:
@@ -216,7 +223,7 @@ compile-ether-archetype:
 
 ## compile: compile all modules in dependency order
 compile: compile-ether-parent compile-ether-di compile-ether-config compile-ether-crypto compile-ether-database-core \
-         compile-ether-jdbc compile-ether-database-postgres compile-ether-json compile-ether-jwt \
+         compile-ether-jdbc compile-ether-database-postgres compile-ether-database-sqlite compile-ether-json compile-ether-jwt \
          compile-ether-observability-core compile-ether-http-core compile-ether-http-security \
          compile-ether-http-problem compile-ether-http-openapi compile-ether-http-client \
          compile-ether-logging-core compile-ether-brain compile-ether-ai-core compile-ether-ai-openai compile-ether-ai-deepseek \
@@ -232,7 +239,7 @@ validate-main-build: install-all
 	@echo "Local compile validation completed."
 
 ## install-all: mvn clean install for every module in strict dependency order
-## Order: parent → di → config → crypto → database-core → jdbc → database-postgres → json → jwt → observability-core → http-core
+## Order: parent → di → config → crypto → database-core → jdbc → database-postgres → database-sqlite → json → jwt → observability-core → http-core
 ##        → http-security → http-problem → http-openapi → http-client → logging-core → brain
 ##        → ai-core → ai-openai → ai-deepseek
 ##        → websocket-core → http-jetty12 → websocket-jetty12 → webhook

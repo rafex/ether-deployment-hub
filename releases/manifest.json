@@ -9,6 +9,7 @@
     "ether-database-core",
     "ether-jdbc",
     "ether-database-postgres",
+    "ether-database-sqlite",
     "ether-json",
     "ether-jwt",
     "ether-observability-core",
@@ -136,6 +137,27 @@
       ],
       "internalDependencyProperties": {
         "ether-database-core": "ether-database-core.version"
+      },
+      "dependencyReleaseImpact": "patch"
+    },
+    {
+      "name": "ether-database-sqlite",
+      "path": "ether-database-sqlite",
+      "projectDir": "ether-database-sqlite/ether-database-sqlite",
+      "pomPath": "ether-database-sqlite/ether-database-sqlite/pom.xml",
+      "groupId": "dev.rafex.ether.database",
+      "artifactId": "ether-database-sqlite",
+      "currentVersion": "9.5.5",
+      "published": false,
+      "usesParent": true,
+      "dependencies": [
+        "ether-parent",
+        "ether-database-core",
+        "ether-jdbc"
+      ],
+      "internalDependencyProperties": {
+        "ether-database-core": "ether-database-core.version",
+        "ether-jdbc": "ether-jdbc.version"
       },
       "dependencyReleaseImpact": "patch"
     },

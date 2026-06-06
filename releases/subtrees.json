@@ -218,7 +218,7 @@
       "url": "git@github.com:rafex/ether-database-sqlite.git",
       "branch": "main",
       "importedSha": "329be14e86d62b19195c8357677666127f3fcd27",
-      "releaseManifest": false
+      "releaseManifest": true
     }
   ]
 }

@@ -72,8 +72,8 @@ The publish pipeline is split into two independent workflows:
 
 ### Deployment level chunking
 `compute-deploy-levels.sh` uses Kahn's topological sort + `MAX_LEVEL_SIZE=5` chunking to prevent
-30-minute GitHub Actions job timeouts. For the full 22-module release the result is 7 levels:
-`L0(1) L1(5) L2(4) L3(5) L4(4) L5(2) L6(1)`.
+30-minute GitHub Actions job timeouts. For the full 27-module release the result is 8 levels:
+`L0(1) L1(5) L2(5) L3(2) L4(5) L5(5) L6(3) L7(1)`.
 
 ### GPG signing parallelism
 `deploy-to-github-packages.sh` uses `MAX_GH_PARALLEL=4` semaphore-based bounded parallelism

@@ -12,8 +12,8 @@ La estrategia recomendada es importar snapshots con `git subtree --squash` y man
 - `.gitmodules` fue eliminado.
 - No quedan gitlinks `160000` para modulos.
 - Los 27 SHAs de origen fueron validados contra sus remotos antes y despues de crear `releases/subtrees.json`.
-- `releases/manifest.json` gestiona 26 modulos de release.
-- `ether-database-sqlite` existe como subtree, pero no esta en `releases/manifest.json`.
+- `releases/manifest.json` gestiona 27 modulos de release.
+- `ether-database-sqlite` entra al manifest como publicacion inicial (`published: false`, `currentVersion: 9.5.5`).
 - El release planner ya soporta paths tipo subtree porque detecta cambios por `path` y `path/...`.
 - El deploy usa `validate-source-refs`, que valida `releases/subtrees.json`.
 
@@ -54,7 +54,7 @@ Tradeoff:
 - Crear `releases/subtrees.json`. Hecho.
 - Agregar validacion de referencias subtree. Hecho.
 - Identificar referencias a submodules en Makefiles, scripts, workflows y docs. Hecho.
-- Decidir si `ether-database-sqlite` entra al manifest de releases o queda documentado como modulo no desplegable.
+- Decidir si `ether-database-sqlite` entra al manifest de releases o queda documentado como modulo no desplegable. Hecho: entra al manifest.
 
 ### Fase 1: Migracion mecanica
 
@@ -111,8 +111,8 @@ make publish-plan-ci
 - `.gitmodules` no existe o no contiene submodules activos.
 - Los 27 modulos existen como directorios normales.
 - `releases/subtrees.json` contiene 27 entradas con SHAs exactos.
-- Los 26 modulos del manifest siguen resolviendo `pomPath`.
-- `ether-database-sqlite` tiene decision explicita.
+- Los 27 modulos del manifest siguen resolviendo `pomPath`.
+- `ether-database-sqlite` tiene decision explicita: publicacion inicial gestionada por el manifest.
 - `make validate-main-build` pasa.
 - `make release-plan` pasa.
 - Workflows no dependen de checkout recursivo de submodules.
@@ -123,7 +123,7 @@ make publish-plan-ci
 - Merge inicial voluminoso.
 - Si se usa `--squash`, el historial fino queda fuera del hub y se consulta en los repos originales.
 - Si un modulo tenia cambios locales no pusheados dentro del submodule antes de importar, se perderian en la importacion. Mitigacion aplicada: se importaron los SHAs remotos registrados y validados.
-- `ether-database-sqlite` puede quedar fuera de releases si no se agrega al manifest.
+- `ether-database-sqlite` puede fallar si Maven Central exige metadata adicional en su primer publish. Mitigacion: se agrego al parent dependencyManagement y se validara con release plan/build local.
 
 ## Comandos de sincronizacion futura
 

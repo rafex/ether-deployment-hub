@@ -102,6 +102,7 @@
 		<ether-database-core.version>9.5.5-SNAPSHOT</ether-database-core.version>
 		<ether-jdbc.version>9.5.5-SNAPSHOT</ether-jdbc.version>
 		<ether-database-postgres.version>9.5.5-SNAPSHOT</ether-database-postgres.version>
+		<ether-database-sqlite.version>9.5.5-SNAPSHOT</ether-database-sqlite.version>
 		<ether-json.version>9.5.5-SNAPSHOT</ether-json.version>
 		<ether-jwt.version>9.5.5-SNAPSHOT</ether-jwt.version>
 		<ether-observability-core.version>9.5.5-SNAPSHOT</ether-observability-core.version>
@@ -222,6 +223,11 @@
 				<groupId>dev.rafex.ether.database</groupId>
 				<artifactId>ether-database-postgres</artifactId>
 				<version>${ether-database-postgres.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>dev.rafex.ether.database</groupId>
+				<artifactId>ether-database-sqlite</artifactId>
+				<version>${ether-database-sqlite.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>dev.rafex.ether.json</groupId>
