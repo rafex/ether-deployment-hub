@@ -265,21 +265,24 @@ Configura el `<distributionManagement>` en el `pom.xml` del arquetipo y ejecuta:
 
 ## Relación con `ether-deployment-hub`
 
-`ether-archetype` vive como un **submódulo git** dentro de `ether-deployment-hub`:
+`ether-archetype` vive como un **git subtree** dentro de `ether-deployment-hub`:
 
 ```
 ether-deployment-hub/
-└── ether-archetype/   ← submódulo git (repo independiente)
+└── ether-archetype/   ← subtree git (repo fuente independiente)
 ```
 
 Comandos útiles:
 
 ```bash
-# actualizar el submódulo al último commit
-git submodule update --remote ether-archetype
+# actualizar todos los subtrees configurados
+make subtrees-pull
 
-# clonar incluyendo submódulos
-git clone --recurse-submodules https://github.com/rafex/ether-deployment-hub
+# actualizar solo este subtree
+git subtree pull --prefix=ether-archetype https://github.com/rafex/ether-archetype.git main --squash
+
+# clonar el hub ya incluye el contenido de los subtrees
+git clone https://github.com/rafex/ether-deployment-hub
 ```
 
 ---

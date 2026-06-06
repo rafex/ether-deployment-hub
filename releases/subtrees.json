@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "defaultBranch": "main",
   "importMode": "subtree-squash",
-  "source": "generated from .gitmodules and HEAD gitlinks before subtree migration",
+  "source": "generated from the pre-migration module inventory",
   "modules": [
     {
       "name": "ether-parent",
