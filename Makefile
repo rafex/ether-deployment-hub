@@ -3,16 +3,11 @@ include build-helpers/compile.mk
 include build-helpers/gh.mk
 include build-helpers/docs.mk
 
-.PHONY: help validate-source-refs validate-submodule-refs validate-subtree-source-refs
+.PHONY: help validate-source-refs validate-subtree-source-refs
 
 ## validate-source-refs: verify module source SHAs exist in remotes
 validate-source-refs:
-	@if [ -f ./.gitmodules ]; then ./scripts/validate-submodule-remote-refs.sh; fi
 	@if [ -f ./releases/subtrees.json ]; then ./scripts/validate-subtree-source-refs.sh; fi
-
-## validate-submodule-refs: verify hub submodule SHAs exist in remotes
-validate-submodule-refs:
-	@./scripts/validate-submodule-remote-refs.sh
 
 ## validate-subtree-source-refs: verify recorded subtree source SHAs exist in remotes
 validate-subtree-source-refs:
@@ -26,18 +21,12 @@ help:
 	@echo "  make new TAG=<version> MESSAGE=\"msg\"    - Create new Git tag"
 	@echo "  make retag TAG=<version> MESSAGE=\"msg\"  - Recreate tag (force)"
 	@echo ""
-	@echo "Submodule Management:"
-	@echo "  make submodules-status    - Check status of all submodules"
-	@echo "  make submodules-push      - Push submodules with pending commits"
-	@echo "  make submodules-update    - Update submodules to latest versions"
-	@echo "  make submodules-init      - Initialize and update all submodules"
-	@echo "  make submodules-clean     - Reset all submodules (loses changes)"
-	@echo "  make submodules-all       - Run complete workflow"
-	@echo "  make submodules-pull      - Pull all submodules and update parent"
+	@echo "Subtree Management:"
+	@echo "  make subtrees-status      - Show configured subtrees and source SHAs"
+	@echo "  make subtrees-pull        - Pull every subtree from its configured source branch"
 	@echo "  make validate-source-refs    - Verify module source SHAs exist in remotes"
-	@echo "  make validate-submodule-refs - Verify hub submodule SHAs exist in remotes"
 	@echo "  make validate-subtree-source-refs - Verify recorded subtree source SHAs exist in remotes"
-	@echo "  make submodules-help      - Detailed submodule help"
+	@echo "  make subtrees-help        - Detailed subtree help"
 	@echo ""
 	@echo "Documentation:"
 	@echo "  make docs-gen             - Generate documentation"
@@ -56,4 +45,4 @@ help:
 	@echo "  make publish-plan-ci      - Dry-run publish (no actual deploy)"
 	@echo ""
 	@echo "For more details on any command, check the corresponding .mk file"
-	@echo "or run: make submodules-help"
+	@echo "or run: make subtrees-help"

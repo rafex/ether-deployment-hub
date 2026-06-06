@@ -39,16 +39,16 @@ set_project_version() {
 }
 
 # Update the <parent><version> of any artifact inside a multi-module tree that
-# declares $artifact as its parent. This keeps submodule poms consistent with
+# declares $artifact as its parent. This keeps child module poms consistent with
 # the root pom version so that Maven can load the reactor before versions:set.
-sync_submodule_parent_versions() {
+sync_child_parent_versions() {
   local project_dir="$1"
   local artifact="$2"
   local new_version="$3"
   [ -d "$project_dir" ] || return 0
   while IFS= read -r -d '' sub_pom; do
     if [ "$DRY_RUN" = "true" ]; then
-      echo "[dry-run] sync submodule parent version in $sub_pom ($artifact -> $new_version)"
+      echo "[dry-run] sync child parent version in $sub_pom ($artifact -> $new_version)"
       continue
     fi
     perl -0777 -i -pe \
@@ -114,11 +114,11 @@ while IFS= read -r module; do
   if [ "$release_level" != "none" ]; then
     set_project_version "$pom_path" "$artifact_id" "$module_version"
     # For multi-module projects the root pom version was just changed; update any
-    # submodule poms that declare this artifact as their <parent> so the reactor
+    # child poms that declare this artifact as their <parent> so the reactor
     # is consistent before `mvn versions:set` runs in `make deploy`.
     project_dir_rel="$(printf '%s' "$module" | jq -r '.projectDir // empty')"
     if [ -n "${project_dir_rel:-}" ]; then
-      sync_submodule_parent_versions "$ROOT_DIR/$project_dir_rel" "$artifact_id" "$module_version"
+      sync_child_parent_versions "$ROOT_DIR/$project_dir_rel" "$artifact_id" "$module_version"
     fi
   fi
 

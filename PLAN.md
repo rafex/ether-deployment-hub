@@ -8,16 +8,18 @@ La estrategia recomendada es importar snapshots con `git subtree --squash` y man
 
 ## Estado actual
 
-- El repositorio usa 27 submodules declarados en `.gitmodules`.
-- Los 27 gitlinks registrados en `HEAD` fueron validados contra sus remotos.
+- El repositorio fue migrado a 27 subtrees importados con `git subtree add --squash`.
+- `.gitmodules` fue eliminado.
+- No quedan gitlinks `160000` para modulos.
+- Los 27 SHAs de origen fueron validados contra sus remotos antes y despues de crear `releases/subtrees.json`.
 - `releases/manifest.json` gestiona 26 modulos de release.
-- `ether-database-sqlite` existe como submodule, pero no esta en `releases/manifest.json`.
+- `ether-database-sqlite` existe como subtree, pero no esta en `releases/manifest.json`.
 - El release planner ya soporta paths tipo subtree porque detecta cambios por `path` y `path/...`.
-- El deploy todavia depende de validacion explicita de submodules mediante `validate-submodule-refs`.
+- El deploy usa `validate-source-refs`, que valida `releases/subtrees.json`.
 
 ## Principios de no perdida
 
-1. No eliminar `.gitmodules` ni gitlinks hasta tener trazabilidad completa en `releases/subtrees.json`.
+1. No eliminar `.gitmodules` ni gitlinks hasta tener trazabilidad completa en `releases/subtrees.json`. Hecho.
 2. Validar que cada SHA grabado en `HEAD` exista en el remoto antes de importar.
 3. Importar cada modulo al mismo path que usa hoy el submodule.
 4. Registrar para cada modulo:
@@ -48,10 +50,10 @@ Tradeoff:
 
 ### Fase 0: Preparacion
 
-- Crear rama `codex/migrate-submodules-to-subtrees`.
-- Crear `releases/subtrees.json`.
-- Agregar validacion de referencias subtree.
-- Identificar referencias a submodules en Makefiles, scripts, workflows y docs.
+- Crear rama `codex/migrate-submodules-to-subtrees`. Hecho.
+- Crear `releases/subtrees.json`. Hecho.
+- Agregar validacion de referencias subtree. Hecho.
+- Identificar referencias a submodules en Makefiles, scripts, workflows y docs. Hecho.
 - Decidir si `ether-database-sqlite` entra al manifest de releases o queda documentado como modulo no desplegable.
 
 ### Fase 1: Migracion mecanica
@@ -64,22 +66,21 @@ rm -rf <module>
 git subtree add --prefix=<module> <remote-url> main --squash
 ```
 
-Despues de importar todos:
+Estado: hecho. Despues de importar todos:
 
 ```bash
 git rm .gitmodules
-git rm .gitmodules.backup  # si ya no se quiere conservar
 git add releases/subtrees.json
 ```
 
-Nota: si se desea conservar `.gitmodules.backup` solo como evidencia historica, moverlo a `docs/archive/` y documentarlo.
+La copia historica de `.gitmodules` quedo archivada en `docs/archive/gitmodules.pre-subtree-migration`.
 
 ### Fase 2: Automatizacion
 
-- Quitar `submodules: recursive` de workflows que ya no lo necesitan.
-- Reemplazar comandos `submodules-*` por equivalentes `subtrees-*`.
-- Convertir `validate-submodule-refs` en una validacion de fuentes compatible con subtree.
-- Actualizar documentacion en `scripts/README-submodules.md` o reemplazarla por documentacion de subtree.
+- Quitar `submodules: recursive` de workflows que ya no lo necesitan. Hecho.
+- Reemplazar comandos `submodules-*` por equivalentes `subtrees-*`. Hecho.
+- Convertir `validate-submodule-refs` en una validacion de fuentes compatible con subtree. Hecho.
+- Reemplazar documentacion y scripts legacy de submodules. Hecho.
 
 ### Fase 3: Verificacion local
 
@@ -100,7 +101,7 @@ make publish-plan-ci
 ### Fase 4: Verificacion CI
 
 - Confirmar que `Generate Release Plan` detecta cambios dentro de `ether-x/...`.
-- Confirmar que `Validate Java Build On Main` ya no requiere submodules.
+- Confirmar que `Validate Java Build On Main` ya no requiere checkout recursivo.
 - Confirmar que `Publish Java Modules - Maven Central` aplica versiones y despliega por `path` normal.
 - Confirmar que `Publish Java Modules - GitHub Packages` sigue usando artefactos de Maven Central run, no polling.
 
@@ -121,7 +122,7 @@ make publish-plan-ci
 - Repo mas grande despues de importar snapshots.
 - Merge inicial voluminoso.
 - Si se usa `--squash`, el historial fino queda fuera del hub y se consulta en los repos originales.
-- Si un modulo tenia cambios locales no pusheados dentro del submodule, se perderian en la importacion. Mitigacion: validar `git submodule foreach git status --short` antes de migrar.
+- Si un modulo tenia cambios locales no pusheados dentro del submodule antes de importar, se perderian en la importacion. Mitigacion aplicada: se importaron los SHAs remotos registrados y validados.
 - `ether-database-sqlite` puede quedar fuera de releases si no se agrega al manifest.
 
 ## Comandos de sincronizacion futura

@@ -79,7 +79,7 @@ show-env:
 	@echo "ARTIFACTORY_BASE_URL='$(ARTIFACTORY_BASE_URL)'"
 	@echo "MAVEN_GPG_PASSPHRASE length='$(shell printf '%s' "$(MAVEN_GPG_PASSPHRASE)" | wc -c)'"
 
-.PHONY: show-env write-settings validate-source-refs validate-submodule-refs validate-subtree-source-refs sync-pom-versions set-version update-license-headers build deploy show-version valid-version
+.PHONY: show-env write-settings validate-source-refs validate-subtree-source-refs sync-pom-versions set-version update-license-headers build deploy show-version valid-version
 
 #
 # Raw Git tag, or default "0.0.0"
@@ -127,11 +127,6 @@ write-settings:
 	@mkdir -p ~/.m2
 	@printf '<settings>\n  <servers>\n    <server>\n      <id>%s</id>\n      <username>%s</username>\n      <password>%s</password>\n    </server>\n    <server>\n      <id>%s</id>\n      <username>%s</username>\n      <password>%s</password>\n    </server>\n  </servers>\n</settings>\n' "$(MAVEN_SERVER_ID)" "$(MAVEN_REPO_USERNAME)" "$(MAVEN_REPO_PASSWORD)" "$(CENTRAL_SERVER_ID)" "$(CENTRAL_REPO_USERNAME)" "$(CENTRAL_REPO_PASSWORD)" > ~/.m2/settings.xml
 
-## validate-submodule-refs: ensure submodule SHAs recorded by the hub exist in remote repos
-validate-submodule-refs:
-	@ROOT_DIR="$$(git rev-parse --show-superproject-working-tree 2>/dev/null || git rev-parse --show-toplevel)"; \
-	"$$ROOT_DIR/scripts/validate-submodule-remote-refs.sh"
-
 ## validate-subtree-source-refs: ensure subtree source SHAs recorded by the hub exist in remote repos
 validate-subtree-source-refs:
 	@ROOT_DIR="$$(git rev-parse --show-superproject-working-tree 2>/dev/null || git rev-parse --show-toplevel)"; \
@@ -140,9 +135,6 @@ validate-subtree-source-refs:
 ## validate-source-refs: validate module source refs for the current hub layout
 validate-source-refs:
 	@ROOT_DIR="$$(git rev-parse --show-superproject-working-tree 2>/dev/null || git rev-parse --show-toplevel)"; \
-	if [ -f "$$ROOT_DIR/.gitmodules" ]; then \
-		"$$ROOT_DIR/scripts/validate-submodule-remote-refs.sh"; \
-	fi; \
 	if [ -f "$$ROOT_DIR/releases/subtrees.json" ]; then \
 		"$$ROOT_DIR/scripts/validate-subtree-source-refs.sh"; \
 	fi

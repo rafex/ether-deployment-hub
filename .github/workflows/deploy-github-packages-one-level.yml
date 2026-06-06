@@ -35,11 +35,10 @@ jobs:
       # We re-use pre-built artifacts staged by the Maven Central workflow
       # instead of recompiling from source.
       # Only the scripts/ and releases/ directories are needed here.
-      - name: Checkout repo (shallow, no submodules)
+      - name: Checkout repo (shallow, sources not needed)
         uses: actions/checkout@v6
         with:
           fetch-depth: 1
-          submodules: false
 
       - name: Download release plan artifact
         uses: actions/download-artifact@v8

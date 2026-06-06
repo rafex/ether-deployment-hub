@@ -78,7 +78,7 @@ El pipeline de publicación está dividido en dos workflows independientes para 
 
 #### 6. **Utilidades y Mantenimiento**
 - `release-common.sh` - Funciones comunes para todos los scripts de release
-- `push-all-submodules.sh` - Empuja todos los submódulos Git
+- `pull-subtrees.sh` - Muestra y sincroniza subtrees Git desde `releases/subtrees.json`
 - `setup-hooks.sh` - Configura hooks Git para el proyecto
 
 ## Scripts Revisados (Estado Actual)

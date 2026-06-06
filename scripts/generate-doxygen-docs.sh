@@ -29,7 +29,7 @@ build_input_paths() {
       fi
     done < <(jq -r '.modules[].projectDir // empty' "$ROOT_DIR/releases/manifest.json")
 
-    # Module README files — from top-level path (submodule root)
+    # Module README files — from top-level path (module root)
     while IFS= read -r module_path; do
       [ -n "$module_path" ] || continue
       local readme="$module_path/README.md"

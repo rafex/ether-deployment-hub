@@ -108,7 +108,7 @@ to prevent `gpg: signing failed: Cannot allocate memory` on shared GitHub Action
 
 ## Java 25 code improvements (branch `migrate-jdk25`)
 
-Applied on 2026-03-22 across 5 submodules:
+Applied on 2026-03-22 across 5 modules:
 
 | Module | File | Improvement | JEP |
 |---|---|---|---|
