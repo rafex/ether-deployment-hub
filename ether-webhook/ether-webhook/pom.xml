@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>dev.rafex.ether.parent</groupId>
+		<artifactId>ether-parent</artifactId>
+		<version>9.5.5-SNAPSHOT</version>
+		<relativePath>../../ether-parent/ether-parent/pom.xml</relativePath>
+	</parent>
+
+	<groupId>dev.rafex.ether.webhook</groupId>
+	<artifactId>ether-webhook</artifactId>
+	<version>9.5.5-SNAPSHOT</version>
+
+	<packaging>jar</packaging>
+	<name>${project.artifactId}</name>
+
+	<url>https://rafex.dev/ether/webhook</url>
+
+	<description>
+		Webhook signing, verification and delivery utilities built on top of
+		ether-http-client.
+	</description>
+
+	<licenses>
+		<license>
+			<name>MIT License</name>
+			<url>https://opensource.org/license/mit/</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<issueManagement>
+		<system>GitHub Issues</system>
+		<url>https://github.com/rafex/ether-webhook/issues</url>
+	</issueManagement>
+
+	<developers>
+		<developer>
+			<name>Raúl Eduardo González Argote</name>
+			<email>rafex@rafex.dev</email>
+			<organization>dev.rafex</organization>
+			<organizationUrl>https://rafex.dev</organizationUrl>
+		</developer>
+	</developers>
+
+	<scm>
+		<connection>scm:git:https://github.com/rafex/ether-webhook.git</connection>
+		<developerConnection>scm:git:https://github.com/rafex/ether-webhook.git</developerConnection>
+		<url>https://github.com/rafex/ether-webhook</url>
+	</scm>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>dev.rafex.ether.http</groupId>
+			<artifactId>ether-http-client</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>dev.rafex.ether.json</groupId>
+			<artifactId>ether-json</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<finalName>${project.name}</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>flatten-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+</project>
