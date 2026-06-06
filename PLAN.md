@@ -123,7 +123,7 @@ make publish-plan-ci
 - Merge inicial voluminoso.
 - Si se usa `--squash`, el historial fino queda fuera del hub y se consulta en los repos originales.
 - Si un modulo tenia cambios locales no pusheados dentro del submodule antes de importar, se perderian en la importacion. Mitigacion aplicada: se importaron los SHAs remotos registrados y validados.
-- `ether-database-sqlite` puede fallar si Maven Central exige metadata adicional en su primer publish. Mitigacion: se agrego al parent dependencyManagement y se validara con release plan/build local.
+- `ether-database-sqlite` puede fallar si Maven Central exige metadata adicional en su primer publish. Mitigacion aplicada: se agrego al parent dependencyManagement y se valido con release plan/build local.
 
 ## Comandos de sincronizacion futura
 

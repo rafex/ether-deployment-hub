@@ -54,6 +54,15 @@
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.database/ether-database-postgres"
   },
   {
+    "module": "ether-database-sqlite",
+    "groupId": "dev.rafex.ether.database",
+    "artifactId": "ether-database-sqlite",
+    "deployed": false,
+    "latestVersion": "",
+    "lastUpdatedUtc": "",
+    "artifactUrl": "https://central.sonatype.com/search?q=ether-database-sqlite"
+  },
+  {
     "module": "ether-json",
     "groupId": "dev.rafex.ether.json",
     "artifactId": "ether-json",

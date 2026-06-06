@@ -169,12 +169,13 @@ Basado en `releases/manifest.json` y `MAX_LEVEL_SIZE=5`, el orden actual es:
 | Nivel | Módulos |
 |-------|---------|
 | L0 | `ether-parent` |
-| L1 | `ether-ai-core`, `ether-config`, `ether-crypto`, `ether-database-core`, `ether-http-core` |
-| L2 | `ether-http-security`, `ether-json`, `ether-logging-core`, `ether-observability-core`, `ether-websocket-core` |
-| L3 | `ether-ai-deepseek`, `ether-ai-openai`, `ether-database-postgres`, `ether-http-client`, `ether-http-openapi` |
-| L4 | `ether-http-problem`, `ether-jdbc`, `ether-jwt`, `ether-websocket-jetty12` |
-| L5 | `ether-http-jetty12`, `ether-webhook` |
-| L6 | `ether-glowroot-jetty12` |
+| L1 | `ether-crypto`, `ether-database-core`, `ether-json`, `ether-observability-core`, `ether-http-core` |
+| L2 | `ether-http-security`, `ether-logging-core`, `ether-ai-core`, `ether-websocket-core`, `ether-archetype` |
+| L3 | `ether-brain`, `ether-di` |
+| L4 | `ether-config`, `ether-jdbc`, `ether-database-postgres`, `ether-jwt`, `ether-http-problem` |
+| L5 | `ether-http-openapi`, `ether-http-client`, `ether-ai-openai`, `ether-ai-deepseek`, `ether-websocket-jetty12` |
+| L6 | `ether-database-sqlite`, `ether-http-jetty12`, `ether-webhook` |
+| L7 | `ether-glowroot-jetty12` |
 
 ## Convenciones CI/Runtime
 
