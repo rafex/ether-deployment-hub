@@ -1,0 +1,51 @@
+package dev.rafex.ether.jwt;
+
+import java.util.Arrays;
+
+/*-
+ * #%L
+ * ether-jwt
+ * %%
+ * Copyright (C) 2025 - 2026 Raúl Eduardo González Argote
+ * %%
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ * #L%
+ */
+
+/** Supported JWT signature algorithms. */
+public enum JwtAlgorithm {
+    HS256("HS256"), RS256("RS256");
+
+    private final String headerValue;
+
+    JwtAlgorithm(final String headerValue) {
+        this.headerValue = headerValue;
+    }
+
+    public String headerValue() {
+        return headerValue;
+    }
+
+    public static JwtAlgorithm fromHeaderValue(final String value) {
+        return Arrays.stream(values())
+                .filter(a -> a.headerValue.equals(value))
+                .findFirst()
+                .orElse(null);
+    }
+}
