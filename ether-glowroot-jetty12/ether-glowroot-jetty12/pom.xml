@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>dev.rafex.ether.parent</groupId>
+		<artifactId>ether-parent</artifactId>
+		<version>9.5.5-SNAPSHOT</version>
+		<relativePath>../../ether-parent/ether-parent/pom.xml</relativePath>
+	</parent>
+
+	<groupId>dev.rafex.ether.glowroot</groupId>
+	<artifactId>ether-glowroot-jetty12</artifactId>
+	<version>9.5.5-SNAPSHOT</version>
+
+	<packaging>jar</packaging>
+	<name>${project.artifactId}</name>
+
+	<url>https://rafex.dev/ether/glowroot/jetty12</url>
+
+	<description>
+		Glowroot APM instrumentation for ether-http and ether-websocket on Jetty 12.
+		Provides transaction naming, path normalization, trace entries, timers,
+		and programmatic config generation for the Glowroot agent.
+	</description>
+
+	<licenses>
+		<license>
+			<name>MIT License</name>
+			<url>https://opensource.org/license/mit/</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<issueManagement>
+		<system>GitHub Issues</system>
+		<url>https://github.com/rafex/ether-glowroot-jetty12/issues</url>
+	</issueManagement>
+
+	<developers>
+		<developer>
+			<name>Raúl Eduardo González Argote</name>
+			<email>rafex@rafex.dev</email>
+			<organization>dev.rafex</organization>
+			<organizationUrl>https://rafex.dev</organizationUrl>
+		</developer>
+	</developers>
+
+	<scm>
+		<connection>scm:git:https://github.com/rafex/ether-glowroot-jetty12.git</connection>
+		<developerConnection>scm:git:https://github.com/rafex/ether-glowroot-jetty12.git</developerConnection>
+		<url>https://github.com/rafex/ether-glowroot-jetty12</url>
+	</scm>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	</properties>
+
+	<dependencies>
+		<!-- Glowroot Agent API (provided: loaded via -javaagent at runtime) -->
+		<dependency>
+			<groupId>org.glowroot</groupId>
+			<artifactId>glowroot-agent-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Ether HTTP (provided: consumer brings these) -->
+		<dependency>
+			<groupId>dev.rafex.ether.observability</groupId>
+			<artifactId>ether-observability-core</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>dev.rafex.ether.http</groupId>
+			<artifactId>ether-http-core</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>dev.rafex.ether.http</groupId>
+			<artifactId>ether-http-jetty12</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Ether JSON (provided: needed for config serialization) -->
+		<dependency>
+			<groupId>dev.rafex.ether.json</groupId>
+			<artifactId>ether-json</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Ether WebSocket (provided: consumer brings these) -->
+		<dependency>
+			<groupId>dev.rafex.ether.websocket</groupId>
+			<artifactId>ether-websocket-core</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>dev.rafex.ether.websocket</groupId>
+			<artifactId>ether-websocket-jetty12</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Jetty 12 (provided: consumer brings Jetty) -->
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-server</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty.websocket</groupId>
+			<artifactId>jetty-websocket-jetty-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty.websocket</groupId>
+			<artifactId>jetty-websocket-jetty-server</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Test -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<finalName>${project.name}</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>flatten-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+</project>
