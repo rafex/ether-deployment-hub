@@ -15,10 +15,10 @@ flowchart TD
     C --> D[generate-release-plan.sh]
     D --> E[validate-release-plan-against-central.sh]
     E --> F[apply-release-plan.sh]
-    F --> G[Deploy a Maven Central\ndeploy-one-level.yml × 7 niveles]
+    F --> G[Deploy a Maven Central\ndeploy-one-level.yml × 8 niveles]
     G --> H[Artifacts subidos a\nGitHub Actions Storage]
     G --> I[update-manifest-from-plan.sh]
-    H --> J[deploy-github-packages-one-level.yml × 7 niveles]
+    H --> J[deploy-github-packages-one-level.yml × 8 niveles]
     J --> K[GitHub Packages actualizado]
     I --> L[sync-manifest-from-central.sh]
     L --> M[Documentación actualizada]
@@ -29,7 +29,7 @@ flowchart TD
 El pipeline de publicación está dividido en dos workflows independientes para mayor resiliencia y facilidad de re-ejecución:
 
 #### `publish-java-modules-maven-central.yml`
-- Despliega los 22 módulos a Maven Central en 7 niveles topológicos (L0–L6).
+- Despliega los 27 módulos a Maven Central en 8 niveles topológicos (L0–L7).
 - Sube los JARs/POMs compilados como **GitHub Actions artifacts** (`maven-artifacts-level-N`) para uso posterior.
 - Sube el `release-plan` artifact para consumo del workflow de GitHub Packages.
 - Trigger: tag push o `workflow_dispatch`.
@@ -78,7 +78,7 @@ El pipeline de publicación está dividido en dos workflows independientes para 
 
 #### 6. **Utilidades y Mantenimiento**
 - `release-common.sh` - Funciones comunes para todos los scripts de release
-- `push-all-submodules.sh` - Empuja todos los submódulos Git
+- `pull-subtrees.sh` - Muestra y sincroniza subtrees Git desde `releases/subtrees.json`
 - `setup-hooks.sh` - Configura hooks Git para el proyecto
 
 ## Scripts Revisados (Estado Actual)
@@ -120,7 +120,7 @@ El pipeline de publicación está dividido en dos workflows independientes para 
 **Características clave**:
 - Implementa el algoritmo de Kahn para ordenamiento topológico de dependencias
 - `MAX_LEVEL_SIZE=5` (configurable vía `$2`): divide niveles grandes en sub-niveles para respetar el timeout de 30 min de GitHub Actions
-- Para los 22 módulos actuales produce 7 niveles: `L0(1) L1(5) L2(4) L3(5) L4(4) L5(2) L6(1)`
+- Para los 27 módulos actuales produce 8 niveles: `L0(1) L1(5) L2(5) L3(2) L4(5) L5(5) L6(3) L7(1)`
 - Salida JSON: `{"levels": [["mod-a", "mod-b"], ["mod-c"], ...]}`
 
 ### 5. `deploy-to-github-packages.sh`
@@ -169,12 +169,13 @@ Basado en `releases/manifest.json` y `MAX_LEVEL_SIZE=5`, el orden actual es:
 | Nivel | Módulos |
 |-------|---------|
 | L0 | `ether-parent` |
-| L1 | `ether-ai-core`, `ether-config`, `ether-crypto`, `ether-database-core`, `ether-http-core` |
-| L2 | `ether-http-security`, `ether-json`, `ether-logging-core`, `ether-observability-core`, `ether-websocket-core` |
-| L3 | `ether-ai-deepseek`, `ether-ai-openai`, `ether-database-postgres`, `ether-http-client`, `ether-http-openapi` |
-| L4 | `ether-http-problem`, `ether-jdbc`, `ether-jwt`, `ether-websocket-jetty12` |
-| L5 | `ether-http-jetty12`, `ether-webhook` |
-| L6 | `ether-glowroot-jetty12` |
+| L1 | `ether-crypto`, `ether-database-core`, `ether-json`, `ether-observability-core`, `ether-http-core` |
+| L2 | `ether-http-security`, `ether-logging-core`, `ether-ai-core`, `ether-websocket-core`, `ether-archetype` |
+| L3 | `ether-brain`, `ether-di` |
+| L4 | `ether-config`, `ether-jdbc`, `ether-database-postgres`, `ether-jwt`, `ether-http-problem` |
+| L5 | `ether-http-openapi`, `ether-http-client`, `ether-ai-openai`, `ether-ai-deepseek`, `ether-websocket-jetty12` |
+| L6 | `ether-database-sqlite`, `ether-http-jetty12`, `ether-webhook` |
+| L7 | `ether-glowroot-jetty12` |
 
 ## Convenciones CI/Runtime
 
@@ -193,6 +194,12 @@ Basado en `releases/manifest.json` y `MAX_LEVEL_SIZE=5`, el orden actual es:
 | `make gh-runs` | Lista runs recientes de ambos workflows |
 | `make gh-watch RUN_ID=<id>` | Observa un run específico |
 | `make gh-logs RUN_ID=<id>` | Logs de un run específico |
+
+## Flujo operativo
+
+La operativa para sincronizar subtrees, subir cambios a repos fuente y disparar
+despliegues desde el hub esta documentada en
+[`docs/subtree-deployment-workflow.md`](subtree-deployment-workflow.md).
 
 ## Stack de Documentación (Fase 1)
 

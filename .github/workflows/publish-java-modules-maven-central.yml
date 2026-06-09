@@ -55,7 +55,6 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          submodules: recursive
 
       - name: Resolve comparison refs
         id: refs
@@ -326,7 +325,6 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
-          submodules: recursive
 
       - name: Download release plan artifact
         uses: actions/download-artifact@v8

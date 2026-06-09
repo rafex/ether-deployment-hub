@@ -1,0 +1,64 @@
+package dev.rafex.ether.glowroot.jetty12;
+
+/*-
+ * #%L
+ * ether-glowroot-jetty12
+ * %%
+ * Copyright (C) 2025 - 2026 Raúl Eduardo González Argote
+ * %%
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ * #L%
+ */
+
+import java.util.Objects;
+
+import org.glowroot.agent.api.Glowroot;
+
+import dev.rafex.ether.observability.core.request.RequestIdGenerator;
+import dev.rafex.ether.observability.core.request.UuidRequestIdGenerator;
+
+/**
+ * {@link RequestIdGenerator} bridge that records generated request IDs into
+ * Glowroot transaction attributes.
+ */
+public final class GlowrootRequestIdGenerator implements RequestIdGenerator {
+
+    private final RequestIdGenerator delegate;
+
+    public GlowrootRequestIdGenerator() {
+        this(new UuidRequestIdGenerator());
+    }
+
+    public GlowrootRequestIdGenerator(final RequestIdGenerator delegate) {
+        this.delegate = Objects.requireNonNull(delegate, "delegate");
+    }
+
+    @Override
+    public String nextId() {
+        final var requestId = delegate.nextId();
+        if (requestId != null && !requestId.isBlank()) {
+            try {
+                Glowroot.addTransactionAttribute("request.id", requestId);
+            } catch (final Throwable ignore) {
+                // Glowroot agent not present; do not affect request processing
+            }
+        }
+        return requestId;
+    }
+}

@@ -1,0 +1,224 @@
+{
+  "schemaVersion": 1,
+  "defaultBranch": "main",
+  "importMode": "subtree-squash",
+  "source": "generated from the pre-migration module inventory",
+  "modules": [
+    {
+      "name": "ether-parent",
+      "prefix": "ether-parent",
+      "url": "git@github.com:rafex/ether-parent.git",
+      "branch": "main",
+      "importedSha": "b3c2e81595f398481caedc0846b335c08bc7841a",
+      "releaseManifest": true
+    },
+    {
+      "name": "ether-jwt",
+      "prefix": "ether-jwt",
+      "url": "git@github.com:rafex/ether-jwt.git",
+      "branch": "main",
+      "importedSha": "ca97961ed6fca65d25a7fdc831f2ea1248086ea4",
+      "releaseManifest": true
+    },
+    {
+      "name": "ether-json",
+      "prefix": "ether-json",
+      "url": "git@github.com:rafex/ether-json.git",
+      "branch": "main",
+      "importedSha": "6991a4724d34e69a633b0f097f5efe42d14b0e07",
+      "releaseManifest": true
+    },
+    {
+      "name": "ether-http-jetty12",
+      "prefix": "ether-http-jetty12",
+      "url": "git@github.com:rafex/ether-http-jetty12.git",
+      "branch": "main",
+      "importedSha": "c54c9f8fc38673daabd871fafc08213d5795811e",
+      "releaseManifest": true
+    },
+    {
+      "name": "ether-http-core",
+      "prefix": "ether-http-core",
+      "url": "git@github.com:rafex/ether-http-core.git",
+      "branch": "main",
+      "importedSha": "b53f51c0e809dcdf04b1afa6ed77a3a4696d449b",
+      "releaseManifest": true
+    },
+    {
+      "name": "ether-websocket-jetty12",
+      "prefix": "ether-websocket-jetty12",
+      "url": "git@github.com:rafex/ether-websocket-jetty12.git",
+      "branch": "main",
+      "importedSha": "fe8b0c45d6b25cf1de638f019f5adbfd44688653",
+      "releaseManifest": true
+    },
+    {
+      "name": "ether-websocket-core",
+      "prefix": "ether-websocket-core",
+      "url": "git@github.com:rafex/ether-websocket-core.git",
+      "branch": "main",
+      "importedSha": "173637ee604f2c553733d2a4fb3ff7ed3bd679a5",
+      "releaseManifest": true
+    },
+    {
+      "name": "ether-glowroot-jetty12",
+      "prefix": "ether-glowroot-jetty12",
+      "url": "git@github.com:rafex/ether-glowroot-jetty12.git",
+      "branch": "main",
+      "importedSha": "7fc3369071a6d5a38d4d9a64d121bd8dee5abfc6",
+      "releaseManifest": true
+    },
+    {
+      "name": "ether-config",
+      "prefix": "ether-config",
+      "url": "git@github.com:rafex/ether-config.git",
+      "branch": "main",
+      "importedSha": "f969621f986934a2bf38b31b4e9076918cf22ef9",
+      "releaseManifest": true
+    },
+    {
+      "name": "ether-http-security",
+      "prefix": "ether-http-security",
+      "url": "git@github.com:rafex/ether-http-security.git",
+      "branch": "main",
+      "importedSha": "1712c4081150f55c4fa5c9398e19a0ca3ca24b4b",
+      "releaseManifest": true
+    },
+    {
+      "name": "ether-webhook",
+      "prefix": "ether-webhook",
+      "url": "git@github.com:rafex/ether-webhook.git",
+      "branch": "main",
+      "importedSha": "e0e0032afebdad7095a7af19cfe73d968275dc54",
+      "releaseManifest": true
+    },
+    {
+      "name": "ether-http-client",
+      "prefix": "ether-http-client",
+      "url": "git@github.com:rafex/ether-http-client.git",
+      "branch": "main",
+      "importedSha": "28a476671365337e9e759b0c9abec4db88db5573",
+      "releaseManifest": true
+    },
+    {
+      "name": "ether-http-problem",
+      "prefix": "ether-http-problem",
+      "url": "git@github.com:rafex/ether-http-problem.git",
+      "branch": "main",
+      "importedSha": "d33e6cfbc16a1b74218d26c9723d6e69d227f838",
+      "releaseManifest": true
+    },
+    {
+      "name": "ether-observability-core",
+      "prefix": "ether-observability-core",
+      "url": "git@github.com:rafex/ether-observability-core.git",
+      "branch": "main",
+      "importedSha": "074a91b6215d3aa96fcb24e4a18161abaf674b25",
+      "releaseManifest": true
+    },
+    {
+      "name": "ether-http-openapi",
+      "prefix": "ether-http-openapi",
+      "url": "git@github.com:rafex/ether-http-openapi.git",
+      "branch": "main",
+      "importedSha": "5e670c348505f684602b8763ac3d8d012688aa7e",
+      "releaseManifest": true
+    },
+    {
+      "name": "ether-database-core",
+      "prefix": "ether-database-core",
+      "url": "git@github.com:rafex/ether-database-core.git",
+      "branch": "main",
+      "importedSha": "605979c1871379095f12b320d77bdc9b886b1c89",
+      "releaseManifest": true
+    },
+    {
+      "name": "ether-jdbc",
+      "prefix": "ether-jdbc",
+      "url": "git@github.com:rafex/ether-jdbc.git",
+      "branch": "main",
+      "importedSha": "7968dd8baf79211915d7020826a15fa8261cc0ab",
+      "releaseManifest": true
+    },
+    {
+      "name": "ether-database-postgres",
+      "prefix": "ether-database-postgres",
+      "url": "git@github.com:rafex/ether-database-postgres.git",
+      "branch": "main",
+      "importedSha": "22aa84af3b13b24c50e09c6188c479063a7f65fd",
+      "releaseManifest": true
+    },
+    {
+      "name": "ether-ai-core",
+      "prefix": "ether-ai-core",
+      "url": "git@github.com:rafex/ether-ai-core.git",
+      "branch": "main",
+      "importedSha": "38f60a38f36027e660cc8b0621d58f37c1dfd4b7",
+      "releaseManifest": true
+    },
+    {
+      "name": "ether-ai-openai",
+      "prefix": "ether-ai-openai",
+      "url": "git@github.com:rafex/ether-ai-openai.git",
+      "branch": "main",
+      "importedSha": "3f7dc1ad170743f6efc3e20c88c159e495b7dc14",
+      "releaseManifest": true
+    },
+    {
+      "name": "ether-ai-deepseek",
+      "prefix": "ether-ai-deepseek",
+      "url": "git@github.com:rafex/ether-ai-deepseek.git",
+      "branch": "main",
+      "importedSha": "6ff6a312d4952109b9cb62f2337155c658f6bce2",
+      "releaseManifest": true
+    },
+    {
+      "name": "ether-logging-core",
+      "prefix": "ether-logging-core",
+      "url": "git@github.com:rafex/ether-logging-core.git",
+      "branch": "main",
+      "importedSha": "e2ecf3340c2af24b60e67adfb403a271453aaf11",
+      "releaseManifest": true
+    },
+    {
+      "name": "ether-crypto",
+      "prefix": "ether-crypto",
+      "url": "git@github.com:rafex/ether-crypto.git",
+      "branch": "main",
+      "importedSha": "110dc7079f408a0a4c8abd9e6e29d03935849930",
+      "releaseManifest": true
+    },
+    {
+      "name": "ether-archetype",
+      "prefix": "ether-archetype",
+      "url": "git@github.com:rafex/ether-archetype.git",
+      "branch": "main",
+      "importedSha": "b2049c7b146b1d7ebb728d6062730f3fc24419ee",
+      "releaseManifest": true
+    },
+    {
+      "name": "ether-brain",
+      "prefix": "ether-brain",
+      "url": "git@github.com:rafex/ether-brain.git",
+      "branch": "main",
+      "importedSha": "1f860c17beabfde640c84f44e0162b733208aa04",
+      "releaseManifest": true
+    },
+    {
+      "name": "ether-di",
+      "prefix": "ether-di",
+      "url": "git@github.com:rafex/ether-di.git",
+      "branch": "main",
+      "importedSha": "6553a3f78e9be8f5aa1a4ee72b26fe4717e7636e",
+      "releaseManifest": true
+    },
+    {
+      "name": "ether-database-sqlite",
+      "prefix": "ether-database-sqlite",
+      "url": "git@github.com:rafex/ether-database-sqlite.git",
+      "branch": "main",
+      "importedSha": "329be14e86d62b19195c8357677666127f3fcd27",
+      "releaseManifest": true
+    }
+  ]
+}

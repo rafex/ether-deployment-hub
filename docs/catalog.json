@@ -1,0 +1,447 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-06-06T03:27:41Z",
+  "totalModules": 27,
+  "deployOrder": [
+    "ether-parent",
+    "ether-config",
+    "ether-crypto",
+    "ether-database-core",
+    "ether-jdbc",
+    "ether-database-postgres",
+    "ether-database-sqlite",
+    "ether-json",
+    "ether-jwt",
+    "ether-observability-core",
+    "ether-http-core",
+    "ether-http-security",
+    "ether-http-problem",
+    "ether-http-openapi",
+    "ether-http-client",
+    "ether-logging-core",
+    "ether-ai-core",
+    "ether-ai-openai",
+    "ether-ai-deepseek",
+    "ether-websocket-core",
+    "ether-http-jetty12",
+    "ether-websocket-jetty12",
+    "ether-webhook",
+    "ether-glowroot-jetty12",
+    "ether-archetype",
+    "ether-brain",
+    "ether-di"
+  ],
+  "releasePolicy": {
+    "conventionalCommits": true,
+    "dependencyPropagation": "patch",
+    "docsOnly": "none",
+    "testsOnly": "none",
+    "buildOnly": "patch"
+  },
+  "modules": [
+    {
+      "name": "ether-parent",
+      "groupId": "dev.rafex.ether.parent",
+      "artifactId": "ether-parent",
+      "version": "9.6.2",
+      "deployed": true,
+      "description": "Parent POM and BOM managing all external dependency versions across the ecosystem",
+      "dependencies": [],
+      "dependencyReleaseImpact": "patch",
+      "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.parent/ether-parent",
+      "mavenCoord": "dev.rafex.ether.parent:ether-parent"
+    },
+    {
+      "name": "ether-config",
+      "groupId": "dev.rafex.ether.config",
+      "artifactId": "ether-config",
+      "version": "9.5.6",
+      "deployed": true,
+      "description": "Typed configuration entry points and composition APIs for Ether applications",
+      "dependencies": [
+        "ether-parent",
+        "ether-logging-core"
+      ],
+      "dependencyReleaseImpact": "patch",
+      "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.config/ether-config",
+      "mavenCoord": "dev.rafex.ether.config:ether-config"
+    },
+    {
+      "name": "ether-crypto",
+      "groupId": "dev.rafex.ether.crypto",
+      "artifactId": "ether-crypto",
+      "version": "9.5.5",
+      "deployed": true,
+      "description": "Cryptographic utilities: hashing, encoding, secure random, key generation",
+      "dependencies": [
+        "ether-parent"
+      ],
+      "dependencyReleaseImpact": "patch",
+      "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.crypto/ether-crypto",
+      "mavenCoord": "dev.rafex.ether.crypto:ether-crypto"
+    },
+    {
+      "name": "ether-database-core",
+      "groupId": "dev.rafex.ether.database",
+      "artifactId": "ether-database-core",
+      "version": "9.5.5",
+      "deployed": true,
+      "description": "Database contracts: DatabaseClient interface and RowMapper abstraction",
+      "dependencies": [
+        "ether-parent"
+      ],
+      "dependencyReleaseImpact": "patch",
+      "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.database/ether-database-core",
+      "mavenCoord": "dev.rafex.ether.database:ether-database-core"
+    },
+    {
+      "name": "ether-jdbc",
+      "groupId": "dev.rafex.ether.jdbc",
+      "artifactId": "ether-jdbc",
+      "version": "9.5.5",
+      "deployed": true,
+      "description": "JDBC implementation of ether-database-core abstractions",
+      "dependencies": [
+        "ether-parent",
+        "ether-database-core"
+      ],
+      "dependencyReleaseImpact": "patch",
+      "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.jdbc/ether-jdbc",
+      "mavenCoord": "dev.rafex.ether.jdbc:ether-jdbc"
+    },
+    {
+      "name": "ether-database-postgres",
+      "groupId": "dev.rafex.ether.database",
+      "artifactId": "ether-database-postgres",
+      "version": "9.5.5",
+      "deployed": true,
+      "description": "PostgreSQL error classification, SQL state constants, and pg-specific helpers",
+      "dependencies": [
+        "ether-parent",
+        "ether-database-core"
+      ],
+      "dependencyReleaseImpact": "patch",
+      "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.database/ether-database-postgres",
+      "mavenCoord": "dev.rafex.ether.database:ether-database-postgres"
+    },
+    {
+      "name": "ether-database-sqlite",
+      "groupId": "dev.rafex.ether.database",
+      "artifactId": "ether-database-sqlite",
+      "version": "9.5.5",
+      "deployed": false,
+      "description": "SQLite client wrapper, PRAGMA configuration, SQLite parameter helpers, and error utilities",
+      "dependencies": [
+        "ether-parent",
+        "ether-database-core",
+        "ether-jdbc"
+      ],
+      "dependencyReleaseImpact": "patch",
+      "artifactUrl": "https://central.sonatype.com/search?q=ether-database-sqlite",
+      "mavenCoord": "dev.rafex.ether.database:ether-database-sqlite"
+    },
+    {
+      "name": "ether-json",
+      "groupId": "dev.rafex.ether.json",
+      "artifactId": "ether-json",
+      "version": "9.5.5",
+      "deployed": true,
+      "description": "JsonCodec interface built on Jackson for flexible and pluggable serialization",
+      "dependencies": [
+        "ether-parent"
+      ],
+      "dependencyReleaseImpact": "patch",
+      "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.json/ether-json",
+      "mavenCoord": "dev.rafex.ether.json:ether-json"
+    },
+    {
+      "name": "ether-di",
+      "groupId": "dev.rafex.ether.di",
+      "artifactId": "ether-di",
+      "version": "1.0.0",
+      "deployed": true,
+      "description": "Explicit dependency injection building blocks for Java 21+: Lazy, Closer, and Bootstrap — no reflection, no annotations, GraalVM native-image compatible",
+      "dependencies": [
+        "ether-parent"
+      ],
+      "dependencyReleaseImpact": "patch",
+      "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.di/ether-di",
+      "mavenCoord": "dev.rafex.ether.di:ether-di"
+    },
+    {
+      "name": "ether-jwt",
+      "groupId": "dev.rafex.ether.jwt",
+      "artifactId": "ether-jwt",
+      "version": "9.5.5",
+      "deployed": true,
+      "description": "Lightweight cryptographic primitives for JWT: HS256, RS256, ES256 token operations",
+      "dependencies": [
+        "ether-parent",
+        "ether-json"
+      ],
+      "dependencyReleaseImpact": "patch",
+      "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.jwt/ether-jwt",
+      "mavenCoord": "dev.rafex.ether.jwt:ether-jwt"
+    },
+    {
+      "name": "ether-observability-core",
+      "groupId": "dev.rafex.ether.observability",
+      "artifactId": "ether-observability-core",
+      "version": "9.5.5",
+      "deployed": true,
+      "description": "Health checks, request ID generation, timing recording, and metrics contracts",
+      "dependencies": [
+        "ether-parent"
+      ],
+      "dependencyReleaseImpact": "patch",
+      "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.observability/ether-observability-core",
+      "mavenCoord": "dev.rafex.ether.observability:ether-observability-core"
+    },
+    {
+      "name": "ether-http-core",
+      "groupId": "dev.rafex.ether.http",
+      "artifactId": "ether-http-core",
+      "version": "9.5.5",
+      "deployed": true,
+      "description": "Core HTTP contracts: HttpExchange, HttpHandler, Middleware, routing abstractions",
+      "dependencies": [
+        "ether-parent"
+      ],
+      "dependencyReleaseImpact": "patch",
+      "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.http/ether-http-core",
+      "mavenCoord": "dev.rafex.ether.http:ether-http-core"
+    },
+    {
+      "name": "ether-http-security",
+      "groupId": "dev.rafex.ether.http",
+      "artifactId": "ether-http-security",
+      "version": "9.5.5",
+      "deployed": true,
+      "description": "CORS policies, security headers, IP allowlisting, and rate limiting configurations",
+      "dependencies": [
+        "ether-parent"
+      ],
+      "dependencyReleaseImpact": "patch",
+      "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.http/ether-http-security",
+      "mavenCoord": "dev.rafex.ether.http:ether-http-security"
+    },
+    {
+      "name": "ether-http-problem",
+      "groupId": "dev.rafex.ether.http",
+      "artifactId": "ether-http-problem",
+      "version": "9.5.5",
+      "deployed": true,
+      "description": "RFC 7807 Problem Details error response formatting for HTTP APIs",
+      "dependencies": [
+        "ether-parent",
+        "ether-json",
+        "ether-http-core"
+      ],
+      "dependencyReleaseImpact": "patch",
+      "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.http/ether-http-problem",
+      "mavenCoord": "dev.rafex.ether.http:ether-http-problem"
+    },
+    {
+      "name": "ether-http-openapi",
+      "groupId": "dev.rafex.ether.http",
+      "artifactId": "ether-http-openapi",
+      "version": "9.5.5",
+      "deployed": true,
+      "description": "Programmatic OpenAPI 3.1 specification builder — describe your API in Java code",
+      "dependencies": [
+        "ether-parent",
+        "ether-json"
+      ],
+      "dependencyReleaseImpact": "patch",
+      "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.http/ether-http-openapi",
+      "mavenCoord": "dev.rafex.ether.http:ether-http-openapi"
+    },
+    {
+      "name": "ether-http-client",
+      "groupId": "dev.rafex.ether.http",
+      "artifactId": "ether-http-client",
+      "version": "9.5.5",
+      "deployed": true,
+      "description": "Outbound HTTP client built on java.net.http with retry and JSON parsing support",
+      "dependencies": [
+        "ether-parent",
+        "ether-json"
+      ],
+      "dependencyReleaseImpact": "patch",
+      "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.http/ether-http-client",
+      "mavenCoord": "dev.rafex.ether.http:ether-http-client"
+    },
+    {
+      "name": "ether-logging-core",
+      "groupId": "dev.rafex.ether.logging",
+      "artifactId": "ether-logging-core",
+      "version": "9.5.5",
+      "deployed": true,
+      "description": "Logging contracts and structured log support for Ether applications",
+      "dependencies": [
+        "ether-parent"
+      ],
+      "dependencyReleaseImpact": "patch",
+      "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.logging/ether-logging-core",
+      "mavenCoord": "dev.rafex.ether.logging:ether-logging-core"
+    },
+    {
+      "name": "ether-ai-core",
+      "groupId": "dev.rafex.ether.ai",
+      "artifactId": "ether-ai-core",
+      "version": "9.5.6",
+      "deployed": true,
+      "description": "AI provider contracts: ChatClient, CompletionRequest, Message abstractions",
+      "dependencies": [
+        "ether-parent"
+      ],
+      "dependencyReleaseImpact": "patch",
+      "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.ai/ether-ai-core",
+      "mavenCoord": "dev.rafex.ether.ai:ether-ai-core"
+    },
+    {
+      "name": "ether-ai-openai",
+      "groupId": "dev.rafex.ether.ai",
+      "artifactId": "ether-ai-openai",
+      "version": "9.5.5",
+      "deployed": true,
+      "description": "OpenAI provider implementation for ether-ai-core (chat completions, embeddings)",
+      "dependencies": [
+        "ether-parent",
+        "ether-json",
+        "ether-ai-core"
+      ],
+      "dependencyReleaseImpact": "patch",
+      "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.ai/ether-ai-openai",
+      "mavenCoord": "dev.rafex.ether.ai:ether-ai-openai"
+    },
+    {
+      "name": "ether-ai-deepseek",
+      "groupId": "dev.rafex.ether.ai",
+      "artifactId": "ether-ai-deepseek",
+      "version": "9.5.5",
+      "deployed": true,
+      "description": "DeepSeek provider implementation for ether-ai-core",
+      "dependencies": [
+        "ether-parent",
+        "ether-json",
+        "ether-ai-core"
+      ],
+      "dependencyReleaseImpact": "patch",
+      "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.ai/ether-ai-deepseek",
+      "mavenCoord": "dev.rafex.ether.ai:ether-ai-deepseek"
+    },
+    {
+      "name": "ether-http-jetty12",
+      "groupId": "dev.rafex.ether.http",
+      "artifactId": "ether-http-jetty12",
+      "version": "9.5.5",
+      "deployed": true,
+      "description": "Production-ready HTTP server integrating all ether-http-* modules via Jetty 12",
+      "dependencies": [
+        "ether-parent",
+        "ether-config",
+        "ether-json",
+        "ether-observability-core",
+        "ether-http-core",
+        "ether-http-security",
+        "ether-http-problem"
+      ],
+      "dependencyReleaseImpact": "patch",
+      "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.http/ether-http-jetty12",
+      "mavenCoord": "dev.rafex.ether.http:ether-http-jetty12"
+    },
+    {
+      "name": "ether-websocket-core",
+      "groupId": "dev.rafex.ether.websocket",
+      "artifactId": "ether-websocket-core",
+      "version": "9.5.5",
+      "deployed": true,
+      "description": "Transport-agnostic WebSocket contracts: Session, MessageHandler, frame types",
+      "dependencies": [
+        "ether-parent"
+      ],
+      "dependencyReleaseImpact": "patch",
+      "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.websocket/ether-websocket-core",
+      "mavenCoord": "dev.rafex.ether.websocket:ether-websocket-core"
+    },
+    {
+      "name": "ether-websocket-jetty12",
+      "groupId": "dev.rafex.ether.websocket",
+      "artifactId": "ether-websocket-jetty12",
+      "version": "9.5.5",
+      "deployed": true,
+      "description": "Jetty 12-based WebSocket server implementation of ether-websocket-core",
+      "dependencies": [
+        "ether-parent",
+        "ether-websocket-core"
+      ],
+      "dependencyReleaseImpact": "patch",
+      "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.websocket/ether-websocket-jetty12",
+      "mavenCoord": "dev.rafex.ether.websocket:ether-websocket-jetty12"
+    },
+    {
+      "name": "ether-webhook",
+      "groupId": "dev.rafex.ether.webhook",
+      "artifactId": "ether-webhook",
+      "version": "9.5.5",
+      "deployed": true,
+      "description": "Webhook delivery, signing (HMAC-SHA256), and signature verification support",
+      "dependencies": [
+        "ether-parent",
+        "ether-json",
+        "ether-http-client"
+      ],
+      "dependencyReleaseImpact": "patch",
+      "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.webhook/ether-webhook",
+      "mavenCoord": "dev.rafex.ether.webhook:ether-webhook"
+    },
+    {
+      "name": "ether-glowroot-jetty12",
+      "groupId": "dev.rafex.ether.glowroot",
+      "artifactId": "ether-glowroot-jetty12",
+      "version": "9.5.5",
+      "deployed": true,
+      "description": "Glowroot APM instrumentation plugin for Jetty 12 — zero code modification required",
+      "dependencies": [
+        "ether-parent",
+        "ether-json",
+        "ether-http-core",
+        "ether-websocket-core",
+        "ether-http-jetty12",
+        "ether-websocket-jetty12"
+      ],
+      "dependencyReleaseImpact": "patch",
+      "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.glowroot/ether-glowroot-jetty12",
+      "mavenCoord": "dev.rafex.ether.glowroot:ether-glowroot-jetty12"
+    },
+    {
+      "name": "ether-archetype",
+      "groupId": "dev.rafex.ether",
+      "artifactId": "ether-hexagonal-archetype",
+      "version": "1.0.1",
+      "deployed": true,
+      "description": "",
+      "dependencies": [
+        "ether-parent"
+      ],
+      "dependencyReleaseImpact": "patch",
+      "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether/ether-hexagonal-archetype",
+      "mavenCoord": "dev.rafex.ether:ether-hexagonal-archetype"
+    },
+    {
+      "name": "ether-brain",
+      "groupId": "dev.rafex.ether.brain",
+      "artifactId": "ether-brain-parent",
+      "version": "0.1.1",
+      "deployed": true,
+      "description": "",
+      "dependencies": [
+        "ether-parent"
+      ],
+      "dependencyReleaseImpact": "patch",
+      "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.brain/ether-brain-parent",
+      "mavenCoord": "dev.rafex.ether.brain:ether-brain-parent"
+    }
+  ]
+}

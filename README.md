@@ -14,6 +14,7 @@
 | ether-database-core | ![ether-database-core](https://img.shields.io/maven-central/v/dev.rafex.ether.database/ether-database-core) | dev.rafex.ether.database | ether-database-core | si |
 | ether-jdbc | ![ether-jdbc](https://img.shields.io/maven-central/v/dev.rafex.ether.jdbc/ether-jdbc) | dev.rafex.ether.jdbc | ether-jdbc | si |
 | ether-database-postgres | ![ether-database-postgres](https://img.shields.io/maven-central/v/dev.rafex.ether.database/ether-database-postgres) | dev.rafex.ether.database | ether-database-postgres | si |
+| ether-database-sqlite | ![ether-database-sqlite](https://img.shields.io/maven-central/v/dev.rafex.ether.database/ether-database-sqlite) | dev.rafex.ether.database | ether-database-sqlite | no |
 | ether-json | ![ether-json](https://img.shields.io/maven-central/v/dev.rafex.ether.json/ether-json) | dev.rafex.ether.json | ether-json | si |
 | ether-jwt | ![ether-jwt](https://img.shields.io/maven-central/v/dev.rafex.ether.jwt/ether-jwt) | dev.rafex.ether.jwt | ether-jwt | si |
 | ether-observability-core | ![ether-observability-core](https://img.shields.io/maven-central/v/dev.rafex.ether.observability/ether-observability-core) | dev.rafex.ether.observability | ether-observability-core | si |
@@ -479,7 +480,7 @@ flowchart LR
 ```
 
 Incluye:
-- Detección automática de cambios por submódulo (git diff)
+- Detección automática de cambios por subtree (git diff)
 - Release plan con bump semántico de versiones
 - Validación de colisiones de versión contra Maven Central
 - Despliegue en orden estricto de dependencias
@@ -489,6 +490,8 @@ Incluye:
 ---
 
 ## Cómo compilar y publicar
+
+Guía operativa completa: [Flujo de trabajo con subtrees y despliegue](docs/subtree-deployment-workflow.md).
 
 ### Instalar todo localmente
 
@@ -529,7 +532,7 @@ make publish-plan-ci
 # deploy real — todos los módulos con cambios
 make publish-ci
 
-# deploy forzado — todos los 18 módulos
+# deploy forzado — todos los módulos
 FIRST=$(git rev-list --max-parents=0 HEAD)
 make publish-ci BASE_REF=$FIRST
 ```

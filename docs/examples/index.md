@@ -26,6 +26,7 @@ En particular, los ejemplos priorizan patrones prácticos de:
 | [ether-database-core](ether-database-core.md) | DatabaseClient, SqlQuery, RowMapper — contratos de acceso a base de datos |
 | [ether-jdbc](ether-jdbc.md) | JdbcDatabaseClient, SimpleDataSource — implementación JDBC de DatabaseClient |
 | [ether-database-postgres](ether-database-postgres.md) | PostgresErrorClassifier — clasificación semántica de errores PostgreSQL |
+| [ether-database-sqlite](ether-database-sqlite.md) | SQLiteDatabaseClient, SQLiteParameters, SQLitePragmas — utilidades SQLite |
 | [ether-http-core](ether-http-core.md) | HttpExchange, HttpResource, Route, Middleware — contratos del pipeline HTTP |
 | [ether-http-security](ether-http-security.md) | HttpSecurityProfile, CORS, headers, rate limiting, IP filtering |
 | [ether-http-problem](ether-http-problem.md) | ProblemDetails (RFC 7807), ProblemException — errores HTTP estructurados |

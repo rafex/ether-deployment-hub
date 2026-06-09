@@ -191,7 +191,7 @@ while IFS= read -r module_json; do
   artifact_id=$(printf '%s' "$manifest_entry" | jq -r '.artifactId')
   version=$(printf '%s'     "$module_json"    | jq -r '.nextVersion')
 
-  # Collect sub-artifacts for multi-module projects (e.g. ether-brain submodules).
+  # Collect sub-artifacts for multi-module projects (e.g. ether-brain child modules).
   # subArtifacts share the same groupId and version as the parent artifact.
   mapfile -t sub_artifact_ids < <(printf '%s' "$manifest_entry" \
     | jq -r '.subArtifacts // [] | .[]')

@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<archetype-descriptor
+    xmlns="https://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.1.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="https://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.1.0 https://maven.apache.org/xsd/archetype-descriptor-1.1.0.xsd"
+    name="${rootArtifactId}" partial="false">
+
+    <requiredProperties>
+        <requiredProperty key="groupId">
+            <defaultValue>com.example</defaultValue>
+        </requiredProperty>
+        <requiredProperty key="artifactId">
+            <defaultValue>myapp-parent</defaultValue>
+        </requiredProperty>
+        <requiredProperty key="version">
+            <defaultValue>0.1.0-SNAPSHOT</defaultValue>
+        </requiredProperty>
+        <requiredProperty key="package">
+            <defaultValue>com.example.myapp</defaultValue>
+        </requiredProperty>
+        <requiredProperty key="javaVersion">
+            <defaultValue>21</defaultValue>
+        </requiredProperty>
+        <requiredProperty key="etherVersion">
+            <defaultValue>9.0.0</defaultValue>
+        </requiredProperty>
+    </requiredProperties>
+
+    <modules>
+        <module id="${rootArtifactId}-architecture-tests" dir="__rootArtifactId__-architecture-tests" name="${rootArtifactId}-architecture-tests">
+            <fileSets>
+                <fileSet filtered="true" packaged="false" encoding="UTF-8">
+                    <directory>src/test/java</directory>
+                    <includes>
+                        <include>**/*.java</include>
+                    </includes>
+                </fileSet>
+            </fileSets>
+        </module>
+        <module id="${rootArtifactId}-ports" dir="__rootArtifactId__-ports" name="${rootArtifactId}-ports">
+            <fileSets>
+                <fileSet filtered="true" packaged="false" encoding="UTF-8">
+                    <directory>src/main/java</directory>
+                    <includes>
+                        <include>**/*.java</include>
+                    </includes>
+                </fileSet>
+            </fileSets>
+        </module>
+        <module id="${rootArtifactId}-common" dir="__rootArtifactId__-common" name="${rootArtifactId}-common">
+            <fileSets>
+                <fileSet filtered="true" packaged="false" encoding="UTF-8">
+                    <directory>src/main/java</directory>
+                    <includes>
+                        <include>**/*.java</include>
+                    </includes>
+                </fileSet>
+            </fileSets>
+        </module>
+        <module id="${rootArtifactId}-core" dir="__rootArtifactId__-core" name="${rootArtifactId}-core">
+            <fileSets>
+                <fileSet filtered="true" packaged="false" encoding="UTF-8">
+                    <directory>src/main/java</directory>
+                    <includes>
+                        <include>**/*.java</include>
+                    </includes>
+                </fileSet>
+            </fileSets>
+        </module>
+        <module id="${rootArtifactId}-infra-postgres" dir="__rootArtifactId__-infra-postgres" name="${rootArtifactId}-infra-postgres">
+            <fileSets>
+                <fileSet filtered="true" packaged="false" encoding="UTF-8">
+                    <directory>src/main/java</directory>
+                    <includes>
+                        <include>**/*.java</include>
+                    </includes>
+                </fileSet>
+            </fileSets>
+        </module>
+        <module id="${rootArtifactId}-bootstrap" dir="__rootArtifactId__-bootstrap" name="${rootArtifactId}-bootstrap">
+            <fileSets>
+                <fileSet filtered="true" packaged="false" encoding="UTF-8">
+                    <directory>src/main/java</directory>
+                    <includes>
+                        <include>**/*.java</include>
+                    </includes>
+                </fileSet>
+            </fileSets>
+        </module>
+        <module id="${rootArtifactId}-transport-jetty" dir="__rootArtifactId__-transport-jetty" name="${rootArtifactId}-transport-jetty">
+            <fileSets>
+                <fileSet filtered="true" packaged="false" encoding="UTF-8">
+                    <directory>src/main/java</directory>
+                    <includes>
+                        <include>**/*.java</include>
+                    </includes>
+                </fileSet>
+                <fileSet filtered="true" encoding="UTF-8">
+                    <directory>src/main/resources</directory>
+                    <includes>
+                        <include>**/*.properties</include>
+                    </includes>
+                </fileSet>
+            </fileSets>
+        </module>
+        <module id="${rootArtifactId}-transport-grpc" dir="__rootArtifactId__-transport-grpc" name="${rootArtifactId}-transport-grpc">
+            <fileSets>
+                <fileSet filtered="true" packaged="false" encoding="UTF-8">
+                    <directory>src/main/java</directory>
+                    <includes>
+                        <include>**/*.java</include>
+                    </includes>
+                </fileSet>
+            </fileSets>
+        </module>
+        <module id="${rootArtifactId}-transport-rabbitmq" dir="__rootArtifactId__-transport-rabbitmq" name="${rootArtifactId}-transport-rabbitmq">
+            <fileSets>
+                <fileSet filtered="true" packaged="false" encoding="UTF-8">
+                    <directory>src/main/java</directory>
+                    <includes>
+                        <include>**/*.java</include>
+                    </includes>
+                </fileSet>
+            </fileSets>
+        </module>
+        <module id="${rootArtifactId}-tools" dir="__rootArtifactId__-tools" name="${rootArtifactId}-tools">
+            <fileSets>
+                <fileSet filtered="true" packaged="false" encoding="UTF-8">
+                    <directory>src/main/java</directory>
+                    <includes>
+                        <include>**/*.java</include>
+                    </includes>
+                </fileSet>
+            </fileSets>
+        </module>
+    </modules>
+
+    <fileSets>
+        <!-- Config files (static) -->
+        <fileSet filtered="false" encoding="UTF-8">
+            <directory>config/checkstyle</directory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+        </fileSet>
+        <fileSet filtered="false" encoding="UTF-8">
+            <directory>config/owasp</directory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+        </fileSet>
+        <fileSet filtered="true" encoding="UTF-8">
+            <directory>config/spotless</directory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+        </fileSet>
+
+        <!-- Maven wrapper (static — binary-safe scripts) -->
+        <fileSet filtered="false" encoding="UTF-8">
+            <directory></directory>
+            <includes>
+                <include>mvnw</include>
+                <include>mvnw.cmd</include>
+            </includes>
+        </fileSet>
+        <fileSet filtered="false" encoding="UTF-8">
+            <directory>.mvn/wrapper</directory>
+            <includes>
+                <include>maven-wrapper.properties</include>
+            </includes>
+        </fileSet>
+
+        <!-- Build system (make) and task runner (just) -->
+        <fileSet filtered="true" encoding="UTF-8">
+            <directory></directory>
+            <includes>
+                <include>Makefile</include>
+                <include>Justfile</include>
+            </includes>
+        </fileSet>
+
+        <!-- Note: .gitignore files are created by archetype-post-generate.groovy
+             because maven-archetype-plugin silently skips dot-files in fileSets. -->
+    </fileSets>
+
+</archetype-descriptor>

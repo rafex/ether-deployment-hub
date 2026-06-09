@@ -1,0 +1,641 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>dev.rafex.ether.parent</groupId>
+	<artifactId>ether-parent</artifactId>
+	<version>9.5.5-SNAPSHOT</version>
+
+	<packaging>pom</packaging>
+	<name>${project.artifactId}</name>
+
+	<description>
+		Colección de utilidades ligeras y modulares para crear, configurar y
+		desplegar microservicios en Java sin necesidad de frameworks pesados.
+		Incluye componentes reutilizables de JSON, gestión de propiedades, JDBC,
+		email, CLI y más, facilitando la implementación ágil y estandarizada de
+		servicios REST.
+	</description>
+
+	<url>https://rafex.dev/ether/parent</url>
+
+	<licenses>
+		<license>
+			<name>MIT License</name>
+			<url>https://opensource.org/license/mit/</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<issueManagement>
+		<system>GitHub Issues</system>
+		<url>https://github.com/rafex/ether-parent/issues</url>
+	</issueManagement>
+
+	<developers>
+		<developer>
+			<name>Raúl Eduardo González Argote</name>
+			<email>rafex@rafex.dev</email>
+			<organization>dev.rafex</organization>
+			<organizationUrl>https://rafex.dev</organizationUrl>
+		</developer>
+	</developers>
+
+	<scm>
+		<connection>scm:git:https://github.com/rafex/ether-parent.git</connection>
+		<developerConnection>scm:git:https://github.com/rafex/ether-parent.git</developerConnection>
+		<url>https://github.com/rafex/ether-parent</url>
+	</scm>
+
+	<properties>
+		<java.version>25</java.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+		<maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
+		<maven-surefire-plugin.version>3.5.5</maven-surefire-plugin.version>
+		<maven-jar-plugin.version>3.5.0</maven-jar-plugin.version>
+		<maven-install-plugin.version>3.1.4</maven-install-plugin.version>
+		<maven-deploy-plugin.version>3.1.4</maven-deploy-plugin.version>
+		<maven-clean-plugin.version>3.5.0</maven-clean-plugin.version>
+		<maven-resources-plugin.version>3.5.0</maven-resources-plugin.version>
+		<maven-site-plugin.version>4.0.0-M16</maven-site-plugin.version>
+		<maven-project-info-reports-plugin.version>3.9.0</maven-project-info-reports-plugin.version>
+		<maven-assembly-plugin.version>3.8.0</maven-assembly-plugin.version>
+		<maven-source-plugin.version>3.4.0</maven-source-plugin.version>
+		<maven-javadoc-plugin.version>3.12.0</maven-javadoc-plugin.version>
+		<maven-gpg-plugin.version>3.2.8</maven-gpg-plugin.version>
+		<maven-enforcer-plugin.version>3.6.2</maven-enforcer-plugin.version>
+		<maven-release-plugin.version>3.3.1</maven-release-plugin.version>
+		<flatten-maven-plugin.version>1.7.0</flatten-maven-plugin.version>
+
+		<license-maven-plugin.version>2.7.1</license-maven-plugin.version>
+		<central-publishing-maven-plugin.version>0.10.0</central-publishing-maven-plugin.version>
+		<central.waitUntil>published</central.waitUntil>
+		<json-schema-validator.version>1.5.9</json-schema-validator.version>
+		<commons-lang3.version>3.20.0</commons-lang3.version>
+		<jakarta.mail-api.version>2.1.5</jakarta.mail-api.version>
+		<guice.version>7.0.0</guice.version>
+		<junit-bom.version>5.14.3</junit-bom.version>
+		<netty.version>4.1.131.Final</netty.version>
+		<jackson.version>2.21.2</jackson.version>
+		<jetty.version>12.1.7</jetty.version>
+		<!--
+			GlowRoot API — decisión de versión (opción B):
+			La última versión estable (0.14.5) tiene soporte para JDK 25 pero NO está publicada
+			en Maven Central; solo se distribuye como ZIP en GitHub Releases.
+			Se mantiene 0.14.0-beta.3 (la última en Central) como dependencia de COMPILACIÓN únicamente.
+			Esto es seguro porque glowroot-agent-api es compile-only: sus anotaciones e interfaces
+			son binariamente compatibles entre versiones.
+			Para RUNTIME se debe usar el agente glowroot.jar >= 0.14.5 (descargable de GitHub Releases).
+			Nota: con JDK 24+ se requiere la flag -XX:+EnableDynamicAgentLoading al arrancar la JVM
+			cuando se adjunta el agente de GlowRoot dinámicamente.
+			Seguimiento: https://github.com/glowroot/glowroot/releases/tag/v0.14.5
+		-->
+		<glowroot-agent-api.version>0.14.0-beta.3</glowroot-agent-api.version>
+		<versions-maven-plugin.version>2.21.0</versions-maven-plugin.version>
+
+		<ether-config.version>9.5.5-SNAPSHOT</ether-config.version>
+		<ether-crypto.version>9.5.5-SNAPSHOT</ether-crypto.version>
+		<ether-database-core.version>9.5.5-SNAPSHOT</ether-database-core.version>
+		<ether-jdbc.version>9.5.5-SNAPSHOT</ether-jdbc.version>
+		<ether-database-postgres.version>9.5.5-SNAPSHOT</ether-database-postgres.version>
+		<ether-database-sqlite.version>9.5.5-SNAPSHOT</ether-database-sqlite.version>
+		<ether-json.version>9.5.5-SNAPSHOT</ether-json.version>
+		<ether-jwt.version>9.5.5-SNAPSHOT</ether-jwt.version>
+		<ether-observability-core.version>9.5.5-SNAPSHOT</ether-observability-core.version>
+		<ether-http-core.version>9.5.5-SNAPSHOT</ether-http-core.version>
+		<ether-http-security.version>9.5.5-SNAPSHOT</ether-http-security.version>
+		<ether-http-problem.version>9.5.5-SNAPSHOT</ether-http-problem.version>
+		<ether-http-openapi.version>9.5.5-SNAPSHOT</ether-http-openapi.version>
+		<ether-http-client.version>9.5.5-SNAPSHOT</ether-http-client.version>
+		<ether-ai-core.version>9.5.5-SNAPSHOT</ether-ai-core.version>
+		<ether-ai-openai.version>9.5.5-SNAPSHOT</ether-ai-openai.version>
+		<ether-ai-deepseek.version>9.5.5-SNAPSHOT</ether-ai-deepseek.version>
+		<ether-logging-core.version>9.5.5-SNAPSHOT</ether-logging-core.version>
+		<ether-http-jetty12.version>9.5.5-SNAPSHOT</ether-http-jetty12.version>
+		<ether-websocket-core.version>9.5.5-SNAPSHOT</ether-websocket-core.version>
+		<ether-websocket-jetty12.version>9.5.5-SNAPSHOT</ether-websocket-jetty12.version>
+		<ether-webhook.version>9.5.5-SNAPSHOT</ether-webhook.version>
+		<ether-glowroot-jetty12.version>9.5.5-SNAPSHOT</ether-glowroot-jetty12.version>
+		<ether-hexagonal-archetype.version>1.0.0-SNAPSHOT</ether-hexagonal-archetype.version>
+		<ether-brain-parent.version>0.1.0-SNAPSHOT</ether-brain-parent.version>
+		<ether-di.version>1.0.0-SNAPSHOT</ether-di.version>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+
+			<!-- Test -->
+			<dependency>
+				<groupId>org.junit</groupId>
+				<artifactId>junit-bom</artifactId>
+				<version>${junit-bom.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<!-- Test -->
+
+			<!-- 3er -->
+			<dependency>
+				<groupId>com.fasterxml.jackson</groupId>
+				<artifactId>jackson-bom</artifactId>
+				<version>${jackson.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.google.inject</groupId>
+				<artifactId>guice</artifactId>
+				<version>${guice.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.networknt</groupId>
+				<artifactId>json-schema-validator</artifactId>
+				<version>${json-schema-validator.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>jakarta.mail</groupId>
+				<artifactId>jakarta.mail-api</artifactId>
+				<version>${jakarta.mail-api.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-lang3</artifactId>
+				<version>${commons-lang3.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.netty</groupId>
+				<artifactId>netty-codec-http</artifactId>
+				<version>${netty.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.netty</groupId>
+				<artifactId>netty-handler</artifactId>
+				<version>${netty.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-server</artifactId>
+				<version>${jetty.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.eclipse.jetty.websocket</groupId>
+				<artifactId>jetty-websocket-jetty-api</artifactId>
+				<version>${jetty.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.eclipse.jetty.websocket</groupId>
+				<artifactId>jetty-websocket-jetty-server</artifactId>
+				<version>${jetty.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.glowroot</groupId>
+				<artifactId>glowroot-agent-api</artifactId>
+				<version>${glowroot-agent-api.version}</version>
+			</dependency>
+			<!-- 3er -->
+
+			<!-- Ether -->
+			<dependency>
+				<groupId>dev.rafex.ether.config</groupId>
+				<artifactId>ether-config</artifactId>
+				<version>${ether-config.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>dev.rafex.ether.crypto</groupId>
+				<artifactId>ether-crypto</artifactId>
+				<version>${ether-crypto.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>dev.rafex.ether.database</groupId>
+				<artifactId>ether-database-core</artifactId>
+				<version>${ether-database-core.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>dev.rafex.ether.jdbc</groupId>
+				<artifactId>ether-jdbc</artifactId>
+				<version>${ether-jdbc.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>dev.rafex.ether.database</groupId>
+				<artifactId>ether-database-postgres</artifactId>
+				<version>${ether-database-postgres.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>dev.rafex.ether.database</groupId>
+				<artifactId>ether-database-sqlite</artifactId>
+				<version>${ether-database-sqlite.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>dev.rafex.ether.json</groupId>
+				<artifactId>ether-json</artifactId>
+				<version>${ether-json.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>dev.rafex.ether.di</groupId>
+				<artifactId>ether-di</artifactId>
+				<version>${ether-di.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>dev.rafex.ether.jwt</groupId>
+				<artifactId>ether-jwt</artifactId>
+				<version>${ether-jwt.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>dev.rafex.ether.observability</groupId>
+				<artifactId>ether-observability-core</artifactId>
+				<version>${ether-observability-core.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>dev.rafex.ether.http</groupId>
+				<artifactId>ether-http-core</artifactId>
+				<version>${ether-http-core.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>dev.rafex.ether.http</groupId>
+				<artifactId>ether-http-security</artifactId>
+				<version>${ether-http-security.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>dev.rafex.ether.http</groupId>
+				<artifactId>ether-http-problem</artifactId>
+				<version>${ether-http-problem.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>dev.rafex.ether.http</groupId>
+				<artifactId>ether-http-openapi</artifactId>
+				<version>${ether-http-openapi.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>dev.rafex.ether.http</groupId>
+				<artifactId>ether-http-client</artifactId>
+				<version>${ether-http-client.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>dev.rafex.ether.ai</groupId>
+				<artifactId>ether-ai-core</artifactId>
+				<version>${ether-ai-core.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>dev.rafex.ether.ai</groupId>
+				<artifactId>ether-ai-openai</artifactId>
+				<version>${ether-ai-openai.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>dev.rafex.ether.ai</groupId>
+				<artifactId>ether-ai-deepseek</artifactId>
+				<version>${ether-ai-deepseek.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>dev.rafex.ether.logging</groupId>
+				<artifactId>ether-logging-core</artifactId>
+				<version>${ether-logging-core.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>dev.rafex.ether.http</groupId>
+				<artifactId>ether-http-jetty12</artifactId>
+				<version>${ether-http-jetty12.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>dev.rafex.ether.websocket</groupId>
+				<artifactId>ether-websocket-core</artifactId>
+				<version>${ether-websocket-core.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>dev.rafex.ether.websocket</groupId>
+				<artifactId>ether-websocket-jetty12</artifactId>
+				<version>${ether-websocket-jetty12.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>dev.rafex.ether.webhook</groupId>
+				<artifactId>ether-webhook</artifactId>
+				<version>${ether-webhook.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>dev.rafex.ether.glowroot</groupId>
+				<artifactId>ether-glowroot-jetty12</artifactId>
+				<version>${ether-glowroot-jetty12.version}</version>
+			</dependency>
+			<!-- Ether -->
+
+		</dependencies>
+	</dependencyManagement>
+
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-clean-plugin</artifactId>
+					<version>${maven-clean-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>${maven-resources-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>${maven-compiler-plugin.version}</version>
+					<configuration>
+						<source>${java.version}</source>
+						<target>${java.version}</target>
+						<release>${java.version}</release>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>${maven-surefire-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>${maven-jar-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-install-plugin</artifactId>
+					<version>${maven-install-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-deploy-plugin</artifactId>
+					<version>${maven-deploy-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+					<version>${maven-source-plugin.version}</version>
+					<executions>
+						<execution>
+							<id>attach-sources</id>
+							<goals>
+								<goal>jar-no-fork</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<version>${maven-javadoc-plugin.version}</version>
+					<configuration>
+						<!-- Parámetros válidos para jar / javadoc / test-jar -->
+						<source>${java.version}</source>
+						<release>${java.version}</release>
+						<doclint>none</doclint>
+						<quiet>true</quiet>
+						<failOnWarnings>false</failOnWarnings>
+					</configuration>
+					<executions>
+						<execution>
+							<id>attach-javadocs</id>
+							<goals>
+								<goal>jar</goal>
+							</goals>
+						</execution>
+						<execution>
+							<!-- javadoc:fix — genera stubs deterministas en el código fuente.
+							     phase=none → no corre automáticamente; se invoca manualmente
+							     con: mvn javadoc:fix -->
+							<id>fix-javadoc-stubs</id>
+							<phase>none</phase>
+							<goals>
+								<goal>fix</goal>
+							</goals>
+							<configuration>
+								<fixTags>param,return,throws,link</fixTags>
+								<level>public</level>
+								<defaultAuthor>Raúl Eduardo González Argote</defaultAuthor>
+								<defaultSince>${project.version}</defaultSince>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-enforcer-plugin</artifactId>
+					<version>${maven-enforcer-plugin.version}</version>
+					<executions>
+						<execution>
+							<id>enforce-java</id>
+							<goals>
+								<goal>enforce</goal>
+							</goals>
+							<configuration>
+								<rules>
+									<requireJavaVersion>
+										<version>${java.version}</version>
+									</requireJavaVersion>
+								</rules>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-gpg-plugin</artifactId>
+					<version>${maven-gpg-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-site-plugin</artifactId>
+					<version>${maven-site-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-project-info-reports-plugin</artifactId>
+					<version>${maven-project-info-reports-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-release-plugin</artifactId>
+					<version>${maven-release-plugin.version}</version>
+					<configuration>
+						<!-- Cómo formatear el nombre del tag -->
+						<tagNameFormat>v@{project.version}</tagNameFormat>
+						<!-- Si quieres que empuje automáticamente los commits y
+						tags -->
+						<pushChanges>true</pushChanges>
+						<!-- Comentario para los commits de versión -->
+						<scmCommentPrefix>[release]</scmCommentPrefix>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.sonatype.central</groupId>
+					<artifactId>central-publishing-maven-plugin</artifactId>
+					<version>${central-publishing-maven-plugin.version}</version>
+					<extensions>true</extensions>
+					<configuration>
+						<publishingServerId>central</publishingServerId>
+						<autoPublish>true</autoPublish>
+						<waitUntil>${central.waitUntil}</waitUntil>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>versions-maven-plugin</artifactId>
+					<version>${versions-maven-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>license-maven-plugin</artifactId>
+					<version>${license-maven-plugin.version}</version>
+						<configuration>
+							<licenseName>mit</licenseName>
+							<organizationName>Raúl Eduardo González Argote</organizationName>
+							<inceptionYear>2025</inceptionYear>
+							<projectName>${project.name}</projectName>
+
+						<!-- Configuración específica para resolver el problema -->
+						<roots>
+							<root>${project.basedir}/src/main/java</root>
+							<root>${project.basedir}/src/test/java</root>
+						</roots>
+
+						<includes>
+							<include>**/*.java</include>
+						</includes>
+
+							<excludes>
+								<exclude>**/generated/**</exclude>
+								<exclude>**/target/**</exclude>
+							</excludes>
+						</configuration>
+						<executions>
+						<execution>
+							<id>update-licenses</id>
+							<phase>generate-sources</phase>
+							<goals>
+								<goal>update-file-header</goal>
+								<goal>update-project-license</goal>
+							</goals>
+						</execution>
+							<execution>
+								<id>check-license</id>
+								<goals>
+									<goal>check-file-header</goal>
+								</goals>
+								<phase>validate</phase>
+								<configuration>
+									<failOnMissingHeader>true</failOnMissingHeader>
+								</configuration>
+							</execution>
+						<execution>
+							<id>add-license</id>
+							<goals>
+								<goal>update-file-header</goal>
+							</goals>
+							<phase>process-sources</phase>
+						</execution>
+					</executions>
+				</plugin>
+				<!-- Flatten POMs before staging so Central's validator sees all
+				     inherited fields (description, url, licenses, scm, developers)
+				     and resolved dependency versions directly in each module POM.
+				     Without this, Central validates raw pom.xml and cannot resolve
+				     parent-chain inheritance from a first-time upload. -->
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>flatten-maven-plugin</artifactId>
+					<version>${flatten-maven-plugin.version}</version>
+					<configuration>
+						<updatePomFile>true</updatePomFile>
+						<flattenMode>ossrh</flattenMode>
+					</configuration>
+					<executions>
+						<execution>
+							<id>flatten</id>
+							<phase>process-resources</phase>
+							<goals><goal>flatten</goal></goals>
+						</execution>
+						<execution>
+							<id>flatten.clean</id>
+							<phase>clean</phase>
+							<goals><goal>clean</goal></goals>
+						</execution>
+					</executions>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>flatten-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>${maven-javadoc-plugin.version}</version>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>javadoc</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+				<version>${maven-project-info-reports-plugin.version}</version>
+			</plugin>
+		</plugins>
+	</reporting>
+
+	<profiles>
+		<profile>
+			<id>deploy</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.sonatype.central</groupId>
+						<artifactId>central-publishing-maven-plugin</artifactId>
+						<extensions>true</extensions>
+						<configuration>
+							<publishingServerId>central</publishingServerId>
+							<autoPublish>true</autoPublish>
+							<waitUntil>${central.waitUntil}</waitUntil>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<gpgArguments>
+								<arg>--pinentry-mode</arg>
+								<arg>loopback</arg>
+							</gpgArguments>
+							<useAgent>false</useAgent>
+							<passphrase>${gpg.passphrase}</passphrase>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>license-maven-plugin</artifactId>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+</project>
