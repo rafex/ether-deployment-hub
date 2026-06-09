@@ -46,7 +46,7 @@
       "pomPath": "ether-parent/ether-parent/pom.xml",
       "groupId": "dev.rafex.ether.parent",
       "artifactId": "ether-parent",
-      "currentVersion": "9.6.3",
+      "currentVersion": "9.6.4",
       "published": true,
       "usesParent": false,
       "dependencies": [],
@@ -148,7 +148,7 @@
       "groupId": "dev.rafex.ether.database",
       "artifactId": "ether-database-sqlite",
       "currentVersion": "9.5.5",
-      "published": false,
+      "published": true,
       "usesParent": true,
       "dependencies": [
         "ether-parent",
