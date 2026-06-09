@@ -4,7 +4,7 @@
     "groupId": "dev.rafex.ether.parent",
     "artifactId": "ether-parent",
     "deployed": true,
-    "latestVersion": "9.6.3",
+    "latestVersion": "9.6.4",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.parent/ether-parent"
   },
@@ -57,10 +57,10 @@
     "module": "ether-database-sqlite",
     "groupId": "dev.rafex.ether.database",
     "artifactId": "ether-database-sqlite",
-    "deployed": false,
-    "latestVersion": "",
+    "deployed": true,
+    "latestVersion": "9.5.5",
     "lastUpdatedUtc": "",
-    "artifactUrl": "https://central.sonatype.com/search?q=ether-database-sqlite"
+    "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.database/ether-database-sqlite"
   },
   {
     "module": "ether-json",
