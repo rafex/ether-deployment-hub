@@ -50,58 +50,107 @@ while IFS= read -r module_json; do
 
   name="$(printf '%s' "$module_json" | jq -r '.name')"
   group_id="$(printf '%s' "$module_json" | jq -r '.groupId')"
-  artifact_id="$(printf '%s' "$module_json" | jq -r '.artifactId')"
   version="$(printf '%s' "$module_json" | jq -r '.nextVersion')"
-  group_path="${group_id//./\/}"
-  pom_url="${REPO_URL%/}/${group_path}/${artifact_id}/${version}/${artifact_id}-${version}.pom"
-  sonatype_url="https://central.sonatype.com/artifact/${group_id}/${artifact_id}"
-  code="$(http_code_with_retry "$pom_url")"
 
-  status="unknown"
-  collision=false
-  case "$code" in
-    200)
-      status="already_published"
-      if [ "$ALLOW_EXISTING" = "true" ]; then
+  if [ -z "$group_id" ] || [ "$group_id" = "null" ]; then
+    jq -n \
+      --arg name "$name" \
+      --arg groupId "$group_id" \
+      --arg artifactId "" \
+      --arg version "$version" \
+      '{
+        name: $name,
+        groupId: $groupId,
+        artifactId: $artifactId,
+        version: $version,
+        pomUrl: null,
+        sonatypeUrl: null,
+        httpCode: "000",
+        status: "missing_group_id",
+        collision: true
+      }' >> "$tmp_results"
+    continue
+  fi
+
+  while IFS= read -r artifact_entry; do
+    artifact_name="$(printf '%s' "$artifact_entry" | jq -r '.name')"
+    artifact_id="$(printf '%s' "$artifact_entry" | jq -r '.artifactId')"
+
+    if [ -z "$artifact_id" ] || [ "$artifact_id" = "null" ]; then
+      jq -n \
+        --arg name "$artifact_name" \
+        --arg groupId "$group_id" \
+        --arg artifactId "$artifact_id" \
+        --arg version "$version" \
+        '{
+          name: $name,
+          groupId: $groupId,
+          artifactId: $artifactId,
+          version: $version,
+          pomUrl: null,
+          sonatypeUrl: null,
+          httpCode: "000",
+          status: "missing_artifact_id",
+          collision: true
+        }' >> "$tmp_results"
+      continue
+    fi
+
+    group_path="${group_id//./\/}"
+    pom_url="${REPO_URL%/}/${group_path}/${artifact_id}/${version}/${artifact_id}-${version}.pom"
+    sonatype_url="https://central.sonatype.com/artifact/${group_id}/${artifact_id}"
+    code="$(http_code_with_retry "$pom_url")"
+
+    status="unknown"
+    collision=false
+    case "$code" in
+      200)
+        status="already_published"
+        if [ "$ALLOW_EXISTING" = "true" ]; then
+          collision=false
+        else
+          collision=true
+        fi
+        ;;
+      404)
+        status="available"
         collision=false
-      else
+        ;;
+      *)
+        status="lookup_error"
         collision=true
-      fi
-      ;;
-    404)
-      status="available"
-      collision=false
-      ;;
-    *)
-      status="lookup_error"
-      collision=true
-      ;;
-  esac
+        ;;
+    esac
 
-  jq -n \
-    --arg name "$name" \
-    --arg groupId "$group_id" \
-    --arg artifactId "$artifact_id" \
-    --arg version "$version" \
-    --arg pomUrl "$pom_url" \
-    --arg sonatypeUrl "$sonatype_url" \
-    --arg httpCode "$code" \
-    --arg status "$status" \
-    --argjson collision "$collision" \
-    '{
-      name: $name,
-      groupId: $groupId,
-      artifactId: $artifactId,
-      version: $version,
-      pomUrl: $pomUrl,
-      sonatypeUrl: $sonatypeUrl,
-      httpCode: $httpCode,
-      status: $status,
-      collision: $collision
-    }' >> "$tmp_results"
+    jq -n \
+      --arg name "$artifact_name" \
+      --arg groupId "$group_id" \
+      --arg artifactId "$artifact_id" \
+      --arg version "$version" \
+      --arg pomUrl "$pom_url" \
+      --arg sonatypeUrl "$sonatype_url" \
+      --arg httpCode "$code" \
+      --arg status "$status" \
+      --argjson collision "$collision" \
+      '{
+        name: $name,
+        groupId: $groupId,
+        artifactId: $artifactId,
+        version: $version,
+        pomUrl: $pomUrl,
+        sonatypeUrl: $sonatypeUrl,
+        httpCode: $httpCode,
+        status: $status,
+        collision: $collision
+      }' >> "$tmp_results"
+  done < <(printf '%s' "$module_json" | jq -c '
+    [{name: .name, artifactId: .artifactId}]
+    + ((.subArtifacts // []) | map({name: (. as $artifact | "\($artifact)"), artifactId: .}))
+    | .[]
+  ')
 done < <(jq -c '
   .modules[]
-  | {name, groupId, artifactId, nextVersion, releaseLevel}
+  | {name, groupId, artifactId, subArtifacts, nextVersion, releaseLevel}
 ' "$PLAN_PATH")
 
 results_json="$(jq -s '.' "$tmp_results")"

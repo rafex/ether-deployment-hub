@@ -94,6 +94,10 @@ jq -c '.modules[]' "$MANIFEST_PATH" | while IFS= read -r module_json; do
   jq -n \
     --arg name "$name" \
     --arg path "$path" \
+    --arg projectDir "$(printf '%s' "$module_json" | jq -r '.projectDir // ""')" \
+    --arg pomPath "$(printf '%s' "$module_json" | jq -r '.pomPath // ""')" \
+    --arg groupId "$(printf '%s' "$module_json" | jq -r '.groupId // ""')" \
+    --arg artifactId "$(printf '%s' "$module_json" | jq -r '.artifactId // ""')" \
     --arg currentVersion "$current_version" \
     --arg nextVersion "$next_version" \
     --arg level "$level" \
@@ -102,11 +106,16 @@ jq -c '.modules[]' "$MANIFEST_PATH" | while IFS= read -r module_json; do
     --argjson directChanged "$direct_changed" \
     --argjson directChangedFiles "$direct_files_json" \
     --argjson dependencies "$(printf '%s' "$module_json" | jq -c '.dependencies // []')" \
+    --argjson subArtifacts "$(printf '%s' "$module_json" | jq -c '.subArtifacts // []')" \
     --argjson reasons "$(printf '%s\n' "${reasons[@]:-}" | jq -R . | jq -s 'map(select(length > 0))')" \
     --argjson commits "$commits_json" \
     '{
       name: $name,
       path: $path,
+      projectDir: (if $projectDir == "" then null else $projectDir end),
+      pomPath: (if $pomPath == "" then null else $pomPath end),
+      groupId: (if $groupId == "" then null else $groupId end),
+      artifactId: (if $artifactId == "" then null else $artifactId end),
       currentVersion: $currentVersion,
       nextVersion: $nextVersion,
       published: ($publishedRaw == "true"),
@@ -114,6 +123,7 @@ jq -c '.modules[]' "$MANIFEST_PATH" | while IFS= read -r module_json; do
       directChanged: $directChanged,
       directChangedFiles: $directChangedFiles,
       dependencies: $dependencies,
+      subArtifacts: $subArtifacts,
       dependencyReleaseImpact: $dependencyImpact,
       reasons: $reasons,
       commits: $commits
