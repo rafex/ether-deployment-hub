@@ -29,6 +29,7 @@ jobs:
     timeout-minutes: 10
     outputs:
       maven_central_run_id: ${{ steps.run-id.outputs.run_id }}
+      has_maven_artifacts: ${{ steps.artifacts.outputs.has_maven_artifacts }}
       selected_count: ${{ steps.plan.outputs.selected_count }}
       level0: ${{ steps.plan.outputs.level0 }}
       level1: ${{ steps.plan.outputs.level1 }}
@@ -58,6 +59,25 @@ jobs:
             echo "run_id=${{ inputs.maven_central_run_id }}" >> "$GITHUB_OUTPUT"
           else
             echo "run_id=${{ github.event.workflow_run.id }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Detect Maven artifacts from Maven Central run
+        id: artifacts
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          artifact_names="$(
+            gh api \
+              "repos/${{ github.repository }}/actions/runs/${{ steps.run-id.outputs.run_id }}/artifacts" \
+              --paginate \
+              --jq '.artifacts[].name' || true
+          )"
+          if printf '%s\n' "$artifact_names" | grep -q '^maven-artifacts-level-'; then
+            echo "has_maven_artifacts=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No Maven artifacts found; treating upstream run as dry-run."
+            echo "has_maven_artifacts=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Download release plan from Maven Central run
@@ -102,7 +122,7 @@ jobs:
   # ── L0 ────────────────────────────────────────────────────────────────────────
   deploy-gh-packages-level-0:
     needs: setup
-    if: ${{ needs.setup.outputs.selected_count != '0' && needs.setup.outputs.level0 != '[]' }}
+    if: ${{ needs.setup.outputs.selected_count != '0' && needs.setup.outputs.has_maven_artifacts == 'true' && needs.setup.outputs.level0 != '[]' }}
     uses: ./.github/workflows/deploy-github-packages-one-level.yml
     with:
       modules_json: ${{ needs.setup.outputs.level0 }}
@@ -115,7 +135,7 @@ jobs:
   # ── L1 ────────────────────────────────────────────────────────────────────────
   deploy-gh-packages-level-1:
     needs: [setup, deploy-gh-packages-level-0]
-    if: ${{ needs.setup.outputs.level1 != '[]' && (needs.deploy-gh-packages-level-0.result == 'success' || needs.deploy-gh-packages-level-0.result == 'skipped') }}
+    if: ${{ needs.setup.outputs.has_maven_artifacts == 'true' && needs.setup.outputs.level1 != '[]' && (needs.deploy-gh-packages-level-0.result == 'success' || needs.deploy-gh-packages-level-0.result == 'skipped') }}
     uses: ./.github/workflows/deploy-github-packages-one-level.yml
     with:
       modules_json: ${{ needs.setup.outputs.level1 }}
@@ -128,7 +148,7 @@ jobs:
   # ── L2 ────────────────────────────────────────────────────────────────────────
   deploy-gh-packages-level-2:
     needs: [setup, deploy-gh-packages-level-1]
-    if: ${{ needs.setup.outputs.level2 != '[]' && (needs.deploy-gh-packages-level-1.result == 'success' || needs.deploy-gh-packages-level-1.result == 'skipped') }}
+    if: ${{ needs.setup.outputs.has_maven_artifacts == 'true' && needs.setup.outputs.level2 != '[]' && (needs.deploy-gh-packages-level-1.result == 'success' || needs.deploy-gh-packages-level-1.result == 'skipped') }}
     uses: ./.github/workflows/deploy-github-packages-one-level.yml
     with:
       modules_json: ${{ needs.setup.outputs.level2 }}
@@ -141,7 +161,7 @@ jobs:
   # ── L3 ────────────────────────────────────────────────────────────────────────
   deploy-gh-packages-level-3:
     needs: [setup, deploy-gh-packages-level-2]
-    if: ${{ needs.setup.outputs.level3 != '[]' && (needs.deploy-gh-packages-level-2.result == 'success' || needs.deploy-gh-packages-level-2.result == 'skipped') }}
+    if: ${{ needs.setup.outputs.has_maven_artifacts == 'true' && needs.setup.outputs.level3 != '[]' && (needs.deploy-gh-packages-level-2.result == 'success' || needs.deploy-gh-packages-level-2.result == 'skipped') }}
     uses: ./.github/workflows/deploy-github-packages-one-level.yml
     with:
       modules_json: ${{ needs.setup.outputs.level3 }}
@@ -154,7 +174,7 @@ jobs:
   # ── L4 ────────────────────────────────────────────────────────────────────────
   deploy-gh-packages-level-4:
     needs: [setup, deploy-gh-packages-level-3]
-    if: ${{ needs.setup.outputs.level4 != '[]' && (needs.deploy-gh-packages-level-3.result == 'success' || needs.deploy-gh-packages-level-3.result == 'skipped') }}
+    if: ${{ needs.setup.outputs.has_maven_artifacts == 'true' && needs.setup.outputs.level4 != '[]' && (needs.deploy-gh-packages-level-3.result == 'success' || needs.deploy-gh-packages-level-3.result == 'skipped') }}
     uses: ./.github/workflows/deploy-github-packages-one-level.yml
     with:
       modules_json: ${{ needs.setup.outputs.level4 }}
@@ -167,7 +187,7 @@ jobs:
   # ── L5 ────────────────────────────────────────────────────────────────────────
   deploy-gh-packages-level-5:
     needs: [setup, deploy-gh-packages-level-4]
-    if: ${{ needs.setup.outputs.level5 != '[]' && (needs.deploy-gh-packages-level-4.result == 'success' || needs.deploy-gh-packages-level-4.result == 'skipped') }}
+    if: ${{ needs.setup.outputs.has_maven_artifacts == 'true' && needs.setup.outputs.level5 != '[]' && (needs.deploy-gh-packages-level-4.result == 'success' || needs.deploy-gh-packages-level-4.result == 'skipped') }}
     uses: ./.github/workflows/deploy-github-packages-one-level.yml
     with:
       modules_json: ${{ needs.setup.outputs.level5 }}
@@ -180,7 +200,7 @@ jobs:
   # ── L6 ────────────────────────────────────────────────────────────────────────
   deploy-gh-packages-level-6:
     needs: [setup, deploy-gh-packages-level-5]
-    if: ${{ needs.setup.outputs.level6 != '[]' && (needs.deploy-gh-packages-level-5.result == 'success' || needs.deploy-gh-packages-level-5.result == 'skipped') }}
+    if: ${{ needs.setup.outputs.has_maven_artifacts == 'true' && needs.setup.outputs.level6 != '[]' && (needs.deploy-gh-packages-level-5.result == 'success' || needs.deploy-gh-packages-level-5.result == 'skipped') }}
     uses: ./.github/workflows/deploy-github-packages-one-level.yml
     with:
       modules_json: ${{ needs.setup.outputs.level6 }}
@@ -193,7 +213,7 @@ jobs:
   # ── L7 ────────────────────────────────────────────────────────────────────────
   deploy-gh-packages-level-7:
     needs: [setup, deploy-gh-packages-level-6]
-    if: ${{ needs.setup.outputs.level7 != '[]' && (needs.deploy-gh-packages-level-6.result == 'success' || needs.deploy-gh-packages-level-6.result == 'skipped') }}
+    if: ${{ needs.setup.outputs.has_maven_artifacts == 'true' && needs.setup.outputs.level7 != '[]' && (needs.deploy-gh-packages-level-6.result == 'success' || needs.deploy-gh-packages-level-6.result == 'skipped') }}
     uses: ./.github/workflows/deploy-github-packages-one-level.yml
     with:
       modules_json: ${{ needs.setup.outputs.level7 }}
@@ -206,7 +226,7 @@ jobs:
   # ── L8 ────────────────────────────────────────────────────────────────────────
   deploy-gh-packages-level-8:
     needs: [setup, deploy-gh-packages-level-7]
-    if: ${{ needs.setup.outputs.level8 != '[]' && (needs.deploy-gh-packages-level-7.result == 'success' || needs.deploy-gh-packages-level-7.result == 'skipped') }}
+    if: ${{ needs.setup.outputs.has_maven_artifacts == 'true' && needs.setup.outputs.level8 != '[]' && (needs.deploy-gh-packages-level-7.result == 'success' || needs.deploy-gh-packages-level-7.result == 'skipped') }}
     uses: ./.github/workflows/deploy-github-packages-one-level.yml
     with:
       modules_json: ${{ needs.setup.outputs.level8 }}
@@ -219,7 +239,7 @@ jobs:
   # ── L9 ────────────────────────────────────────────────────────────────────────
   deploy-gh-packages-level-9:
     needs: [setup, deploy-gh-packages-level-8]
-    if: ${{ needs.setup.outputs.level9 != '[]' && (needs.deploy-gh-packages-level-8.result == 'success' || needs.deploy-gh-packages-level-8.result == 'skipped') }}
+    if: ${{ needs.setup.outputs.has_maven_artifacts == 'true' && needs.setup.outputs.level9 != '[]' && (needs.deploy-gh-packages-level-8.result == 'success' || needs.deploy-gh-packages-level-8.result == 'skipped') }}
     uses: ./.github/workflows/deploy-github-packages-one-level.yml
     with:
       modules_json: ${{ needs.setup.outputs.level9 }}
@@ -231,7 +251,7 @@ jobs:
 
   deploy-gh-packages-level-10:
     needs: [setup, deploy-gh-packages-level-9]
-    if: ${{ needs.setup.outputs.level10 != '[]' && (needs.deploy-gh-packages-level-9.result == 'success' || needs.deploy-gh-packages-level-9.result == 'skipped') }}
+    if: ${{ needs.setup.outputs.has_maven_artifacts == 'true' && needs.setup.outputs.level10 != '[]' && (needs.deploy-gh-packages-level-9.result == 'success' || needs.deploy-gh-packages-level-9.result == 'skipped') }}
     uses: ./.github/workflows/deploy-github-packages-one-level.yml
     with:
       modules_json: ${{ needs.setup.outputs.level10 }}
@@ -243,7 +263,7 @@ jobs:
 
   deploy-gh-packages-level-11:
     needs: [setup, deploy-gh-packages-level-10]
-    if: ${{ needs.setup.outputs.level11 != '[]' && (needs.deploy-gh-packages-level-10.result == 'success' || needs.deploy-gh-packages-level-10.result == 'skipped') }}
+    if: ${{ needs.setup.outputs.has_maven_artifacts == 'true' && needs.setup.outputs.level11 != '[]' && (needs.deploy-gh-packages-level-10.result == 'success' || needs.deploy-gh-packages-level-10.result == 'skipped') }}
     uses: ./.github/workflows/deploy-github-packages-one-level.yml
     with:
       modules_json: ${{ needs.setup.outputs.level11 }}
@@ -255,7 +275,7 @@ jobs:
 
   deploy-gh-packages-level-12:
     needs: [setup, deploy-gh-packages-level-11]
-    if: ${{ needs.setup.outputs.level12 != '[]' && (needs.deploy-gh-packages-level-11.result == 'success' || needs.deploy-gh-packages-level-11.result == 'skipped') }}
+    if: ${{ needs.setup.outputs.has_maven_artifacts == 'true' && needs.setup.outputs.level12 != '[]' && (needs.deploy-gh-packages-level-11.result == 'success' || needs.deploy-gh-packages-level-11.result == 'skipped') }}
     uses: ./.github/workflows/deploy-github-packages-one-level.yml
     with:
       modules_json: ${{ needs.setup.outputs.level12 }}
