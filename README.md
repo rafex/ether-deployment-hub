@@ -480,7 +480,7 @@ flowchart LR
 ```
 
 Incluye:
-- Detección automática de cambios por subtree (git diff)
+- Detección automática de cambios por submódulo (git diff)
 - Release plan con bump semántico de versiones
 - Validación de colisiones de versión contra Maven Central
 - Despliegue en orden estricto de dependencias
@@ -490,8 +490,6 @@ Incluye:
 ---
 
 ## Cómo compilar y publicar
-
-Guía operativa completa: [Flujo de trabajo con subtrees y despliegue](docs/subtree-deployment-workflow.md).
 
 ### Instalar todo localmente
 
@@ -532,7 +530,7 @@ make publish-plan-ci
 # deploy real — todos los módulos con cambios
 make publish-ci
 
-# deploy forzado — todos los módulos
+# deploy forzado — todos los 18 módulos
 FIRST=$(git rev-list --max-parents=0 HEAD)
 make publish-ci BASE_REF=$FIRST
 ```
