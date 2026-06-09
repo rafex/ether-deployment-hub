@@ -315,7 +315,7 @@ jobs:
     needs:
       - release-plan
       - deploy-level-12
-    if: ${{ needs.release-plan.outputs.selected_count != '0' && (needs.deploy-level-12.result == 'success' || needs.deploy-level-12.result == 'skipped') }}
+    if: ${{ needs.release-plan.outputs.selected_count != '0' && (needs.deploy-level-12.result == 'success' || needs.deploy-level-12.result == 'skipped') && (github.event_name != 'workflow_dispatch' || inputs.run_deploy == true) }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -381,6 +381,7 @@ jobs:
       ${{ always()
           && needs.release-plan.result == 'success'
           && needs.release-plan.outputs.selected_count != '0'
+          && (github.event_name != 'workflow_dispatch' || inputs.run_deploy == true)
           && needs.update-manifest.result != 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
