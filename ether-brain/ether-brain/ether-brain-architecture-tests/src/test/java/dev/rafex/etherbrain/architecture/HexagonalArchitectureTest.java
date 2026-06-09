@@ -2,21 +2,26 @@ package dev.rafex.etherbrain.architecture;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
+import com.tngtech.archunit.core.domain.JavaClasses;
+import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
-import com.tngtech.archunit.junit.AnalyzeClasses;
-import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
+import org.junit.jupiter.api.Test;
 
-@AnalyzeClasses(
-        packages = "dev.rafex.etherbrain",
-        importOptions = ImportOption.DoNotIncludeTests.class
-)
-class HexagonalArchitectureTest {
+public class HexagonalArchitectureTest {
 
-    @ArchTest
-    static final ArchRule core_does_not_depend_on_infrastructure =
+    private static final ArchRule CORE_DOES_NOT_DEPEND_ON_INFRASTRUCTURE =
             noClasses()
                     .that().resideInAPackage("..core..")
                     .should().dependOnClassesThat()
                     .resideInAnyPackage("..infra..", "..tools.local..", "..cli..", "..bootstrap..");
+
+    @Test
+    void coreDoesNotDependOnInfrastructure() {
+        JavaClasses classes = new ClassFileImporter()
+                .withImportOption(new ImportOption.DoNotIncludeTests())
+                .importPackages("dev.rafex.etherbrain");
+
+        CORE_DOES_NOT_DEPEND_ON_INFRASTRUCTURE.check(classes);
+    }
 }
