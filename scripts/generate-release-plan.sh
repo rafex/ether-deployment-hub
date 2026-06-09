@@ -149,6 +149,11 @@ while [ "$changed" = "true" ]; do
       if [ "$(release_level_rank "$dependency_level")" -eq 0 ]; then
         continue
       fi
+      dependency_current_version="$(jq -r '.currentVersion' "$dependency_file")"
+      dependency_next_version="$(jq -r '.nextVersion' "$dependency_file")"
+      if [ "$dependency_current_version" = "$dependency_next_version" ]; then
+        continue
+      fi
       propagated_level="$dependency_impact"
       target_level="$(release_max_level "$current_level" "$propagated_level")"
       if [ "$target_level" != "$current_level" ]; then

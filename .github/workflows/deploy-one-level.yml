@@ -121,7 +121,7 @@ jobs:
                 SYNC_FROM_REPO=false \
                 SKIP_TESTS=false \
                 AUTO_UPDATE_LICENSE_HEADERS=true \
-                CENTRAL_WAIT_UNTIL=validated
+                CENTRAL_WAIT_UNTIL=published
             ) >"$log_file" 2>&1; then
               echo "  [OK]   $module ($next_version)"
               ok_modules+=("$module ($next_version)")

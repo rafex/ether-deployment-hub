@@ -42,12 +42,22 @@ PROJECT_DIR ?= ether-parent
 
 # Helper function to find and execute mvnw
 define run_mvnw
-	if [ -f "$(PROJECT_DIR)/mvnw" ]; then \
-		cd $(PROJECT_DIR) && ./mvnw $(1); \
-	elif [ -f "$(PROJECT_DIR)/$(notdir $(PROJECT_DIR))/mvnw" ]; then \
-		cd $(PROJECT_DIR)/$(notdir $(PROJECT_DIR)) && ./mvnw $(1); \
+	if [ -f "$(PROJECT_DIR)/pom.xml" ]; then \
+		cd $(PROJECT_DIR) && \
+		if [ -x "./mvnw" ] && [ -f "./.mvn/wrapper/maven-wrapper.properties" ]; then \
+			./mvnw $(1); \
+		else \
+			mvn $(1); \
+		fi; \
+	elif [ -f "$(PROJECT_DIR)/$(notdir $(PROJECT_DIR))/pom.xml" ]; then \
+		cd $(PROJECT_DIR)/$(notdir $(PROJECT_DIR)) && \
+		if [ -x "./mvnw" ] && [ -f "./.mvn/wrapper/maven-wrapper.properties" ]; then \
+			./mvnw $(1); \
+		else \
+			mvn $(1); \
+		fi; \
 	else \
-		echo "Error: mvnw not found in $(PROJECT_DIR) or $(PROJECT_DIR)/$(notdir $(PROJECT_DIR))"; \
+		echo "Error: pom.xml not found in $(PROJECT_DIR) or $(PROJECT_DIR)/$(notdir $(PROJECT_DIR))"; \
 		exit 1; \
 	fi
 endef

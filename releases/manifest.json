@@ -47,7 +47,7 @@
       "groupId": "dev.rafex.ether.parent",
       "artifactId": "ether-parent",
       "currentVersion": "9.6.3",
-      "published": true,
+      "published": false,
       "usesParent": false,
       "dependencies": [],
       "internalDependencyProperties": {},
@@ -529,7 +529,7 @@
       "groupId": "dev.rafex.ether.brain",
       "artifactId": "ether-brain-parent",
       "currentVersion": "0.1.2",
-      "published": true,
+      "published": false,
       "usesParent": true,
       "dependencies": [
         "ether-parent"
