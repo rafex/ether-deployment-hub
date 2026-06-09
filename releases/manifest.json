@@ -540,10 +540,19 @@
         "ether-brain-common",
         "ether-brain-ports",
         "ether-brain-core",
+        "ether-brain-spi-model",
         "ether-brain-infra-memory",
+        "ether-brain-infra-http",
+        "ether-brain-infra-file",
+        "ether-brain-infra-model-demo",
+        "ether-brain-infra-model-openai",
+        "ether-brain-infra-model-ollama",
         "ether-brain-tools-local",
+        "ether-brain-tools-remote",
         "ether-brain-bootstrap",
-        "ether-brain-transport-cli"
+        "ether-brain-transport-cli",
+        "ether-brain-transport-http",
+        "ether-brain-transport-mqtt"
       ]
     }
   ]

@@ -49,10 +49,19 @@
         <module>ether-brain-common</module>
         <module>ether-brain-ports</module>
         <module>ether-brain-core</module>
+        <module>ether-brain-spi-model</module>
         <module>ether-brain-infra-memory</module>
+        <module>ether-brain-infra-http</module>
+        <module>ether-brain-infra-file</module>
+        <module>ether-brain-infra-model-demo</module>
+        <module>ether-brain-infra-model-openai</module>
+        <module>ether-brain-infra-model-ollama</module>
         <module>ether-brain-tools-local</module>
+        <module>ether-brain-tools-remote</module>
         <module>ether-brain-bootstrap</module>
         <module>ether-brain-transport-cli</module>
+        <module>ether-brain-transport-http</module>
+        <module>ether-brain-transport-mqtt</module>
         <module>ether-brain-architecture-tests</module>
     </modules>
 
@@ -63,10 +72,23 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <junit.version>5.12.2</junit.version>
         <archunit.version>1.4.1</archunit.version>
+        <!-- Pinned because ether-parent 9.5.5-SNAPSHOT dropped ether-logging from its BOM -->
+        <ether-logging-core.version>9.5.5-SNAPSHOT</ether-logging-core.version>
+        <!-- Jetty 12.1 BOM — manages versions of all jetty-* artifacts -->
+        <jetty.version>12.1.10</jetty.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <!-- Jetty 12.1 BOM — import before individual jetty deps so
+                 all jetty-* artifacts use the same version automatically. -->
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-bom</artifactId>
+                <version>${jetty.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter</artifactId>
