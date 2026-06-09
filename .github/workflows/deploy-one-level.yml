@@ -131,6 +131,29 @@ jobs:
                 "$log_file" 2>/dev/null; then
                 echo "  [SKIP] $module ($next_version) — already published in Sonatype Central"
                 skip_modules+=("$module ($next_version)")
+              elif grep -Eq \
+                "currently being published in another deployment" \
+                "$log_file" 2>/dev/null; then
+                group_id=$(jq -r --arg m "$module" \
+                  '.modules[] | select(.name == $m) | .groupId' "$PLAN")
+                artifact_id=$(jq -r --arg m "$module" \
+                  '.modules[] | select(.name == $m) | .artifactId' "$PLAN")
+                echo "  [WAIT] $module ($next_version) — another Sonatype deployment is publishing it"
+                if ./scripts/wait-for-maven-central-artifact.sh \
+                  "https://repo1.maven.org/maven2" \
+                  "$group_id" \
+                  "$artifact_id" \
+                  "$next_version"; then
+                  echo "  [SKIP] $module ($next_version) — published by in-flight Sonatype deployment"
+                  skip_modules+=("$module ($next_version)")
+                else
+                  echo "  [FAIL] $module ($next_version)"
+                  echo "──── $log_file ────"
+                  cat "$log_file"
+                  echo "────────────────────"
+                  fail_modules+=("$module ($next_version)")
+                  level_failed=true
+                fi
               else
                 echo "  [FAIL] $module ($next_version)"
                 echo "──── $log_file ────"
