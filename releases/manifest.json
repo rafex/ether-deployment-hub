@@ -46,7 +46,7 @@
       "pomPath": "ether-parent/ether-parent/pom.xml",
       "groupId": "dev.rafex.ether.parent",
       "artifactId": "ether-parent",
-      "currentVersion": "9.6.2",
+      "currentVersion": "9.6.3",
       "published": true,
       "usesParent": false,
       "dependencies": [],
@@ -528,7 +528,7 @@
       "pomPath": "ether-brain/ether-brain/pom.xml",
       "groupId": "dev.rafex.ether.brain",
       "artifactId": "ether-brain-parent",
-      "currentVersion": "0.1.1",
+      "currentVersion": "0.1.2",
       "published": true,
       "usesParent": true,
       "dependencies": [
