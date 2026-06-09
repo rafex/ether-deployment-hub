@@ -139,7 +139,7 @@ jobs:
                 artifact_id=$(jq -r --arg m "$module" \
                   '.modules[] | select(.name == $m) | .artifactId' "$PLAN")
                 echo "  [WAIT] $module ($next_version) — another Sonatype deployment is publishing it"
-                if ./scripts/wait-for-maven-central-artifact.sh \
+                if bash ./scripts/wait-for-maven-central-artifact.sh \
                   "https://repo1.maven.org/maven2" \
                   "$group_id" \
                   "$artifact_id" \
