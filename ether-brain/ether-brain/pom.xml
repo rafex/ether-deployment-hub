@@ -72,8 +72,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <junit.version>5.12.2</junit.version>
         <archunit.version>1.4.1</archunit.version>
-        <!-- Pinned because ether-parent 9.5.5-SNAPSHOT dropped ether-logging from its BOM -->
-        <ether-logging-core.version>9.5.5-SNAPSHOT</ether-logging-core.version>
+        <!-- Pinned because ether-parent no longer manages ether-logging in its BOM -->
+        <ether-logging-core.version>9.5.5</ether-logging-core.version>
         <!-- Jetty 12.1 BOM — manages versions of all jetty-* artifacts -->
         <jetty.version>12.1.10</jetty.version>
     </properties>
