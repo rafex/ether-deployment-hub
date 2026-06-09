@@ -352,6 +352,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add releases/manifest.json
           git commit -m "release: update manifest after publish"
+          git pull --rebase origin main
           git push origin main
 
   # ────────────────────────────────────────────────────────────────────────────
@@ -419,4 +420,5 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add releases/manifest.json
           git commit -m "release: partial manifest sync after pipeline failure"
+          git pull --rebase origin main
           git push origin main

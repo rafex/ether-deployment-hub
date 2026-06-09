@@ -195,6 +195,10 @@ if [ -f "$parent_file" ] && [ "$(jq -r '.releaseLevel' "$parent_file")" = "none"
 fi
 
 modules_json="$(jq -s 'sort_by(.name)' "$TMP_PLAN_DIR"/*.json)"
+modules_json_file="$TMP_PLAN_DIR/modules.json"
+changes_json_file="$TMP_PLAN_DIR/changes.json"
+printf '%s\n' "$modules_json" > "$modules_json_file"
+printf '%s\n' "$DETECTION_JSON" > "$changes_json_file"
 selected_count="$(printf '%s' "$modules_json" | jq '[.[] | select(.releaseLevel != "none")] | length')"
 selected_names_json="$(printf '%s' "$modules_json" | jq '[.[] | select(.releaseLevel != "none") | .name]')"
 deploy_order='[]'
@@ -243,15 +247,15 @@ plan_json="$(jq -n \
   --arg headRef "$HEAD_REF" \
   --argjson selectedCount "$selected_count" \
   --argjson deployOrder "$deploy_order" \
-  --argjson changes "$DETECTION_JSON" \
-  --argjson modules "$modules_json" \
+  --slurpfile changes "$changes_json_file" \
+  --slurpfile modules "$modules_json_file" \
   '{
     baseRef: $baseRef,
     headRef: $headRef,
     selectedCount: $selectedCount,
     deployOrder: $deployOrder,
-    changes: $changes,
-    modules: $modules
+    changes: $changes[0],
+    modules: $modules[0]
   }')"
 
 printf '%s\n' "$plan_json" > "$OUTPUT_DIR/release-plan.json"
