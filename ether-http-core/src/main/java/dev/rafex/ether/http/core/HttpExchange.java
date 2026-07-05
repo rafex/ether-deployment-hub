@@ -61,4 +61,32 @@ public interface HttpExchange {
     default void options() {
         noContent(204);
     }
+
+    /**
+     * Starts a Server-Sent Events stream. Sets the transport's event-stream headers and
+     * returns an {@link EventStream} for subsequent writes; {@link #json}, {@link #text} and
+     * {@link #noContent} must not be called after this.
+     *
+     * <p>Default throws — only transports that implement long-lived/chunked writes (e.g. the
+     * Jetty 12 transport) support this.
+     */
+    default EventStream startEventStream() {
+        throw new UnsupportedOperationException("SSE not supported by this transport");
+    }
+
+    /** A long-lived, transport-agnostic handle for pushing Server-Sent Events. */
+    interface EventStream {
+
+        /** Sends one SSE event. {@code event} may be null for an unnamed "message" event. */
+        void send(String event, String data);
+
+        /** Sends an SSE comment line (e.g. for heartbeats); ignored by EventSource clients. */
+        void comment(String text);
+
+        /** Registers a callback invoked once when the stream ends (client disconnect or {@link #close()}). */
+        void onClose(Runnable callback);
+
+        /** Ends the stream. Safe to call more than once. */
+        void close();
+    }
 }
