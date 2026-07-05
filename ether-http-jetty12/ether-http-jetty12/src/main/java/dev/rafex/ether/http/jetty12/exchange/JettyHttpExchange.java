@@ -134,6 +134,16 @@ public final class JettyHttpExchange implements HttpExchange {
     }
 
     @Override
+    public EventStream startEventStream() {
+        response.setStatus(200);
+        response.getHeaders().put("content-type", "text/event-stream; charset=utf-8");
+        response.getHeaders().put("cache-control", "no-cache");
+        response.getHeaders().put("connection", "keep-alive");
+        response.getHeaders().put("x-accel-buffering", "no");
+        return new JettyEventStream(response, callback);
+    }
+
+    @Override
     public void methodNotAllowed() {
         response.getHeaders().put("Allow", String.join(", ", allowedMethods));
         HttpExchange.super.methodNotAllowed();
