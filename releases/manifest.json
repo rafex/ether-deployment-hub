@@ -47,7 +47,7 @@
       "pomPath": "ether-parent/ether-parent/pom.xml",
       "groupId": "dev.rafex.ether.parent",
       "artifactId": "ether-parent",
-      "currentVersion": "9.6.4",
+      "currentVersion": "9.6.5",
       "published": true,
       "usesParent": false,
       "dependencies": [],
@@ -186,7 +186,7 @@
       "groupId": "dev.rafex.ether.cron",
       "artifactId": "ether-cron",
       "currentVersion": "9.5.5",
-      "published": false,
+      "published": true,
       "usesParent": true,
       "dependencies": [
         "ether-parent"
