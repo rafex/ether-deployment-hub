@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-07T10:33:43Z",
-  "totalModules": 27,
+  "generatedAt": "2026-07-07T17:14:48Z",
+  "totalModules": 28,
   "deployOrder": [
     "ether-parent",
     "ether-config",
@@ -11,6 +11,7 @@
     "ether-database-postgres",
     "ether-database-sqlite",
     "ether-json",
+    "ether-cron",
     "ether-jwt",
     "ether-observability-core",
     "ether-http-core",
@@ -153,6 +154,20 @@
       "dependencyReleaseImpact": "patch",
       "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.json/ether-json",
       "mavenCoord": "dev.rafex.ether.json:ether-json"
+    },
+    {
+      "name": "ether-cron",
+      "groupId": "dev.rafex.ether.cron",
+      "artifactId": "ether-cron",
+      "version": "9.5.5",
+      "deployed": false,
+      "description": "Lightweight embedded scheduler for Ether applications using JDK ScheduledExecutorService",
+      "dependencies": [
+        "ether-parent"
+      ],
+      "dependencyReleaseImpact": "patch",
+      "artifactUrl": "https://central.sonatype.com/search?q=ether-cron",
+      "mavenCoord": "dev.rafex.ether.cron:ether-cron"
     },
     {
       "name": "ether-di",

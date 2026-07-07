@@ -35,6 +35,7 @@
     "ether-brain-tools-local": "Built-in tool registry with file-system, shell, and math tools for local agents",
     "ether-brain-bootstrap": "Wiring module: assembles a runnable agent from core + infra + tools + transport",
     "ether-brain-transport-cli": "CLI transport adapter for ether-brain — run agents interactively from the terminal",
-    "ether-di": "Explicit dependency injection building blocks for Java 21+: Lazy, Closer, and Bootstrap — no reflection, no annotations, GraalVM native-image compatible"
+    "ether-di": "Explicit dependency injection building blocks for Java 21+: Lazy, Closer, and Bootstrap — no reflection, no annotations, GraalVM native-image compatible",
+    "ether-cron": "Lightweight embedded scheduler for Ether applications using JDK ScheduledExecutorService"
   }
 }

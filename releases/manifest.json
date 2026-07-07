@@ -11,6 +11,7 @@
     "ether-database-postgres",
     "ether-database-sqlite",
     "ether-json",
+    "ether-cron",
     "ether-jwt",
     "ether-observability-core",
     "ether-http-core",
@@ -170,6 +171,22 @@
       "artifactId": "ether-json",
       "currentVersion": "9.5.5",
       "published": true,
+      "usesParent": true,
+      "dependencies": [
+        "ether-parent"
+      ],
+      "internalDependencyProperties": {},
+      "dependencyReleaseImpact": "patch"
+    },
+    {
+      "name": "ether-cron",
+      "path": "ether-cron",
+      "projectDir": "ether-cron/ether-cron",
+      "pomPath": "ether-cron/ether-cron/pom.xml",
+      "groupId": "dev.rafex.ether.cron",
+      "artifactId": "ether-cron",
+      "currentVersion": "9.5.5",
+      "published": false,
       "usesParent": true,
       "dependencies": [
         "ether-parent"

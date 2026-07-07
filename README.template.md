@@ -230,6 +230,17 @@ User user = codec.read(json, User.class);
 List<User> users = codec.read(json, new TypeReference<List<User>>() {});
 ```
 
+#### [`ether-cron`](ether-cron/README.md)
+Scheduler embebido y ligero basado en `ScheduledExecutorService`. Cubre intervalos simples y ejecuciones diarias sin Spring, Quartz ni plataforma de jobs externa.
+
+```java
+try (var scheduler = CronSchedulers.singleThread()) {
+    scheduler.everySeconds("heartbeat", 30, () -> {
+        System.out.println("Ether heartbeat...");
+    });
+}
+```
+
 ---
 
 ### 🔐 Seguridad
@@ -502,7 +513,7 @@ make publish-plan-ci
 # deploy real — todos los módulos con cambios
 make publish-ci
 
-# deploy forzado — todos los 18 módulos
+# deploy forzado — todos los módulos
 FIRST=$(git rev-list --max-parents=0 HEAD)
 make publish-ci BASE_REF=$FIRST
 ```

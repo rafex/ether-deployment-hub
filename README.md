@@ -16,6 +16,7 @@
 | ether-database-postgres | ![ether-database-postgres](https://img.shields.io/maven-central/v/dev.rafex.ether.database/ether-database-postgres) | dev.rafex.ether.database | ether-database-postgres | si |
 | ether-database-sqlite | ![ether-database-sqlite](https://img.shields.io/maven-central/v/dev.rafex.ether.database/ether-database-sqlite) | dev.rafex.ether.database | ether-database-sqlite | si |
 | ether-json | ![ether-json](https://img.shields.io/maven-central/v/dev.rafex.ether.json/ether-json) | dev.rafex.ether.json | ether-json | si |
+| ether-cron | ![ether-cron](https://img.shields.io/maven-central/v/dev.rafex.ether.cron/ether-cron) | dev.rafex.ether.cron | ether-cron | no |
 | ether-jwt | ![ether-jwt](https://img.shields.io/maven-central/v/dev.rafex.ether.jwt/ether-jwt) | dev.rafex.ether.jwt | ether-jwt | si |
 | ether-observability-core | ![ether-observability-core](https://img.shields.io/maven-central/v/dev.rafex.ether.observability/ether-observability-core) | dev.rafex.ether.observability | ether-observability-core | si |
 | ether-http-core | ![ether-http-core](https://img.shields.io/maven-central/v/dev.rafex.ether.http/ether-http-core) | dev.rafex.ether.http | ether-http-core | si |
@@ -256,6 +257,17 @@ User user = codec.read(json, User.class);
 
 // Tipos genéricos
 List<User> users = codec.read(json, new TypeReference<List<User>>() {});
+```
+
+#### [`ether-cron`](ether-cron/README.md)
+Scheduler embebido y ligero basado en `ScheduledExecutorService`. Cubre intervalos simples y ejecuciones diarias sin Spring, Quartz ni plataforma de jobs externa.
+
+```java
+try (var scheduler = CronSchedulers.singleThread()) {
+    scheduler.everySeconds("heartbeat", 30, () -> {
+        System.out.println("Ether heartbeat...");
+    });
+}
 ```
 
 ---
@@ -530,7 +542,7 @@ make publish-plan-ci
 # deploy real — todos los módulos con cambios
 make publish-ci
 
-# deploy forzado — todos los 18 módulos
+# deploy forzado — todos los módulos
 FIRST=$(git rev-list --max-parents=0 HEAD)
 make publish-ci BASE_REF=$FIRST
 ```

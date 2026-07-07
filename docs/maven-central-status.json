@@ -72,6 +72,15 @@
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.json/ether-json"
   },
   {
+    "module": "ether-cron",
+    "groupId": "dev.rafex.ether.cron",
+    "artifactId": "ether-cron",
+    "deployed": false,
+    "latestVersion": "",
+    "lastUpdatedUtc": "",
+    "artifactUrl": "https://central.sonatype.com/search?q=ether-cron"
+  },
+  {
     "module": "ether-jwt",
     "groupId": "dev.rafex.ether.jwt",
     "artifactId": "ether-jwt",

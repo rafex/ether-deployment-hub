@@ -169,9 +169,9 @@ Basado en `releases/manifest.json` y `MAX_LEVEL_SIZE=5`, el orden actual es:
 | Nivel | Módulos |
 |-------|---------|
 | L0 | `ether-parent` |
-| L1 | `ether-crypto`, `ether-database-core`, `ether-json`, `ether-observability-core`, `ether-http-core` |
-| L2 | `ether-http-security`, `ether-logging-core`, `ether-ai-core`, `ether-websocket-core`, `ether-archetype` |
-| L3 | `ether-brain`, `ether-di` |
+| L1 | `ether-crypto`, `ether-database-core`, `ether-json`, `ether-cron`, `ether-observability-core` |
+| L2 | `ether-http-core`, `ether-http-security`, `ether-logging-core`, `ether-ai-core`, `ether-websocket-core` |
+| L3 | `ether-archetype`, `ether-brain`, `ether-di` |
 | L4 | `ether-config`, `ether-jdbc`, `ether-database-postgres`, `ether-jwt`, `ether-http-problem` |
 | L5 | `ether-http-openapi`, `ether-http-client`, `ether-ai-openai`, `ether-ai-deepseek`, `ether-websocket-jetty12` |
 | L6 | `ether-database-sqlite`, `ether-http-jetty12`, `ether-webhook` |

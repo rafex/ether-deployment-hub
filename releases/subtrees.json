@@ -29,6 +29,14 @@
       "releaseManifest": true
     },
     {
+      "name": "ether-cron",
+      "prefix": "ether-cron",
+      "url": "git@github.com:rafex/ether-cron.git",
+      "branch": "main",
+      "importedSha": "ffd68d6d9b4158da197adabfc94dcad75302143a",
+      "releaseManifest": true
+    },
+    {
       "name": "ether-http-jetty12",
       "prefix": "ether-http-jetty12",
       "url": "git@github.com:rafex/ether-http-jetty12.git",
