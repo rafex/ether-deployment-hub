@@ -8,6 +8,7 @@
 
 package dev.rafex.ether.cron;
 
+import java.time.Duration;
 import java.time.LocalTime;
 
 public interface SchedulerPort extends AutoCloseable {
@@ -19,6 +20,10 @@ public interface SchedulerPort extends AutoCloseable {
     ScheduledTask everyHours(String name, long hours, EtherJob job);
 
     ScheduledTask dailyAt(String name, LocalTime time, EtherJob job);
+
+    boolean awaitTermination(Duration timeout) throws InterruptedException;
+
+    void shutdownNow();
 
     @Override
     void close();

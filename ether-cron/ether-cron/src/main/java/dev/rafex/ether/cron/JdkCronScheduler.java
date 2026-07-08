@@ -14,11 +14,13 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Objects;
 import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 public final class JdkCronScheduler implements SchedulerPort {
@@ -64,11 +66,18 @@ public final class JdkCronScheduler implements SchedulerPort {
     }
 
     public ScheduledTask every(final String name, final Duration interval, final EtherJob job) {
+        return every(name, interval, interval, job);
+    }
+
+    public ScheduledTask every(final String name, final Duration initialDelay, final Duration interval,
+            final EtherJob job) {
         final var task = new CronTask(name, job);
+        validateNonNegative(initialDelay, "initialDelay");
         validatePositive(interval, "interval");
 
+        final long initialDelayMillis = initialDelay.toMillis();
         final long delayMillis = interval.toMillis();
-        final ScheduledFuture<?> future = executor.scheduleAtFixedRate(wrap(task), delayMillis, delayMillis,
+        final ScheduledFuture<?> future = executor.scheduleAtFixedRate(wrap(task), initialDelayMillis, delayMillis,
                 TimeUnit.MILLISECONDS);
         return new JdkScheduledTask(task.name(), future);
     }
@@ -78,10 +87,9 @@ public final class JdkCronScheduler implements SchedulerPort {
         final var task = new CronTask(name, job);
         Objects.requireNonNull(time, "time");
 
-        final long initialDelayMillis = millisUntilNextDailyRun(time);
-        final ScheduledFuture<?> future = executor.scheduleAtFixedRate(wrap(task), initialDelayMillis,
-                Duration.ofDays(1).toMillis(), TimeUnit.MILLISECONDS);
-        return new JdkScheduledTask(task.name(), future);
+        final var handle = new ReschedulingTask(task.name());
+        scheduleNextDailyRun(handle, task, time);
+        return handle;
     }
 
     Duration delayUntilNextDailyRun(final LocalTime time) {
@@ -99,6 +107,37 @@ public final class JdkCronScheduler implements SchedulerPort {
         executor.shutdown();
     }
 
+    @Override
+    public boolean awaitTermination(final Duration timeout) throws InterruptedException {
+        validateNonNegative(timeout, "timeout");
+        return executor.awaitTermination(timeout.toMillis(), TimeUnit.MILLISECONDS);
+    }
+
+    @Override
+    public void shutdownNow() {
+        executor.shutdownNow();
+    }
+
+    void scheduleNextDailyRun(final ReschedulingTask handle, final CronTask task, final LocalTime time) {
+        if (handle.isCancelled()) {
+            return;
+        }
+
+        final long delayMillis = millisUntilNextDailyRun(time);
+        try {
+            final ScheduledFuture<?> future = executor.schedule(() -> {
+                if (handle.isCancelled()) {
+                    return;
+                }
+                wrap(task).run();
+                scheduleNextDailyRun(handle, task, time);
+            }, delayMillis, TimeUnit.MILLISECONDS);
+            handle.replaceFuture(future);
+        } catch (final RejectedExecutionException ignored) {
+            handle.cancel();
+        }
+    }
+
     private long millisUntilNextDailyRun(final LocalTime time) {
         final long millis = delayUntilNextDailyRun(time).toMillis();
         return Math.max(1L, millis);
@@ -109,9 +148,17 @@ public final class JdkCronScheduler implements SchedulerPort {
             try {
                 task.job().run();
             } catch (final Exception e) {
-                failureHandler.accept(new CronFailure(task.name(), e));
+                handleFailure(task.name(), e);
             }
         };
+    }
+
+    private void handleFailure(final String taskName, final Exception cause) {
+        try {
+            failureHandler.accept(new CronFailure(taskName, cause));
+        } catch (final Exception ignored) {
+            CronFailure.printToStandardError(new CronFailure(taskName, cause));
+        }
     }
 
     private static ThreadFactory defaultThreadFactory() {
@@ -140,6 +187,16 @@ public final class JdkCronScheduler implements SchedulerPort {
         }
     }
 
+    private static void validateNonNegative(final Duration duration, final String name) {
+        Objects.requireNonNull(duration, name);
+        if (duration.isNegative()) {
+            throw new IllegalArgumentException(name + " must not be negative");
+        }
+        if (!duration.isZero() && duration.toMillis() < 1L) {
+            throw new IllegalArgumentException(name + " must be zero or at least 1 millisecond");
+        }
+    }
+
     public record CronFailure(String taskName, Exception cause) {
 
         public CronFailure {
@@ -158,7 +215,12 @@ public final class JdkCronScheduler implements SchedulerPort {
 
         @Override
         public boolean cancel() {
-            return future.cancel(false);
+            return cancel(false);
+        }
+
+        @Override
+        public boolean cancel(final boolean mayInterruptIfRunning) {
+            return future.cancel(mayInterruptIfRunning);
         }
 
         @Override
@@ -169,6 +231,55 @@ public final class JdkCronScheduler implements SchedulerPort {
         @Override
         public boolean isDone() {
             return future.isDone();
+        }
+    }
+
+    static final class ReschedulingTask implements ScheduledTask {
+
+        private final String name;
+        private final AtomicReference<ScheduledFuture<?>> future = new AtomicReference<>();
+        private volatile boolean cancelled;
+
+        ReschedulingTask(final String name) {
+            this.name = Objects.requireNonNull(name, "name");
+        }
+
+        void replaceFuture(final ScheduledFuture<?> nextFuture) {
+            Objects.requireNonNull(nextFuture, "nextFuture");
+            if (cancelled) {
+                nextFuture.cancel(false);
+                return;
+            }
+            future.set(nextFuture);
+        }
+
+        @Override
+        public String name() {
+            return name;
+        }
+
+        @Override
+        public boolean cancel() {
+            return cancel(false);
+        }
+
+        @Override
+        public boolean cancel(final boolean mayInterruptIfRunning) {
+            cancelled = true;
+            final ScheduledFuture<?> current = future.get();
+            return current == null || current.cancel(mayInterruptIfRunning);
+        }
+
+        @Override
+        public boolean isCancelled() {
+            final ScheduledFuture<?> current = future.get();
+            return cancelled || current != null && current.isCancelled();
+        }
+
+        @Override
+        public boolean isDone() {
+            final ScheduledFuture<?> current = future.get();
+            return cancelled || current != null && current.isDone();
         }
     }
 }

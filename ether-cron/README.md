@@ -36,6 +36,8 @@ classDiagram
         +everyMinutes(String, long, EtherJob) ScheduledTask
         +everyHours(String, long, EtherJob) ScheduledTask
         +dailyAt(String, LocalTime, EtherJob) ScheduledTask
+        +awaitTermination(Duration) boolean
+        +shutdownNow() void
         +close() void
     }
 
@@ -61,6 +63,7 @@ classDiagram
     class JdkCronScheduler {
         -ScheduledExecutorService executor
         +every(Duration) ScheduledTask
+        +every(Duration, Duration) ScheduledTask
         +dailyAt(String, LocalTime, EtherJob) ScheduledTask
     }
 
@@ -75,11 +78,13 @@ classDiagram
 ```java
 import dev.rafex.ether.cron.CronSchedulers;
 
-try (var scheduler = CronSchedulers.singleThread()) {
-    scheduler.everySeconds("heartbeat", 30, () -> {
-        System.out.println("Ether heartbeat...");
-    });
-}
+var scheduler = CronSchedulers.singleThread();
+
+Runtime.getRuntime().addShutdownHook(new Thread(scheduler::close));
+
+scheduler.everySeconds("heartbeat", 30, () -> {
+    System.out.println("Ether heartbeat...");
+});
 ```
 
 ## Supported schedules
@@ -91,8 +96,15 @@ scheduler.everyHours("cleanup", 1, cleanup::run);
 scheduler.dailyAt("daily-report", LocalTime.of(7, 30), report::send);
 ```
 
-For lower-level control, use `every(String, Duration, EtherJob)` on
-`JdkCronScheduler`.
+`dailyAt` recalculates the next run after each execution, so it follows local
+clock changes instead of blindly running every 24 fixed hours.
+
+For lower-level control, use `every(String, Duration, EtherJob)` or
+`every(String, Duration, Duration, EtherJob)` on `JdkCronScheduler`:
+
+```java
+scheduler.every("startup-check", Duration.ZERO, Duration.ofMinutes(5), checks::run);
+```
 
 ## Error handling
 
@@ -104,6 +116,17 @@ Job failed: heartbeat - timeout
 ```
 
 For custom handling, create `JdkCronScheduler` with your own failure consumer.
+If the failure consumer itself throws, the scheduler catches that exception too
+so future executions are not cancelled.
+
+## Shutdown
+
+```java
+scheduler.close();
+scheduler.awaitTermination(Duration.ofSeconds(5));
+```
+
+Use `shutdownNow()` when you need to ask the executor to interrupt running work.
 
 ## Why no cron-utils yet?
 
