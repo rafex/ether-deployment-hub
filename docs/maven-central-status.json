@@ -58,7 +58,7 @@
     "groupId": "dev.rafex.ether.database",
     "artifactId": "ether-database-sqlite",
     "deployed": true,
-    "latestVersion": "9.5.5",
+    "latestVersion": "9.5.6",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.database/ether-database-sqlite"
   },
@@ -202,7 +202,7 @@
     "groupId": "dev.rafex.ether.websocket",
     "artifactId": "ether-websocket-jetty12",
     "deployed": true,
-    "latestVersion": "9.5.5",
+    "latestVersion": "9.5.6",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.websocket/ether-websocket-jetty12"
   },
