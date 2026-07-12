@@ -35,6 +35,7 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.jetty.websocket.api.Callback;
 import org.eclipse.jetty.websocket.api.Session;
@@ -58,6 +59,9 @@ public final class JettyWebSocketSession implements WebSocketSession {
     private final Map<String, List<String>> queryParams;
     private final Map<String, List<String>> headers;
     private final Map<String, Object> attributes = new ConcurrentHashMap<>();
+    private final String id;
+
+    private static final AtomicLong ID_COUNTER = new AtomicLong(System.nanoTime());
 
     /**
      * Creates a session wrapper.
@@ -76,6 +80,7 @@ public final class JettyWebSocketSession implements WebSocketSession {
         this.pathParams = Map.copyOf(pathParams);
         this.queryParams = copyMultiMap(queryParams);
         this.headers = copyMultiMap(headers);
+        this.id = Long.toHexString(ID_COUNTER.incrementAndGet());
     }
 
     /**
@@ -86,7 +91,7 @@ public final class JettyWebSocketSession implements WebSocketSession {
      */
     @Override
     public String id() {
-        return Integer.toHexString(System.identityHashCode(session));
+        return id;
     }
 
     /**

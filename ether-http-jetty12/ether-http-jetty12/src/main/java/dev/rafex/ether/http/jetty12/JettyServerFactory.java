@@ -62,7 +62,6 @@ import dev.rafex.ether.http.jetty12.routing.JettyRouteRegistration;
 import dev.rafex.ether.http.jetty12.routing.JettyRouteRegistry;
 import dev.rafex.ether.http.jetty12.security.JettyAuthPolicyRegistry;
 import dev.rafex.ether.http.jetty12.security.TokenVerifier;
-import dev.rafex.ether.http.jetty12.websocket.JettyWebSocketEndpointAdapter;
 import dev.rafex.ether.http.security.profile.HttpSecurityProfile;
 import dev.rafex.ether.http.security.proxy.TrustedProxyPolicy;
 import dev.rafex.ether.json.JsonCodec;
@@ -71,6 +70,7 @@ import dev.rafex.ether.observability.core.request.UuidRequestIdGenerator;
 import dev.rafex.ether.observability.core.timing.TimingRecorder;
 import dev.rafex.ether.websocket.core.WebSocketPatterns;
 import dev.rafex.ether.websocket.core.WebSocketRoute;
+import dev.rafex.ether.websocket.jetty12.JettyWebSocketEndpointAdapter;
 
 public final class JettyServerFactory {
 

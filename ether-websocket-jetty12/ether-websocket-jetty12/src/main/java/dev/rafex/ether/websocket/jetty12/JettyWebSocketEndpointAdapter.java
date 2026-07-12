@@ -42,7 +42,7 @@ import dev.rafex.ether.websocket.core.WebSocketEndpoint;
  * <p>Esta clase traduce los eventos del ciclo de vida de Jetty a las llamadas
  * definidas en la interfaz {@link WebSocketEndpoint}.</p>
  */
-final class JettyWebSocketEndpointAdapter implements Session.Listener.AutoDemanding {
+public final class JettyWebSocketEndpointAdapter implements Session.Listener.AutoDemanding {
 
     private final WebSocketEndpoint endpoint;
     private final String path;
@@ -60,7 +60,7 @@ final class JettyWebSocketEndpointAdapter implements Session.Listener.AutoDemand
      * @param queryParams parámetros de la consulta HTTP
      * @param headers    cabeceras HTTP
      */
-    JettyWebSocketEndpointAdapter(final WebSocketEndpoint endpoint, final String path,
+    public JettyWebSocketEndpointAdapter(final WebSocketEndpoint endpoint, final String path,
             final Map<String, String> pathParams, final Map<String, List<String>> queryParams,
             final Map<String, List<String>> headers) {
         this.endpoint = endpoint;
@@ -104,7 +104,10 @@ final class JettyWebSocketEndpointAdapter implements Session.Listener.AutoDemand
     public void onWebSocketPartialText(final String payload, final boolean fin) {
         if (fin) {
             onWebSocketText(payload);
+            return;
         }
+        onWebSocketClose(WebSocketCloseStatus.PROTOCOL_ERROR.code(),
+                "unsupported:text_fragmentation", Callback.NOOP);
     }
 
     @Override
@@ -113,7 +116,8 @@ final class JettyWebSocketEndpointAdapter implements Session.Listener.AutoDemand
             onWebSocketBinary(payload, callback);
             return;
         }
-        callback.succeed();
+        callback.fail(new UnsupportedOperationException("unsupported: binary fragmentation"));
+        handleFailure(new UnsupportedOperationException("unsupported: binary fragmentation"));
     }
 
     @Override

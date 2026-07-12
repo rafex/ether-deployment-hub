@@ -88,6 +88,10 @@
 			<artifactId>ether-websocket-core</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>dev.rafex.ether.websocket</groupId>
+			<artifactId>ether-websocket-jetty12</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-server</artifactId>
 		</dependency>

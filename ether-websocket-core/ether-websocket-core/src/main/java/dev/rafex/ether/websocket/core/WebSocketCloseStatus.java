@@ -40,6 +40,18 @@ public record WebSocketCloseStatus(int code, String reason) {
     public static final WebSocketCloseStatus PROTOCOL_ERROR = new WebSocketCloseStatus(1002, "protocol_error");
     /** Se recibió un tipo de mensaje que no es aceptable. */
     public static final WebSocketCloseStatus NOT_ACCEPTABLE = new WebSocketCloseStatus(1003, "not_acceptable");
+    /** Código reservado: no debe enviarse en frames de cierre. */
+    public static final WebSocketCloseStatus RESERVED_NO_STATUS = new WebSocketCloseStatus(1005, "no_status");
+    /** Código reservado: cierre anormal sin frame de cierre. */
+    public static final WebSocketCloseStatus RESERVED_ABNORMAL = new WebSocketCloseStatus(1006, "abnormal");
+    /** El contenido del frame no es consistente con el tipo esperado. */
+    public static final WebSocketCloseStatus INCONSISTENT_DATA = new WebSocketCloseStatus(1007, "inconsistent_data");
+    /** Violación de política (por ejemplo, acceso denegado). */
+    public static final WebSocketCloseStatus POLICY_VIOLATION = new WebSocketCloseStatus(1008, "policy_violation");
+    /** El mensaje es demasiado grande para ser procesado. */
+    public static final WebSocketCloseStatus MESSAGE_TOO_BIG = new WebSocketCloseStatus(1009, "message_too_big");
+    /** El cliente esperaba una extensión obligatoria que el servidor no negoció. */
+    public static final WebSocketCloseStatus MANDATORY_EXTENSION = new WebSocketCloseStatus(1010, "mandatory_extension");
     /** El servidor encontró un error inesperado que impide continuar. */
     public static final WebSocketCloseStatus SERVER_ERROR = new WebSocketCloseStatus(1011, "server_error");
 

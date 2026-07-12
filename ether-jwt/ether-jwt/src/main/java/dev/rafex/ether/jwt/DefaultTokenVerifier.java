@@ -46,6 +46,7 @@ public final class DefaultTokenVerifier implements TokenVerifier {
 
     @Override
     public VerificationResult verify(final String token, final Instant now) {
+        Objects.requireNonNull(now, "now must not be null");
         try {
             final JwtCodec.ParsedJwt parsed = JwtCodec.parse(token);
             final JwtAlgorithm tokenAlg = JwtAlgorithm.fromHeaderValue(parsed.header().path("alg").asText(null));
@@ -60,7 +61,7 @@ public final class DefaultTokenVerifier implements TokenVerifier {
             final String tokenTypeRaw = ClaimsMapper.tokenTypeRaw(parsed.payload());
             final TokenClaims claims = ClaimsMapper.fromPayload(parsed.payload());
             final VerificationCode validationResult = TokenValidator.validate(claims, parsed.payload(), config,
-                    now == null ? Instant.now() : now, tokenTypeRaw);
+                    now, tokenTypeRaw);
 
             if (validationResult != VerificationCode.OK) {
                 return VerificationResult.fail(validationResult);
