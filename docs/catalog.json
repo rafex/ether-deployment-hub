@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-12T10:02:50Z",
-  "totalModules": 28,
+  "generatedAt": "2026-07-12T20:01:07Z",
+  "totalModules": 29,
   "deployOrder": [
     "ether-parent",
     "ether-config",
@@ -26,6 +26,7 @@
     "ether-websocket-core",
     "ether-http-jetty12",
     "ether-websocket-jetty12",
+    "ether-websocket-proxy-jetty12",
     "ether-webhook",
     "ether-glowroot-jetty12",
     "ether-archetype",
@@ -394,6 +395,22 @@
       "dependencyReleaseImpact": "patch",
       "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.websocket/ether-websocket-jetty12",
       "mavenCoord": "dev.rafex.ether.websocket:ether-websocket-jetty12"
+    },
+    {
+      "name": "ether-websocket-proxy-jetty12",
+      "groupId": "dev.rafex.ether.websocket",
+      "artifactId": "ether-websocket-proxy-jetty12",
+      "version": "9.5.5",
+      "deployed": false,
+      "description": "",
+      "dependencies": [
+        "ether-parent",
+        "ether-websocket-core",
+        "ether-http-jetty12"
+      ],
+      "dependencyReleaseImpact": "patch",
+      "artifactUrl": "",
+      "mavenCoord": "dev.rafex.ether.websocket:ether-websocket-proxy-jetty12"
     },
     {
       "name": "ether-webhook",
