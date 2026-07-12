@@ -207,6 +207,15 @@
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.websocket/ether-websocket-jetty12"
   },
   {
+    "module": "ether-websocket-proxy-jetty12",
+    "groupId": "dev.rafex.ether.websocket",
+    "artifactId": "ether-websocket-proxy-jetty12",
+    "deployed": false,
+    "latestVersion": "",
+    "lastUpdatedUtc": "",
+    "artifactUrl": "https://central.sonatype.com/search?q=ether-websocket-proxy-jetty12"
+  },
+  {
     "module": "ether-webhook",
     "groupId": "dev.rafex.ether.webhook",
     "artifactId": "ether-webhook",
