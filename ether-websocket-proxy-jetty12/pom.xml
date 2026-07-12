@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>dev.rafex.ether.parent</groupId>
+		<artifactId>ether-parent</artifactId>
+		<version>9.5.5-SNAPSHOT</version>
+		<relativePath>../../ether-parent/ether-parent/pom.xml</relativePath>
+	</parent>
+
+	<groupId>dev.rafex.ether.websocket</groupId>
+	<artifactId>ether-websocket-proxy-jetty12</artifactId>
+	<version>9.5.5-SNAPSHOT</version>
+
+	<packaging>jar</packaging>
+	<name>${project.artifactId}</name>
+
+	<url>https://rafex.dev/ether/websocket/proxy/jetty12</url>
+
+	<description>
+		WebSocket reverse-proxy endpoint for Ether. Bridges client WebSocket
+		connections to backend servers through the HTTP-server handler chain.
+	</description>
+
+	<licenses>
+		<license>
+			<name>MIT License</name>
+			<url>https://opensource.org/license/mit/</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<issueManagement>
+		<system>GitHub Issues</system>
+		<url>https://github.com/rafex/ether-websocket-proxy-jetty12/issues</url>
+	</issueManagement>
+
+	<developers>
+		<developer>
+			<name>Raúl Eduardo González Argote</name>
+			<email>rafex@rafex.dev</email>
+			<organization>dev.rafex</organization>
+			<organizationUrl>https://rafex.dev</organizationUrl>
+		</developer>
+	</developers>
+
+	<scm>
+		<connection>scm:git:https://github.com/rafex/ether-websocket-proxy-jetty12.git</connection>
+		<developerConnection>scm:git:https://github.com/rafex/ether-websocket-proxy-jetty12.git</developerConnection>
+		<url>https://github.com/rafex/ether-websocket-proxy-jetty12</url>
+	</scm>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>dev.rafex.ether.websocket</groupId>
+			<artifactId>ether-websocket-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>dev.rafex.ether.http</groupId>
+			<artifactId>ether-http-jetty12</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty.websocket</groupId>
+			<artifactId>jetty-websocket-jetty-client</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<finalName>${project.name}</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>flatten-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+</project>
