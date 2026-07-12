@@ -165,7 +165,7 @@ class JettyServerFactoryTest {
                 new RateLimitPolicy(RateLimitPolicy.Scope.GLOBAL, 10, 60, 2, 11));
 
         final var runner = JettyServerFactory.create(config, new JettyRouteRegistry(),
-                JsonCodecBuilder.strict().build(), null, List.of(), List.of(), securityProfile,
+                JsonCodecBuilder.strict().build(), null, List.of(), List.of(), List.of(), securityProfile,
                 new UuidRequestIdGenerator(), timings::add);
 
         assertNotNull(findHandler(runner.server().getHandler(), JettyObservabilityHandler.class));
@@ -188,7 +188,7 @@ class JettyServerFactoryTest {
                 HttpSecurityProfile.defaults().ipPolicy(), HttpSecurityProfile.defaults().rateLimit());
 
         final var runner = JettyServerFactory.create(config, new JettyRouteRegistry(),
-                JsonCodecBuilder.strict().build(), null, List.of(), List.of(), securityProfile,
+                JsonCodecBuilder.strict().build(), null, List.of(), List.of(), List.of(), securityProfile,
                 new UuidRequestIdGenerator(), sample -> {
                 });
 

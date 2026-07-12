@@ -118,6 +118,7 @@
 		<ether-http-jetty12.version>9.5.5-SNAPSHOT</ether-http-jetty12.version>
 		<ether-websocket-core.version>9.5.5-SNAPSHOT</ether-websocket-core.version>
 		<ether-websocket-jetty12.version>9.5.5-SNAPSHOT</ether-websocket-jetty12.version>
+		<ether-websocket-proxy-jetty12.version>9.5.5-SNAPSHOT</ether-websocket-proxy-jetty12.version>
 		<ether-webhook.version>9.5.5-SNAPSHOT</ether-webhook.version>
 		<ether-glowroot-jetty12.version>9.5.5-SNAPSHOT</ether-glowroot-jetty12.version>
 		<ether-hexagonal-archetype.version>1.0.0-SNAPSHOT</ether-hexagonal-archetype.version>
@@ -189,6 +190,11 @@
 			<dependency>
 				<groupId>org.eclipse.jetty.websocket</groupId>
 				<artifactId>jetty-websocket-jetty-server</artifactId>
+				<version>${jetty.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.eclipse.jetty.websocket</groupId>
+				<artifactId>jetty-websocket-jetty-client</artifactId>
 				<version>${jetty.version}</version>
 			</dependency>
 			<dependency>
@@ -308,6 +314,11 @@
 				<groupId>dev.rafex.ether.websocket</groupId>
 				<artifactId>ether-websocket-jetty12</artifactId>
 				<version>${ether-websocket-jetty12.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>dev.rafex.ether.websocket</groupId>
+				<artifactId>ether-websocket-proxy-jetty12</artifactId>
+				<version>${ether-websocket-proxy-jetty12.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>dev.rafex.ether.webhook</groupId>

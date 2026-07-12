@@ -26,9 +26,12 @@ package dev.rafex.ether.http.jetty12;
  * #L%
  */
 
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.eclipse.jetty.http.pathmap.PathSpec;
@@ -43,7 +46,12 @@ import org.eclipse.jetty.server.handler.PathMappingsHandler;
 import org.eclipse.jetty.server.handler.QoSHandler;
 import org.eclipse.jetty.server.handler.SizeLimitHandler;
 import org.eclipse.jetty.server.handler.ThreadLimitHandler;
+import org.eclipse.jetty.util.MultiMap;
+import org.eclipse.jetty.util.UrlEncoded;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
+import org.eclipse.jetty.websocket.server.ServerUpgradeRequest;
+import org.eclipse.jetty.websocket.server.ServerUpgradeResponse;
+import org.eclipse.jetty.websocket.server.WebSocketUpgradeHandler;
 
 import dev.rafex.ether.http.core.AuthPolicy;
 import dev.rafex.ether.http.jetty12.middleware.JettyMiddleware;
@@ -54,12 +62,15 @@ import dev.rafex.ether.http.jetty12.routing.JettyRouteRegistration;
 import dev.rafex.ether.http.jetty12.routing.JettyRouteRegistry;
 import dev.rafex.ether.http.jetty12.security.JettyAuthPolicyRegistry;
 import dev.rafex.ether.http.jetty12.security.TokenVerifier;
+import dev.rafex.ether.http.jetty12.websocket.JettyWebSocketEndpointAdapter;
 import dev.rafex.ether.http.security.profile.HttpSecurityProfile;
 import dev.rafex.ether.http.security.proxy.TrustedProxyPolicy;
 import dev.rafex.ether.json.JsonCodec;
 import dev.rafex.ether.observability.core.request.RequestIdGenerator;
 import dev.rafex.ether.observability.core.request.UuidRequestIdGenerator;
 import dev.rafex.ether.observability.core.timing.TimingRecorder;
+import dev.rafex.ether.websocket.core.WebSocketPatterns;
+import dev.rafex.ether.websocket.core.WebSocketRoute;
 
 public final class JettyServerFactory {
 
@@ -71,20 +82,21 @@ public final class JettyServerFactory {
 
     public static JettyServerRunner create(final JettyServerConfig config, final JettyRouteRegistry routeRegistry,
             final JsonCodec jsonCodec) {
-        return create(config, routeRegistry, jsonCodec, null, List.of(), List.of(), HttpSecurityProfile.defaults(),
-                new UuidRequestIdGenerator(), NOOP_TIMING_RECORDER);
-    }
-
-    public static JettyServerRunner create(final JettyServerConfig config, final JettyRouteRegistry routeRegistry,
-            final JsonCodec jsonCodec, final TokenVerifier tokenVerifier, final List<AuthPolicy> authPolicies,
-            final List<JettyMiddleware> middlewares) {
-        return create(config, routeRegistry, jsonCodec, tokenVerifier, authPolicies, middlewares,
+        return create(config, routeRegistry, jsonCodec, null, List.of(), List.of(), List.of(),
                 HttpSecurityProfile.defaults(), new UuidRequestIdGenerator(), NOOP_TIMING_RECORDER);
     }
 
     public static JettyServerRunner create(final JettyServerConfig config, final JettyRouteRegistry routeRegistry,
             final JsonCodec jsonCodec, final TokenVerifier tokenVerifier, final List<AuthPolicy> authPolicies,
-            final List<JettyMiddleware> middlewares, final HttpSecurityProfile securityProfile,
+            final List<JettyMiddleware> middlewares) {
+        return create(config, routeRegistry, jsonCodec, tokenVerifier, authPolicies, middlewares, List.of(),
+                HttpSecurityProfile.defaults(), new UuidRequestIdGenerator(), NOOP_TIMING_RECORDER);
+    }
+
+    public static JettyServerRunner create(final JettyServerConfig config, final JettyRouteRegistry routeRegistry,
+            final JsonCodec jsonCodec, final TokenVerifier tokenVerifier, final List<AuthPolicy> authPolicies,
+            final List<JettyMiddleware> middlewares, final List<WebSocketRoute> wsRoutes,
+            final HttpSecurityProfile securityProfile,
             final RequestIdGenerator requestIdGenerator, final TimingRecorder timingRecorder) {
 
         Objects.requireNonNull(config, "config");
@@ -115,7 +127,8 @@ public final class JettyServerFactory {
         server.addConnector(connector);
 
         final var routesHandler = buildRoutes(routeRegistry.routes());
-        final var withAuth = applyAuthPolicies(routesHandler, tokenVerifier, jsonCodec, authPolicies);
+        final var withWebSockets = buildWebSocketHandler(server, routesHandler, wsRoutes);
+        final var withAuth = applyAuthPolicies(withWebSockets, tokenVerifier, jsonCodec, authPolicies);
         final var withMiddlewares = applyMiddlewares(withAuth,
                 mergeMiddlewares(jsonCodec, securityProfile, requestIdGenerator, timingRecorder, middlewares));
         final var withSizeLimits = applySizeLimits(withMiddlewares, config);
@@ -148,6 +161,7 @@ public final class JettyServerFactory {
         final var routeRegistry = new JettyRouteRegistry();
         final var authPolicyRegistry = new JettyAuthPolicyRegistry();
         final var middlewareRegistry = new JettyMiddlewareRegistry();
+        final var wsRoutes = new ArrayList<WebSocketRoute>();
 
         final var context = new JettyModuleContext(config, jsonCodec, tokenVerifier, securityProfile,
                 requestIdGenerator, timingRecorder);
@@ -155,11 +169,13 @@ public final class JettyServerFactory {
             module.registerRoutes(routeRegistry, context);
             module.registerAuthPolicies(authPolicyRegistry, context);
             module.registerMiddlewares(middlewareRegistry, context);
+            module.registerWebSocketRoutes(wsRoutes, context);
         }
         JettyBuiltinModule.registerRoutes(routeRegistry, context);
 
         return create(config, routeRegistry, jsonCodec, tokenVerifier, authPolicyRegistry.policies(),
-                middlewareRegistry.middlewares(), securityProfile, requestIdGenerator, timingRecorder);
+                middlewareRegistry.middlewares(), List.copyOf(wsRoutes), securityProfile, requestIdGenerator,
+                timingRecorder);
     }
 
     private static PathMappingsHandler buildRoutes(final List<JettyRouteRegistration> routes) {
@@ -168,6 +184,77 @@ public final class JettyServerFactory {
             handler.addMapping(PathSpec.from(route.pathSpec()), route.handler());
         }
         return handler;
+    }
+
+    private static Handler buildWebSocketHandler(final Server server, final PathMappingsHandler httpHandler,
+            final List<WebSocketRoute> wsRoutes) {
+        if (wsRoutes == null || wsRoutes.isEmpty()) {
+            return httpHandler;
+        }
+
+        final var wsHandler = WebSocketUpgradeHandler.from(server, container -> {
+            for (final var route : wsRoutes) {
+                container.addMapping(PathSpec.from(route.pattern()),
+                        (request, response, callback) -> createEndpoint(route, request, response));
+            }
+        });
+        wsHandler.setHandler(httpHandler);
+        return wsHandler;
+    }
+
+    private static Object createEndpoint(final WebSocketRoute route, final ServerUpgradeRequest request,
+            final ServerUpgradeResponse response) {
+        final var path = request.getHttpURI().getPath();
+        final var pathParams = WebSocketPatterns.match(route.pattern(), path).orElse(Map.of());
+        final var headers = headersOf(request);
+        final var queryParams = queryOf(request);
+        negotiateSubprotocol(route, request, response);
+        return new JettyWebSocketEndpointAdapter(route.endpoint(), path, pathParams, queryParams, headers);
+    }
+
+    private static void negotiateSubprotocol(final WebSocketRoute route, final ServerUpgradeRequest request,
+            final ServerUpgradeResponse response) {
+        final var supported = route.endpoint().subprotocols();
+        if (supported == null || supported.isEmpty()) {
+            return;
+        }
+        for (final var requested : request.getSubProtocols()) {
+            if (supported.contains(requested)) {
+                response.setAcceptedSubProtocol(requested);
+                return;
+            }
+        }
+    }
+
+    private static Map<String, List<String>> headersOf(final ServerUpgradeRequest request) {
+        final var out = new LinkedHashMap<String, List<String>>();
+        for (final var field : request.getHeaders()) {
+            out.computeIfAbsent(field.getName(), ignored -> new ArrayList<>()).add(field.getValue());
+        }
+        return copyMultiMap(out);
+    }
+
+    private static Map<String, List<String>> queryOf(final ServerUpgradeRequest request) {
+        final MultiMap<String> params = new MultiMap<>();
+        final var rawQuery = request.getHttpURI().getQuery();
+        if (rawQuery != null && !rawQuery.isEmpty()) {
+            UrlEncoded.decodeTo(rawQuery, params, StandardCharsets.UTF_8);
+        }
+
+        final var out = new LinkedHashMap<String, List<String>>();
+        for (final var key : params.keySet()) {
+            final var values = params.getValues(key);
+            out.put(key, values == null ? List.of() : List.copyOf(values));
+        }
+        return Map.copyOf(out);
+    }
+
+    private static Map<String, List<String>> copyMultiMap(final Map<String, List<String>> input) {
+        final var out = new LinkedHashMap<String, List<String>>();
+        for (final var entry : input.entrySet()) {
+            out.put(entry.getKey(), entry.getValue() == null ? List.of() : List.copyOf(entry.getValue()));
+        }
+        return Map.copyOf(out);
     }
 
     private static Handler applyAuthPolicies(final Handler delegate, final TokenVerifier tokenVerifier,
