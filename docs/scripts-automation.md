@@ -180,7 +180,7 @@ Basado en `releases/manifest.json` y `MAX_LEVEL_SIZE=5`, el orden actual es:
 ## Convenciones CI/Runtime
 
 - GitHub workflows fuerzan JavaScript actions a Node 24 via `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true`
-- Publicación a Central espera disponibilidad con `central.waitUntil=published` (configurable)
+- Publicación a Central espera disponibilidad con `central.waitUntil=validated` (configurable)
 - **Java 25 LTS** (Temurin) en todos los workflows desde la rama `migrate-jdk25`
 
 ## Make targets (CI)

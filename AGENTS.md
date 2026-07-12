@@ -20,7 +20,7 @@
 - GitHub workflows force JavaScript actions to Node 24 via:
   - `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true`
 - Central publishing waits for availability with:
-  - `central.waitUntil=published` (default, configurable)
+  - `central.waitUntil=validated` (default, configurable)
 
 ## Java platform
 - **Target JDK: 25 LTS** (Temurin) — migrated from Java 21 on branch `migrate-jdk25`.

@@ -65,28 +65,41 @@ public final class WebSocketProxyEndpoint implements WebSocketEndpoint {
         this.connectTimeout = Objects.requireNonNull(connectTimeout, "connectTimeout");
     }
 
+    public int activeConnections() {
+        return backendSessions.size();
+    }
+
     @Override
     public void onOpen(final WebSocketSession clientSession) throws Exception {
+        final var clientId = clientSession.id();
+        final var requestId = requestIdOf(clientSession);
         final var backendUri = backendResolver.resolve(clientSession);
         if (backendUri == null) {
-            LOG.warning(() -> "proxy: client=%s → backend URI is null".formatted(clientSession.id()));
+            LOG.warning(() -> "[%s] proxy: client=%s backend URI null".formatted(requestId, clientId));
             clientSession.close(WebSocketCloseStatus.SERVER_ERROR);
             return;
         }
 
+        final var start = System.nanoTime();
         try {
-            final var backendListener = new BackendSessionListener(clientSession);
+            final var backendListener = new BackendSessionListener(clientSession, requestId);
             final var backendSession = wsClient.connect(backendListener, backendUri)
                     .get(connectTimeout.toMillis(), TimeUnit.MILLISECONDS);
 
-            final var previous = backendSessions.put(clientSession.id(), backendSession);
+            final var previous = backendSessions.put(clientId, backendSession);
             if (previous != null) {
                 previous.close(WebSocketCloseStatus.GOING_AWAY.code(),
                         WebSocketCloseStatus.GOING_AWAY.reason(), Callback.NOOP);
             }
+
+            final var elapsed = Duration.ofNanos(System.nanoTime() - start);
+            LOG.info(() -> "[%s] proxy: client=%s → backend=%s connected (%dms, total=%d)"
+                    .formatted(requestId, clientId, backendUri, elapsed.toMillis(), activeConnections()));
         } catch (final Exception e) {
+            final var elapsed = Duration.ofNanos(System.nanoTime() - start);
             LOG.log(Level.WARNING, e,
-                    () -> "proxy: client=%s → backend=%s connect failed".formatted(clientSession.id(), backendUri));
+                    () -> "[%s] proxy: client=%s → backend=%s failed (%dms, total=%d)"
+                            .formatted(requestId, clientId, backendUri, elapsed.toMillis(), activeConnections()));
             clientSession.close(WebSocketCloseStatus.SERVER_ERROR);
         }
     }
@@ -95,28 +108,45 @@ public final class WebSocketProxyEndpoint implements WebSocketEndpoint {
     public void onText(final WebSocketSession session, final String message) throws Exception {
         final var backend = backendSessions.get(session.id());
         if (backend != null && backend.isOpen()) {
+            LOG.fine(() -> "[%s] proxy: client=%s → backend TEXT(%d)"
+                    .formatted(requestIdOf(session), session.id(), message.length()));
             backend.sendText(message, Callback.NOOP);
+            return;
         }
+        LOG.warning(() -> "[%s] proxy: client=%s onText but backend unavailable"
+                .formatted(requestIdOf(session), session.id()));
     }
 
     @Override
     public void onBinary(final WebSocketSession session, final ByteBuffer message) throws Exception {
         final var backend = backendSessions.get(session.id());
         if (backend != null && backend.isOpen()) {
+            final var size = message == null ? 0 : message.remaining();
+            LOG.fine(() -> "[%s] proxy: client=%s → backend BIN(%d)"
+                    .formatted(requestIdOf(session), session.id(), size));
             backend.sendBinary(message, Callback.NOOP);
+            return;
         }
+        LOG.warning(() -> "[%s] proxy: client=%s onBinary but backend unavailable"
+                .formatted(requestIdOf(session), session.id()));
     }
 
     @Override
     public void onClose(final WebSocketSession session, final WebSocketCloseStatus closeStatus) throws Exception {
-        closeBackend(session.id(), closeStatus);
+        final var clientId = session.id();
+        final var requestId = requestIdOf(session);
+        closeBackend(clientId, closeStatus);
+        LOG.info(() -> "[%s] proxy: client=%s closed (%d %s, total=%d)"
+                .formatted(requestId, clientId, closeStatus.code(), closeStatus.reason(), activeConnections()));
     }
 
     @Override
     public void onError(final WebSocketSession session, final Throwable error) {
+        final var clientId = session.id();
+        final var requestId = requestIdOf(session);
         LOG.log(Level.WARNING, error,
-                () -> "proxy: client=%s error".formatted(session.id()));
-        closeBackend(session.id(), WebSocketCloseStatus.SERVER_ERROR);
+                () -> "[%s] proxy: client=%s error (total=%d)".formatted(requestId, clientId, activeConnections()));
+        closeBackend(clientId, WebSocketCloseStatus.SERVER_ERROR);
     }
 
     @Override
@@ -135,28 +165,45 @@ public final class WebSocketProxyEndpoint implements WebSocketEndpoint {
         }
     }
 
+    private static String requestIdOf(final WebSocketSession session) {
+        final var attr = session.attribute("requestId");
+        return attr != null ? attr.toString() : session.id();
+    }
+
     private static final class BackendSessionListener implements Session.Listener.AutoDemanding {
 
         private final WebSocketSession clientSession;
+        private final String requestId;
 
-        BackendSessionListener(final WebSocketSession clientSession) {
+        BackendSessionListener(final WebSocketSession clientSession, final String requestId) {
             this.clientSession = clientSession;
+            this.requestId = requestId;
         }
 
         @Override
         public void onWebSocketOpen(final Session session) {
+            LOG.fine(() -> "[%s] proxy: backend session opened for client=%s"
+                    .formatted(requestId, clientSession.id()));
         }
 
         @Override
         public void onWebSocketText(final String message) {
             if (clientSession.isOpen()) {
+                LOG.fine(() -> "[%s] proxy: backend → client=%s TEXT(%d)"
+                        .formatted(requestId, clientSession.id(), message.length()));
                 clientSession.sendText(message);
+                return;
             }
+            LOG.warning(() -> "[%s] proxy: backend text but client=%s closed"
+                    .formatted(requestId, clientSession.id()));
         }
 
         @Override
         public void onWebSocketBinary(final ByteBuffer payload, final Callback callback) {
             if (clientSession.isOpen()) {
+                final var size = payload == null ? 0 : payload.remaining();
+                LOG.fine(() -> "[%s] proxy: backend → client=%s BIN(%d)"
+                        .formatted(requestId, clientSession.id(), size));
                 clientSession.sendBinary(payload);
             }
             callback.succeed();
@@ -164,6 +211,8 @@ public final class WebSocketProxyEndpoint implements WebSocketEndpoint {
 
         @Override
         public void onWebSocketClose(final int statusCode, final String reason, final Callback callback) {
+            LOG.info(() -> "[%s] proxy: backend closed (%d %s) for client=%s"
+                    .formatted(requestId, statusCode, reason, clientSession.id()));
             if (clientSession.isOpen()) {
                 clientSession.close(WebSocketCloseStatus.of(statusCode, reason));
             }
@@ -172,6 +221,8 @@ public final class WebSocketProxyEndpoint implements WebSocketEndpoint {
 
         @Override
         public void onWebSocketError(final Throwable cause) {
+            LOG.log(Level.WARNING, cause,
+                    () -> "[%s] proxy: backend error for client=%s".formatted(requestId, clientSession.id()));
             if (clientSession.isOpen()) {
                 clientSession.close(WebSocketCloseStatus.SERVER_ERROR);
             }

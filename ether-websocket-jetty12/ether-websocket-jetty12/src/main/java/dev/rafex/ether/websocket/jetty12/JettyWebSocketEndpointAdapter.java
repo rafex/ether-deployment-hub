@@ -29,6 +29,7 @@ package dev.rafex.ether.websocket.jetty12;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.eclipse.jetty.websocket.api.Callback;
 import org.eclipse.jetty.websocket.api.Session;
@@ -73,6 +74,7 @@ public final class JettyWebSocketEndpointAdapter implements Session.Listener.Aut
     @Override
     public void onWebSocketOpen(final Session session) {
         this.session = new JettyWebSocketSession(session, path, pathParams, queryParams, headers);
+        this.session.attribute("requestId", resolveRequestId(headers));
         try {
             endpoint.onOpen(this.session);
         } catch (final Exception e) {
@@ -140,6 +142,14 @@ public final class JettyWebSocketEndpointAdapter implements Session.Listener.Aut
         if (session != null && session.isOpen()) {
             session.close(WebSocketCloseStatus.SERVER_ERROR);
         }
+    }
+
+    private static String resolveRequestId(final Map<String, List<String>> headers) {
+        final var values = headers.get("x-request-id");
+        if (values != null && !values.isEmpty() && values.get(0) != null && !values.get(0).isBlank()) {
+            return values.get(0);
+        }
+        return UUID.randomUUID().toString();
     }
 
     @Override

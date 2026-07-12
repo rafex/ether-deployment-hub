@@ -26,7 +26,10 @@ package dev.rafex.ether.http.jetty12;
  * #L%
  */
 
+import java.time.Duration;
 import java.time.Instant;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
@@ -38,6 +41,8 @@ import dev.rafex.ether.observability.core.timing.TimingRecorder;
 import dev.rafex.ether.observability.core.timing.TimingSample;
 
 final class JettyObservabilityHandler extends Handler.Wrapper {
+
+    private static final Logger LOG = Logger.getLogger(JettyObservabilityHandler.class.getName());
 
     static final String REQUEST_ID_ATTRIBUTE = "ether.request.id";
     private static final String REQUEST_ID_HEADER = "X-Request-Id";
@@ -58,10 +63,33 @@ final class JettyObservabilityHandler extends Handler.Wrapper {
         request.setAttribute(REQUEST_ID_ATTRIBUTE, requestId);
         response.getHeaders().put(REQUEST_ID_HEADER, requestId);
 
+        final var method = request.getMethod();
+        final var path = request.getHttpURI().getPath();
+        LOG.info(() -> "[%s] → %s %s".formatted(requestId, method, path));
+
         final var startedAt = Instant.now();
+        final var startNanos = System.nanoTime();
+        final var wrappedCallback = new Callback() {
+            @Override
+            public void succeeded() {
+                final var elapsed = Duration.ofNanos(System.nanoTime() - startNanos);
+                LOG.info(() -> "[%s] ← %s %s %d (%dms)".formatted(
+                        requestId, method, path, response.getStatus(), elapsed.toMillis()));
+                callback.succeeded();
+            }
+
+            @Override
+            public void failed(final Throwable x) {
+                final var elapsed = Duration.ofNanos(System.nanoTime() - startNanos);
+                LOG.log(Level.WARNING, x, () -> "[%s] ← %s %s FAILED (%dms)".formatted(
+                        requestId, method, path, elapsed.toMillis()));
+                callback.failed(x);
+            }
+        };
+
         Request.addCompletionListener(request, failure -> timingRecorder.record(new TimingSample(
-                request.getMethod() + " " + request.getHttpURI().getPath(), startedAt, Instant.now())));
-        return super.handle(request, response, callback);
+                method + " " + path, startedAt, Instant.now())));
+        return super.handle(request, response, wrappedCallback);
     }
 
     private String resolveRequestId(final Request request) {

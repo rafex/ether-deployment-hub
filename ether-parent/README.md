@@ -343,7 +343,7 @@ Required `~/.m2/settings.xml` entry:
 </servers>
 ```
 
-The `central.waitUntil` property defaults to `published`, which means the Maven build does not return until the artifact is fully available on Maven Central.
+The `central.waitUntil` property defaults to `validated`, which means the Maven build returns after the deployment bundle has been uploaded and validated on Maven Central, without waiting for full publication.
 
 ---
 
