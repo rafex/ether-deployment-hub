@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-07T17:16:22Z",
+  "generatedAt": "2026-07-12T10:02:50Z",
   "totalModules": 28,
   "deployOrder": [
     "ether-parent",
@@ -44,7 +44,7 @@
       "name": "ether-parent",
       "groupId": "dev.rafex.ether.parent",
       "artifactId": "ether-parent",
-      "version": "9.6.4",
+      "version": "9.6.5",
       "deployed": true,
       "description": "Parent POM and BOM managing all external dependency versions across the ecosystem",
       "dependencies": [],
@@ -160,13 +160,13 @@
       "groupId": "dev.rafex.ether.cron",
       "artifactId": "ether-cron",
       "version": "9.5.5",
-      "deployed": false,
+      "deployed": true,
       "description": "Lightweight embedded scheduler for Ether applications using JDK ScheduledExecutorService",
       "dependencies": [
         "ether-parent"
       ],
       "dependencyReleaseImpact": "patch",
-      "artifactUrl": "https://central.sonatype.com/search?q=ether-cron",
+      "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.cron/ether-cron",
       "mavenCoord": "dev.rafex.ether.cron:ether-cron"
     },
     {

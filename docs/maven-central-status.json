@@ -4,7 +4,7 @@
     "groupId": "dev.rafex.ether.parent",
     "artifactId": "ether-parent",
     "deployed": true,
-    "latestVersion": "9.6.4",
+    "latestVersion": "9.6.5",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.parent/ether-parent"
   },
@@ -75,10 +75,10 @@
     "module": "ether-cron",
     "groupId": "dev.rafex.ether.cron",
     "artifactId": "ether-cron",
-    "deployed": false,
-    "latestVersion": "",
+    "deployed": true,
+    "latestVersion": "9.5.5",
     "lastUpdatedUtc": "",
-    "artifactUrl": "https://central.sonatype.com/search?q=ether-cron"
+    "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.cron/ether-cron"
   },
   {
     "module": "ether-jwt",
