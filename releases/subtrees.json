@@ -227,6 +227,14 @@
       "branch": "main",
       "importedSha": "329be14e86d62b19195c8357677666127f3fcd27",
       "releaseManifest": true
+    },
+    {
+      "name": "ether-websocket-proxy-jetty12",
+      "prefix": "ether-websocket-proxy-jetty12",
+      "url": "git@github.com:rafex/ether-websocket-proxy-jetty12.git",
+      "branch": "main",
+      "importedSha": "748977607ec03de3ed52abe2407b4f98c63e07b4",
+      "releaseManifest": true
     }
   ]
 }

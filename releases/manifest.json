@@ -26,6 +26,7 @@
     "ether-websocket-core",
     "ether-http-jetty12",
     "ether-websocket-jetty12",
+    "ether-websocket-proxy-jetty12",
     "ether-webhook",
     "ether-glowroot-jetty12",
     "ether-archetype",
@@ -471,6 +472,27 @@
       ],
       "internalDependencyProperties": {
         "ether-websocket-core": "ether-websocket-core.version"
+      },
+      "dependencyReleaseImpact": "patch"
+    },
+    {
+      "name": "ether-websocket-proxy-jetty12",
+      "path": "ether-websocket-proxy-jetty12",
+      "projectDir": "ether-websocket-proxy-jetty12/ether-websocket-proxy-jetty12",
+      "pomPath": "ether-websocket-proxy-jetty12/ether-websocket-proxy-jetty12/pom.xml",
+      "groupId": "dev.rafex.ether.websocket",
+      "artifactId": "ether-websocket-proxy-jetty12",
+      "currentVersion": "9.5.5",
+      "published": false,
+      "usesParent": true,
+      "dependencies": [
+        "ether-parent",
+        "ether-websocket-core",
+        "ether-http-jetty12"
+      ],
+      "internalDependencyProperties": {
+        "ether-websocket-core": "ether-websocket-core.version",
+        "ether-http-jetty12": "ether-http-jetty12.version"
       },
       "dependencyReleaseImpact": "patch"
     },
