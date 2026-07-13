@@ -18,7 +18,6 @@ import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
-import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
@@ -297,22 +296,14 @@ public final class GeminiCodec implements ProviderCodec {
                 .POST(BodyPublishers.ofString(body))
                 .build();
 
-        var response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofLines());
-
-        if (response.statusCode() != 200) {
-            String errorBody = response.body()
-                    .filter(l -> !l.isBlank())
-                    .reduce("", (a, b) -> a + b);
-            throw new RuntimeException(
-                    "Gemini returned HTTP %d: %s".formatted(response.statusCode(), errorBody));
-        }
+        var lines = CodecSse.sendAndCheckLines(httpClient, httpRequest, "Gemini");
 
         StringBuilder fullContent = new StringBuilder();
         ModelResponse toolResponse = null;
 
-        for (String line : (Iterable<String>) response.body()::iterator) {
-            if (!line.startsWith("data: ")) continue;
-            String data = line.substring(6).trim();
+        for (String line : (Iterable<String>) lines::iterator) {
+            String data = CodecSse.dataPayload(line);
+            if (data == null) continue;
 
             try {
                 JsonNode chunk = mapper.readTree(data);

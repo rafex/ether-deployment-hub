@@ -17,7 +17,6 @@ import dev.rafex.etherbrain.ports.model.ToolRequest;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
-import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -250,23 +249,15 @@ public final class AnthropicCodec implements ProviderCodec {
                 .POST(BodyPublishers.ofString(bodyStr))
                 .build();
 
-        var response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofLines());
-
-        if (response.statusCode() != 200) {
-            String errorBody = response.body()
-                    .filter(l -> !l.isBlank())
-                    .reduce("", (a, b) -> a + b);
-            throw new RuntimeException(
-                    "Anthropic returned HTTP %d: %s".formatted(response.statusCode(), errorBody));
-        }
+        var lines = CodecSse.sendAndCheckLines(httpClient, httpRequest, "Anthropic");
 
         StringBuilder fullContent = new StringBuilder();
         Map<Integer, AnthropicToolAccumulator> toolCalls = new LinkedHashMap<>();
         String stopReason = null;
 
-        for (String line : (Iterable<String>) response.body()::iterator) {
-            if (!line.startsWith("data: ")) continue;
-            String data = line.substring(6).trim();
+        for (String line : (Iterable<String>) lines::iterator) {
+            String data = CodecSse.dataPayload(line);
+            if (data == null) continue;
 
             try {
                 JsonNode event = mapper.readTree(data);
