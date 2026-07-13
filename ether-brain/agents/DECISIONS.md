@@ -255,3 +255,28 @@ Registrar una decision cuando cambie:
   arquitectura queda preparada para integrar MCP como proveedor de
   registros en vez de acoplar el protocolo al nucleo.
 - Reemplaza: `none`
+
+### DEC-0017 - Refactor guiado por characterization tests
+
+- Fecha: 2026-07-12
+- Estado: accepted
+- Contexto: varios modulos acumulaban duplicacion estructural sin red de
+  pruebas: `buildHttpClient` (TLS trust-all) identico en 4 clases de
+  `ether-brain-tools-remote`, el bloque de auth JWT/API-key en 3 clases,
+  la normalizacion de URL base en 4 codecs de `ether-brain-infra-http` y
+  el helper `env()` (getenv → system property → default) copiado en 5
+  clases de 3 modulos.
+- Decision: antes de refactorizar, cubrir el comportamiento con
+  characterization tests (fase 1: 116 tests en 6 modulos) y solo despues
+  extraer los helpers compartidos (fase 2): `RemoteHttp` (buildHttpClient
+  + applyAuth), `CodecEndpoints.base()` y `Env.get()` en
+  `ether-brain-bootstrap`. Cada extraccion se valida contra los tests
+  antes de commit. Se preservan los wrappers `env()` y todos los
+  call-sites para minimizar el diff.
+- Consecuencias: se eliminaron ~172 lineas duplicadas manteniendo APIs
+  publicas y comportamiento. El caso borde de token en blanco en
+  `KnowledgeSearchTool` se unifico con los demas callers (ahora omite el
+  header en lugar de enviar `X-API-Key` vacio). El `buildHttpClient` de
+  `Main.java` (CLI) se dejo aislado a proposito: migrarlo a `RemoteHttp`
+  acoplaria el modulo `transport-cli` a `tools-remote` solo por un helper.
+- Reemplaza: `none`

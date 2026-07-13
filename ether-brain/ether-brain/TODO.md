@@ -4,6 +4,40 @@ Estado actual del runtime y trabajo pendiente, ordenado por impacto.
 
 ---
 
+## Deuda técnica / Refactoring (auditoría 2026-07-12)
+
+Auditoría de calidad guiada por el knowledge graph (`codebase-memory-mcp`).
+Estrategia: **characterization tests primero** (fase 1), luego refactor con
+tests verdes (fase 2). Ver `agents/DECISIONS.md` → DEC-0017.
+
+### ✅ Hecho
+
+| # | Refactor | Módulo(s) | Commit |
+|---|---|---|---|
+| P1 | `buildHttpClient` duplicado ×4 → `RemoteHttp` (+`applyAuth`) | `tools-remote` | `cdc06f9` |
+| P1 | Normalización URL base en codecs → `CodecEndpoints.base()` | `infra-http` | `2cf1cea` |
+| P2 | `env()` duplicado ×5 → `Env.get()` en bootstrap | `bootstrap`, `transport-cli`, `transport-mqtt` | `690a94f` |
+| — | Red de seguridad: 116 characterization tests (6 módulos) | varios | `542839f` |
+
+### ⏳ Pendiente (ordenado por prioridad)
+
+| # | Hallazgo | Acción propuesta | Riesgo |
+|---|---|---|---|
+| P1 | Codecs AI (`OpenAi`/`Anthropic`/`Gemini`/`Bedrock`) con `generateStreaming`/`parseResponse` casi idénticos (complejidad 11–15) | Base class común o strategy para SSE parsing | Alto — cubierto por tests de codec |
+| P1 | `GlowrootJettyHandler.handle` complejidad 25/66 | Extraer sub-pasos privados (identity, threshold, requestId, status, user) | Medio — cubierto por `GlowrootJettyHandlerTest` |
+| P2 | `addToolResult` idéntico `AnthropicCodec` ↔ `BedrockCodec` | Helper compartido en `codec` | Bajo |
+| P2 | `appendJsonValue`/`extractJsonString` idénticos `OllamaModelClient` ↔ `OpenAiModelClient` | Helper JSON compartido (¿`common`?) | Medio — sin tests aún |
+| P2 | `copyMultiMap`/`createEndpoint` idénticos `JettyServerFactory` ↔ `JettyWebSocketServerFactory` | Mover a módulo compartido jetty | Medio — requiere dependencia común |
+| P2 | Recursividad sin guardas en 7 funciones (`JsonSchemaUtils.validate`, etc.) | Añadir profundidad máxima / validación | Medio |
+| P3 | Allocs en loops (`AgentLoop.run`, `formatResults`) | Pre-asignar capacidades | Bajo |
+| P3 | Constructores con 7–9 params (`HttpAgentServer`, `AgentLoop`, `AgentRuntime`) | Builder o record de configuración | Alto — API pública |
+
+> Nota: el `buildHttpClient` de `Main.java` (CLI) se dejó aislado a
+> propósito — migrarlo acoplaría `transport-cli` a `tools-remote`.
+> `downloadFileFromURL` (MavenWrapper) es código generado, no se toca.
+
+---
+
 ## Capacidades para agentes autónomos y multi-agente
 
 | Capacidad | Estado | Impacto | Módulo |
