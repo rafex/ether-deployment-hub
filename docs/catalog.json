@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-12T20:01:07Z",
+  "generatedAt": "2026-07-13T10:35:11Z",
   "totalModules": 29,
   "deployOrder": [
     "ether-parent",
@@ -45,7 +45,7 @@
       "name": "ether-parent",
       "groupId": "dev.rafex.ether.parent",
       "artifactId": "ether-parent",
-      "version": "9.6.5",
+      "version": "9.6.6",
       "deployed": true,
       "description": "Parent POM and BOM managing all external dependency versions across the ecosystem",
       "dependencies": [],
@@ -57,7 +57,7 @@
       "name": "ether-config",
       "groupId": "dev.rafex.ether.config",
       "artifactId": "ether-config",
-      "version": "9.5.6",
+      "version": "9.5.7",
       "deployed": true,
       "description": "Typed configuration entry points and composition APIs for Ether applications",
       "dependencies": [
@@ -72,7 +72,7 @@
       "name": "ether-crypto",
       "groupId": "dev.rafex.ether.crypto",
       "artifactId": "ether-crypto",
-      "version": "9.5.5",
+      "version": "9.5.6",
       "deployed": true,
       "description": "Cryptographic utilities: hashing, encoding, secure random, key generation",
       "dependencies": [
@@ -86,7 +86,7 @@
       "name": "ether-database-core",
       "groupId": "dev.rafex.ether.database",
       "artifactId": "ether-database-core",
-      "version": "9.5.5",
+      "version": "9.5.6",
       "deployed": true,
       "description": "Database contracts: DatabaseClient interface and RowMapper abstraction",
       "dependencies": [
@@ -100,7 +100,7 @@
       "name": "ether-jdbc",
       "groupId": "dev.rafex.ether.jdbc",
       "artifactId": "ether-jdbc",
-      "version": "9.5.5",
+      "version": "9.5.6",
       "deployed": true,
       "description": "JDBC implementation of ether-database-core abstractions",
       "dependencies": [
@@ -115,7 +115,7 @@
       "name": "ether-database-postgres",
       "groupId": "dev.rafex.ether.database",
       "artifactId": "ether-database-postgres",
-      "version": "9.5.5",
+      "version": "9.5.6",
       "deployed": true,
       "description": "PostgreSQL error classification, SQL state constants, and pg-specific helpers",
       "dependencies": [
@@ -130,7 +130,7 @@
       "name": "ether-database-sqlite",
       "groupId": "dev.rafex.ether.database",
       "artifactId": "ether-database-sqlite",
-      "version": "9.5.5",
+      "version": "9.5.6",
       "deployed": true,
       "description": "SQLite client wrapper, PRAGMA configuration, SQLite parameter helpers, and error utilities",
       "dependencies": [
@@ -146,7 +146,7 @@
       "name": "ether-json",
       "groupId": "dev.rafex.ether.json",
       "artifactId": "ether-json",
-      "version": "9.5.5",
+      "version": "9.5.6",
       "deployed": true,
       "description": "JsonCodec interface built on Jackson for flexible and pluggable serialization",
       "dependencies": [
@@ -160,7 +160,7 @@
       "name": "ether-cron",
       "groupId": "dev.rafex.ether.cron",
       "artifactId": "ether-cron",
-      "version": "9.5.5",
+      "version": "9.5.6",
       "deployed": true,
       "description": "Lightweight embedded scheduler for Ether applications using JDK ScheduledExecutorService",
       "dependencies": [
@@ -174,7 +174,7 @@
       "name": "ether-di",
       "groupId": "dev.rafex.ether.di",
       "artifactId": "ether-di",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "deployed": true,
       "description": "Explicit dependency injection building blocks for Java 21+: Lazy, Closer, and Bootstrap — no reflection, no annotations, GraalVM native-image compatible",
       "dependencies": [
@@ -188,7 +188,7 @@
       "name": "ether-jwt",
       "groupId": "dev.rafex.ether.jwt",
       "artifactId": "ether-jwt",
-      "version": "9.5.5",
+      "version": "9.5.6",
       "deployed": true,
       "description": "Lightweight cryptographic primitives for JWT: HS256, RS256, ES256 token operations",
       "dependencies": [
@@ -203,7 +203,7 @@
       "name": "ether-observability-core",
       "groupId": "dev.rafex.ether.observability",
       "artifactId": "ether-observability-core",
-      "version": "9.5.5",
+      "version": "9.5.6",
       "deployed": true,
       "description": "Health checks, request ID generation, timing recording, and metrics contracts",
       "dependencies": [
@@ -217,7 +217,7 @@
       "name": "ether-http-core",
       "groupId": "dev.rafex.ether.http",
       "artifactId": "ether-http-core",
-      "version": "9.5.6",
+      "version": "9.5.7",
       "deployed": true,
       "description": "Core HTTP contracts: HttpExchange, HttpHandler, Middleware, routing abstractions",
       "dependencies": [
@@ -231,7 +231,7 @@
       "name": "ether-http-security",
       "groupId": "dev.rafex.ether.http",
       "artifactId": "ether-http-security",
-      "version": "9.5.5",
+      "version": "9.5.6",
       "deployed": true,
       "description": "CORS policies, security headers, IP allowlisting, and rate limiting configurations",
       "dependencies": [
@@ -245,7 +245,7 @@
       "name": "ether-http-problem",
       "groupId": "dev.rafex.ether.http",
       "artifactId": "ether-http-problem",
-      "version": "9.5.6",
+      "version": "9.5.7",
       "deployed": true,
       "description": "RFC 7807 Problem Details error response formatting for HTTP APIs",
       "dependencies": [
@@ -261,7 +261,7 @@
       "name": "ether-http-openapi",
       "groupId": "dev.rafex.ether.http",
       "artifactId": "ether-http-openapi",
-      "version": "9.5.5",
+      "version": "9.5.6",
       "deployed": true,
       "description": "Programmatic OpenAPI 3.1 specification builder — describe your API in Java code",
       "dependencies": [
@@ -276,7 +276,7 @@
       "name": "ether-http-client",
       "groupId": "dev.rafex.ether.http",
       "artifactId": "ether-http-client",
-      "version": "9.5.5",
+      "version": "9.5.6",
       "deployed": true,
       "description": "Outbound HTTP client built on java.net.http with retry and JSON parsing support",
       "dependencies": [
@@ -291,7 +291,7 @@
       "name": "ether-logging-core",
       "groupId": "dev.rafex.ether.logging",
       "artifactId": "ether-logging-core",
-      "version": "9.5.5",
+      "version": "9.5.6",
       "deployed": true,
       "description": "Logging contracts and structured log support for Ether applications",
       "dependencies": [
@@ -305,7 +305,7 @@
       "name": "ether-ai-core",
       "groupId": "dev.rafex.ether.ai",
       "artifactId": "ether-ai-core",
-      "version": "9.5.6",
+      "version": "9.5.7",
       "deployed": true,
       "description": "AI provider contracts: ChatClient, CompletionRequest, Message abstractions",
       "dependencies": [
@@ -319,7 +319,7 @@
       "name": "ether-ai-openai",
       "groupId": "dev.rafex.ether.ai",
       "artifactId": "ether-ai-openai",
-      "version": "9.5.5",
+      "version": "9.5.6",
       "deployed": true,
       "description": "OpenAI provider implementation for ether-ai-core (chat completions, embeddings)",
       "dependencies": [
@@ -335,7 +335,7 @@
       "name": "ether-ai-deepseek",
       "groupId": "dev.rafex.ether.ai",
       "artifactId": "ether-ai-deepseek",
-      "version": "9.5.5",
+      "version": "9.5.6",
       "deployed": true,
       "description": "DeepSeek provider implementation for ether-ai-core",
       "dependencies": [
@@ -351,7 +351,7 @@
       "name": "ether-http-jetty12",
       "groupId": "dev.rafex.ether.http",
       "artifactId": "ether-http-jetty12",
-      "version": "9.5.6",
+      "version": "9.6.0",
       "deployed": true,
       "description": "Production-ready HTTP server integrating all ether-http-* modules via Jetty 12",
       "dependencies": [
@@ -371,7 +371,7 @@
       "name": "ether-websocket-core",
       "groupId": "dev.rafex.ether.websocket",
       "artifactId": "ether-websocket-core",
-      "version": "9.5.5",
+      "version": "9.5.6",
       "deployed": true,
       "description": "Transport-agnostic WebSocket contracts: Session, MessageHandler, frame types",
       "dependencies": [
@@ -385,7 +385,7 @@
       "name": "ether-websocket-jetty12",
       "groupId": "dev.rafex.ether.websocket",
       "artifactId": "ether-websocket-jetty12",
-      "version": "9.5.5",
+      "version": "9.5.6",
       "deployed": true,
       "description": "Jetty 12-based WebSocket server implementation of ether-websocket-core",
       "dependencies": [
@@ -401,7 +401,7 @@
       "groupId": "dev.rafex.ether.websocket",
       "artifactId": "ether-websocket-proxy-jetty12",
       "version": "9.5.5",
-      "deployed": false,
+      "deployed": true,
       "description": "",
       "dependencies": [
         "ether-parent",
@@ -409,14 +409,14 @@
         "ether-http-jetty12"
       ],
       "dependencyReleaseImpact": "patch",
-      "artifactUrl": "",
+      "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.websocket/ether-websocket-proxy-jetty12",
       "mavenCoord": "dev.rafex.ether.websocket:ether-websocket-proxy-jetty12"
     },
     {
       "name": "ether-webhook",
       "groupId": "dev.rafex.ether.webhook",
       "artifactId": "ether-webhook",
-      "version": "9.5.5",
+      "version": "9.5.6",
       "deployed": true,
       "description": "Webhook delivery, signing (HMAC-SHA256), and signature verification support",
       "dependencies": [
@@ -432,7 +432,7 @@
       "name": "ether-glowroot-jetty12",
       "groupId": "dev.rafex.ether.glowroot",
       "artifactId": "ether-glowroot-jetty12",
-      "version": "9.5.6",
+      "version": "9.5.7",
       "deployed": true,
       "description": "Glowroot APM instrumentation plugin for Jetty 12 — zero code modification required",
       "dependencies": [
@@ -451,7 +451,7 @@
       "name": "ether-archetype",
       "groupId": "dev.rafex.ether",
       "artifactId": "ether-hexagonal-archetype",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "deployed": true,
       "description": "",
       "dependencies": [
@@ -465,7 +465,7 @@
       "name": "ether-brain",
       "groupId": "dev.rafex.ether.brain",
       "artifactId": "ether-brain-parent",
-      "version": "0.2.1",
+      "version": "0.2.2",
       "deployed": true,
       "description": "",
       "dependencies": [
