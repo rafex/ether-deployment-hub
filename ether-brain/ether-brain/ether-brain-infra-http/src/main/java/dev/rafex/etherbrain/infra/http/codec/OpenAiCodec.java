@@ -89,7 +89,7 @@ public final class OpenAiCodec implements ProviderCodec {
      * </pre>
      */
     static String endpoint(HttpModelConfig config) {
-        String base = config.endpoint().toString().replaceAll("/+$", "");
+        String base = CodecEndpoints.base(config);
         // Ya tiene el path completo
         if (base.contains("/chat/completions")) return base;
         // Termina en /v1 — solo añadir el sufijo sin duplicar la versión

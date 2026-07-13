@@ -82,7 +82,7 @@ public final class GeminiCodec implements ProviderCodec {
      * Si la URL ya incluye {@code :generateContent} se usa tal cual.
      */
     static String endpoint(HttpModelConfig config) {
-        String base = config.endpoint().toString().replaceAll("/+$", "");
+        String base = CodecEndpoints.base(config);
         if (base.contains(":generateContent")) return base;
         return base + "/v1beta/models/" + config.model() + ":generateContent";
     }

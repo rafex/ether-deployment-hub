@@ -60,7 +60,7 @@ public final class BedrockCodec implements ProviderCodec {
      * </pre>
      */
     static String endpoint(HttpModelConfig config) {
-        String base = config.endpoint().toString().replaceAll("/+$", "");
+        String base = CodecEndpoints.base(config);
         if (base.contains("/model/")) return base;   // ya incluye el path
         try {
             String encodedModel = java.net.URLEncoder.encode(

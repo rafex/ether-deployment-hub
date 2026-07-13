@@ -80,7 +80,7 @@ public final class AnthropicCodec implements ProviderCodec {
      * </pre>
      */
     static String endpoint(HttpModelConfig config) {
-        String base = config.endpoint().toString().replaceAll("/+$", "");
+        String base = CodecEndpoints.base(config);
         if (base.contains("/messages"))  return base;
         if (base.endsWith("/v1"))        return base + "/messages";
         return base + API_PATH;
