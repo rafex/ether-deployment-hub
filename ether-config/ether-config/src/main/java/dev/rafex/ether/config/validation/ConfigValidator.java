@@ -41,17 +41,19 @@ public final class ConfigValidator {
     private ConfigValidator() {
     }
 
+    private static final int MAX_DEPTH = 20;
+
     public static void validate(final Object instance) {
         Objects.requireNonNull(instance, "instance");
         final List<ConfigViolation> violations = new ArrayList<>();
-        validateInstance(instance, "", violations);
+        validateInstance(instance, "", violations, 0);
         if (!violations.isEmpty()) {
             throw new ConfigValidationException(violations);
         }
     }
 
     private static void validateInstance(final Object instance, final String path,
-            final List<ConfigViolation> violations) {
+            final List<ConfigViolation> violations, final int depth) {
         if (instance == null || !instance.getClass().isRecord()) {
             return;
         }
@@ -111,30 +113,34 @@ public final class ConfigValidator {
             }
 
             if (component.isAnnotationPresent(Valid.class)) {
-                validateNested(value, componentPath, violations);
+                validateNested(value, componentPath, violations, depth + 1);
             }
         }
     }
 
-    private static void validateNested(final Object value, final String path, final List<ConfigViolation> violations) {
+    private static void validateNested(final Object value, final String path, final List<ConfigViolation> violations,
+            final int depth) {
+        if (depth >= MAX_DEPTH) {
+            return;
+        }
         if (value == null) {
             return;
         }
         if (value.getClass().isRecord()) {
-            validateInstance(value, path, violations);
+            validateInstance(value, path, violations, depth + 1);
             return;
         }
         if (value instanceof final Collection<?> collection) {
             var index = 0;
             for (final Object element : collection) {
-                validateNested(element, path + "[" + index + "]", violations);
+                validateNested(element, path + "[" + index + "]", violations, depth + 1);
                 index++;
             }
             return;
         }
         if (value instanceof final Map<?, ?> map) {
             for (final var entry : map.entrySet()) {
-                validateNested(entry.getValue(), path + "." + entry.getKey(), violations);
+                validateNested(entry.getValue(), path + "." + entry.getKey(), violations, depth + 1);
             }
         }
     }
