@@ -40,10 +40,7 @@ public final class SessionStoreFactory {
     }
 
     private static String env(String name, String defaultValue) {
-        String v = System.getenv(name);
-        if (v != null && !v.isBlank()) return v;
-        v = System.getProperty(name);
-        return (v != null && !v.isBlank()) ? v : defaultValue;
+        return Env.get(name, defaultValue);
     }
 
     private static long parseLong(String value, long fallback) {

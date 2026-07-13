@@ -285,9 +285,6 @@ public final class Main {
     // ── Env helper ────────────────────────────────────────────────────────────
 
     private static String env(String name, String fallback) {
-        String v = System.getenv(name);
-        if (v != null && !v.isBlank()) return v;
-        v = System.getProperty(name);
-        return (v != null && !v.isBlank()) ? v : fallback;
+        return dev.rafex.etherbrain.bootstrap.Env.get(name, fallback);
     }
 }

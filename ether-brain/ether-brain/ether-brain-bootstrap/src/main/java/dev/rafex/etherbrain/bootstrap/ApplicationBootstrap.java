@@ -530,10 +530,7 @@ public final class ApplicationBootstrap {
     }
 
     private static String env(String name, String defaultValue) {
-        String value = System.getenv(name);
-        if (value != null && !value.isBlank()) return value;
-        value = System.getProperty(name);
-        return (value != null && !value.isBlank()) ? value : defaultValue;
+        return Env.get(name, defaultValue);
     }
 
     // Stub model client extracted to StubModelClient.java
