@@ -16,19 +16,20 @@ tests verdes (fase 2). Ver `agents/DECISIONS.md` → DEC-0017.
 |---|---|---|---|
 | P1 | `buildHttpClient` duplicado ×4 → `RemoteHttp` (+`applyAuth`) | `tools-remote` | `cdc06f9` |
 | P1 | Normalización URL base en codecs → `CodecEndpoints.base()` | `infra-http` | `2cf1cea` |
+| P1 | `GlowrootJettyHandler.handle` (25/66) → 6 pasos privados | `glowroot-jetty12` | `9249909` |
+| P1 | Codecs AI: SSE send+loop boilerplate → `CodecSse` | `infra-http` | `8cd68b1` |
 | P2 | `env()` duplicado ×5 → `Env.get()` en bootstrap | `bootstrap`, `transport-cli`, `transport-mqtt` | `690a94f` |
-| — | Red de seguridad: 116 characterization tests (6 módulos) | varios | `542839f` |
+| P2 | `addToolResult` Anthropic↔Bedrock → `AnthropicStyleMessages` | `infra-http` | `fe1a8ba` |
+| P2 | `appendJsonValue`/`extractJsonString`/`toJson` Ollama↔OpenAi → `MiniJson` en spi-model | `spi-model`, `infra-model-ollama/openai` | `1815cfc` |
+| P2 | `copyMultiMap`/`createEndpoint` + 3 helpers WS → `JettyWebSocketUpgrades` | `websocket-jetty12`, `http-jetty12` | `308aea1` |
+| P2 | Recursividad sin guardas `ConfigValidator` → depth guard `MAX_DEPTH=20` | `config` | `f0deb01` |
+| — | Red de seguridad: characterization tests (por módulo) | varios | `542839f` |
 
 ### ⏳ Pendiente (ordenado por prioridad)
 
 | # | Hallazgo | Acción propuesta | Riesgo |
 |---|---|---|---|
-| P1 | Codecs AI (`OpenAi`/`Anthropic`/`Gemini`/`Bedrock`) con `generateStreaming`/`parseResponse` casi idénticos (complejidad 11–15) | Base class común o strategy para SSE parsing | Alto — cubierto por tests de codec |
-| P1 | `GlowrootJettyHandler.handle` complejidad 25/66 | Extraer sub-pasos privados (identity, threshold, requestId, status, user) | Medio — cubierto por `GlowrootJettyHandlerTest` |
-| P2 | `addToolResult` idéntico `AnthropicCodec` ↔ `BedrockCodec` | Helper compartido en `codec` | Bajo |
-| P2 | `appendJsonValue`/`extractJsonString` idénticos `OllamaModelClient` ↔ `OpenAiModelClient` | Helper JSON compartido (¿`common`?) | Medio — sin tests aún |
-| P2 | `copyMultiMap`/`createEndpoint` idénticos `JettyServerFactory` ↔ `JettyWebSocketServerFactory` | Mover a módulo compartido jetty | Medio — requiere dependencia común |
-| P2 | Recursividad sin guardas en 7 funciones (`JsonSchemaUtils.validate`, etc.) | Añadir profundidad máxima / validación | Medio |
+| P2 | Recursividad sin guardas en `JsonSchemaUtils` y `AgentRunner.run` (no `ConfigValidator`, ya hecho) | Añadir validación / profundidad máxima | Medio — requiere tests adicionales |
 | P3 | Allocs en loops (`AgentLoop.run`, `formatResults`) | Pre-asignar capacidades | Bajo |
 | P3 | Constructores con 7–9 params (`HttpAgentServer`, `AgentLoop`, `AgentRuntime`) | Builder o record de configuración | Alto — API pública |
 
