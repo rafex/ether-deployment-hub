@@ -114,7 +114,23 @@ public final class GlowrootJettyHandler extends Handler.Wrapper {
         final var path = request.getHttpURI() != null ? request.getHttpURI().getPath() : null;
         final var normalized = PathNormalizer.normalize(path);
 
-        // ── 1. Transaction identity ──────────────────────────────────────────
+        setTransactionIdentity(method, path, normalized);
+        applySlowThreshold(path, normalized);
+        captureRequestId(request);
+
+        try {
+            final var result = super.handle(request, response, callback);
+            captureResponseStatus(response);
+            captureAuthenticatedUser(request);
+            return result;
+        } catch (final Throwable t) {
+            captureError(t);
+            throw t;
+        }
+    }
+
+    /** Step 1 — sets the Glowroot transaction type, name and HTTP attributes. */
+    private void setTransactionIdentity(final String method, final String path, final String normalized) {
         try {
             Glowroot.setTransactionType("Web");
             Glowroot.setTransactionName(method + " " + normalized);
@@ -123,76 +139,79 @@ public final class GlowrootJettyHandler extends Handler.Wrapper {
             Glowroot.addTransactionAttribute("http.normalized_path", normalized);
         } catch (final Throwable ignore) {
         }
+    }
 
-        // ── 2. Slow-threshold (health suppression or per-route) ──────────────
+    /** Step 2 — raises the slow-threshold for health probes, or applies the per-route/default one. */
+    private void applySlowThreshold(final String path, final String normalized) {
         if (path != null && healthPaths.contains(path)) {
             try {
                 Glowroot.setTransactionSlowThreshold(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
             } catch (final Throwable ignore) {
             }
-        } else {
-            final var threshold = thresholdByNormalizedPath.getOrDefault(normalized, defaultThresholdMs);
-            if (threshold > 0) {
-                try {
-                    Glowroot.setTransactionSlowThreshold(threshold, TimeUnit.MILLISECONDS);
-                } catch (final Throwable ignore) {
-                }
-            }
+            return;
         }
-
-        // ── 3. Request ID ────────────────────────────────────────────────────
-        if (requestIdHeader != null) {
+        final var threshold = thresholdByNormalizedPath.getOrDefault(normalized, defaultThresholdMs);
+        if (threshold > 0) {
             try {
-                var reqId = request.getHeaders().get(requestIdHeader);
-                if ((reqId == null || reqId.isBlank()) && requestIdGenerator != null) {
-                    reqId = requestIdGenerator.nextId();
-                }
-                if (reqId != null && !reqId.isBlank()) {
-                    Glowroot.addTransactionAttribute("request.id", reqId);
-                }
+                Glowroot.setTransactionSlowThreshold(threshold, TimeUnit.MILLISECONDS);
             } catch (final Throwable ignore) {
             }
         }
+    }
 
-        // ── 4. Delegate to next handler ──────────────────────────────────────
+    /** Step 3 — records the request ID from the configured header, generating one if absent. */
+    private void captureRequestId(final Request request) {
+        if (requestIdHeader == null) {
+            return;
+        }
         try {
-            final var result = super.handle(request, response, callback);
+            var reqId = request.getHeaders().get(requestIdHeader);
+            if ((reqId == null || reqId.isBlank()) && requestIdGenerator != null) {
+                reqId = requestIdGenerator.nextId();
+            }
+            if (reqId != null && !reqId.isBlank()) {
+                Glowroot.addTransactionAttribute("request.id", reqId);
+            }
+        } catch (final Throwable ignore) {
+        }
+    }
 
-            // ── 5. Response status (available after synchronous handler) ─────
-            try {
-                final var status = response.getStatus();
-                if (status > 0) {
-                    Glowroot.addTransactionAttribute("http.status", String.valueOf(status));
-                    Glowroot.addTransactionAttribute("http.status_class", status / 100 + "xx");
+    /** Step 5 — records the response status code and status class (after synchronous handling). */
+    private void captureResponseStatus(final Response response) {
+        try {
+            final var status = response.getStatus();
+            if (status > 0) {
+                Glowroot.addTransactionAttribute("http.status", String.valueOf(status));
+                Glowroot.addTransactionAttribute("http.status_class", status / 100 + "xx");
+            }
+        } catch (final Throwable ignore) {
+        }
+    }
+
+    /** Step 6 — records the authenticated user set by {@link JettyAuthHandler} inside the chain. */
+    private void captureAuthenticatedUser(final Request request) {
+        if (userExtractor == null) {
+            return;
+        }
+        try {
+            final var ctx = request.getAttribute(JettyAuthHandler.REQ_ATTR_AUTH);
+            if (ctx != null) {
+                final var user = userExtractor.apply(ctx);
+                if (user != null && !user.isBlank()) {
+                    Glowroot.setTransactionUser(user);
+                    Glowroot.addTransactionAttribute("auth.user", user);
                 }
-            } catch (final Throwable ignore) {
             }
+        } catch (final Throwable ignore) {
+        }
+    }
 
-            // ── 6. Authenticated user (set by JettyAuthHandler inside chain) ─
-            if (userExtractor != null) {
-                try {
-                    final var ctx = request.getAttribute(JettyAuthHandler.REQ_ATTR_AUTH);
-                    if (ctx != null) {
-                        final var user = userExtractor.apply(ctx);
-                        if (user != null && !user.isBlank()) {
-                            Glowroot.setTransactionUser(user);
-                            Glowroot.addTransactionAttribute("auth.user", user);
-                        }
-                    }
-                } catch (final Throwable ignore) {
-                }
-            }
-
-            return result;
-
-        } catch (final Throwable t) {
-            // ── 7. Uncaught exception attributes ─────────────────────────────
-            try {
-                Glowroot.addTransactionAttribute("error", t.getClass().getName());
-                Glowroot.addTransactionAttribute("error.message", t.getMessage() == null ? "" : t.getMessage());
-            } catch (final Throwable ignore) {
-            }
-            throw t;
+    /** Step 7 — records error attributes for an uncaught exception. */
+    private void captureError(final Throwable t) {
+        try {
+            Glowroot.addTransactionAttribute("error", t.getClass().getName());
+            Glowroot.addTransactionAttribute("error.message", t.getMessage() == null ? "" : t.getMessage());
+        } catch (final Throwable ignore) {
         }
     }
 
