@@ -193,7 +193,7 @@
     "groupId": "dev.rafex.ether.http",
     "artifactId": "ether-http-jetty12",
     "deployed": true,
-    "latestVersion": "9.5.6",
+    "latestVersion": "9.6.0",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.http/ether-http-jetty12"
   },
@@ -210,17 +210,17 @@
     "module": "ether-websocket-proxy-jetty12",
     "groupId": "dev.rafex.ether.websocket",
     "artifactId": "ether-websocket-proxy-jetty12",
-    "deployed": false,
-    "latestVersion": "",
+    "deployed": true,
+    "latestVersion": "9.5.5",
     "lastUpdatedUtc": "",
-    "artifactUrl": "https://central.sonatype.com/search?q=ether-websocket-proxy-jetty12"
+    "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.websocket/ether-websocket-proxy-jetty12"
   },
   {
     "module": "ether-webhook",
     "groupId": "dev.rafex.ether.webhook",
     "artifactId": "ether-webhook",
     "deployed": true,
-    "latestVersion": "9.5.5",
+    "latestVersion": "9.5.6",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.webhook/ether-webhook"
   },
@@ -229,7 +229,7 @@
     "groupId": "dev.rafex.ether.glowroot",
     "artifactId": "ether-glowroot-jetty12",
     "deployed": true,
-    "latestVersion": "9.5.6",
+    "latestVersion": "9.5.7",
     "lastUpdatedUtc": "",
     "artifactUrl": "https://central.sonatype.com/artifact/dev.rafex.ether.glowroot/ether-glowroot-jetty12"
   },
