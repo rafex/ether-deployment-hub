@@ -26,10 +26,8 @@ package dev.rafex.ether.http.jetty12;
  * #L%
  */
 
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -68,9 +66,7 @@ import dev.rafex.ether.json.JsonCodec;
 import dev.rafex.ether.observability.core.request.RequestIdGenerator;
 import dev.rafex.ether.observability.core.request.UuidRequestIdGenerator;
 import dev.rafex.ether.observability.core.timing.TimingRecorder;
-import dev.rafex.ether.websocket.core.WebSocketPatterns;
 import dev.rafex.ether.websocket.core.WebSocketRoute;
-import dev.rafex.ether.websocket.jetty12.JettyWebSocketEndpointAdapter;
 
 public final class JettyServerFactory {
 
@@ -204,57 +200,7 @@ public final class JettyServerFactory {
 
     private static Object createEndpoint(final WebSocketRoute route, final ServerUpgradeRequest request,
             final ServerUpgradeResponse response) {
-        final var path = request.getHttpURI().getPath();
-        final var pathParams = WebSocketPatterns.match(route.pattern(), path).orElse(Map.of());
-        final var headers = headersOf(request);
-        final var queryParams = queryOf(request);
-        negotiateSubprotocol(route, request, response);
-        return new JettyWebSocketEndpointAdapter(route.endpoint(), path, pathParams, queryParams, headers);
-    }
-
-    private static void negotiateSubprotocol(final WebSocketRoute route, final ServerUpgradeRequest request,
-            final ServerUpgradeResponse response) {
-        final var supported = route.endpoint().subprotocols();
-        if (supported == null || supported.isEmpty()) {
-            return;
-        }
-        for (final var requested : request.getSubProtocols()) {
-            if (supported.contains(requested)) {
-                response.setAcceptedSubProtocol(requested);
-                return;
-            }
-        }
-    }
-
-    private static Map<String, List<String>> headersOf(final ServerUpgradeRequest request) {
-        final var out = new LinkedHashMap<String, List<String>>();
-        for (final var field : request.getHeaders()) {
-            out.computeIfAbsent(field.getName(), ignored -> new ArrayList<>()).add(field.getValue());
-        }
-        return copyMultiMap(out);
-    }
-
-    private static Map<String, List<String>> queryOf(final ServerUpgradeRequest request) {
-        final MultiMap<String> params = new MultiMap<>();
-        final var rawQuery = request.getHttpURI().getQuery();
-        if (rawQuery != null && !rawQuery.isEmpty()) {
-            UrlEncoded.decodeTo(rawQuery, params, StandardCharsets.UTF_8);
-        }
-
-        final var out = new LinkedHashMap<String, List<String>>();
-        for (final var key : params.keySet()) {
-            final var values = params.getValues(key);
-            out.put(key, values == null ? List.of() : List.copyOf(values));
-        }
-        return Map.copyOf(out);
-    }
-
-    private static Map<String, List<String>> copyMultiMap(final Map<String, List<String>> input) {
-        final var out = new LinkedHashMap<String, List<String>>();
-        for (final var entry : input.entrySet()) {
-            out.put(entry.getKey(), entry.getValue() == null ? List.of() : List.copyOf(entry.getValue()));
-        }
-        return Map.copyOf(out);
+        return dev.rafex.ether.websocket.jetty12.JettyWebSocketUpgrades.createEndpoint(route, request, response);
     }
 
     private static Handler applyAuthPolicies(final Handler delegate, final TokenVerifier tokenVerifier,
