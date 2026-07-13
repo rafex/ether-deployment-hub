@@ -8,17 +8,12 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 /**
  * Dynamic JWT token provider for the faiss-poc service.
@@ -57,7 +52,7 @@ public final class FaissTokenManager implements TokenProvider {
         this.baseUri  = baseUri;
         this.email    = email;
         this.password = password;
-        this.httpClient = buildHttpClient(skipTlsVerify);
+        this.httpClient = RemoteHttp.buildHttpClient(skipTlsVerify);
     }
 
     @Override
@@ -147,31 +142,5 @@ public final class FaissTokenManager implements TokenProvider {
             // fall through
         }
         return Instant.now().plusSeconds(3600);  // safe fallback
-    }
-
-    // ── TLS ──────────────────────────────────────────────────────────────────
-
-    private static HttpClient buildHttpClient(boolean skipTlsVerify) {
-        HttpClient.Builder builder = HttpClient.newBuilder()
-                .connectTimeout(Duration.ofSeconds(10));
-
-        if (skipTlsVerify) {
-            try {
-                TrustManager[] trustAll = {new X509TrustManager() {
-                    public X509Certificate[] getAcceptedIssuers() {
-                        return new X509Certificate[0];
-                    }
-                    public void checkClientTrusted(X509Certificate[] c, String a) {}
-                    public void checkServerTrusted(X509Certificate[] c, String a) {}
-                }};
-                SSLContext ctx = SSLContext.getInstance("TLS");
-                ctx.init(null, trustAll, new SecureRandom());
-                builder.sslContext(ctx);
-            } catch (Exception e) {
-                throw new RuntimeException("Failed to build trust-all SSL context", e);
-            }
-        }
-
-        return builder.build();
     }
 }

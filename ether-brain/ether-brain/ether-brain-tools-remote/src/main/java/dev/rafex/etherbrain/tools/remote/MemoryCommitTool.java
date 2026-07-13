@@ -10,13 +10,8 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.Map;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 /**
  * Tool that allows the model to commit important context from the session
@@ -52,7 +47,7 @@ public final class MemoryCommitTool implements Tool {
         this.namespace      = namespace;
         this.tokenProvider  = tokenProvider;
         this.memoryProvider = memoryProvider;
-        this.httpClient     = buildHttpClient(skipTlsVerify);
+        this.httpClient     = RemoteHttp.buildHttpClient(skipTlsVerify);
     }
 
     @Override
@@ -126,11 +121,7 @@ public final class MemoryCommitTool implements Tool {
                 .header("Content-Type", "application/json")
                 .timeout(Duration.ofSeconds(15));
 
-        if (token != null && token.startsWith("eyJ")) {
-            req.header("Authorization", "Bearer " + token);
-        } else if (token != null && !token.isBlank()) {
-            req.header("X-API-Key", token);
-        }
+        RemoteHttp.applyAuth(req, token);
 
         HttpResponse<String> resp = httpClient.send(
                 req.POST(HttpRequest.BodyPublishers.ofString(body)).build(),
@@ -149,25 +140,5 @@ public final class MemoryCommitTool implements Tool {
                 "Committed " + committed + " memory chunks to long-term storage. " +
                 "Label: \"" + label + "\". " +
                 "This context will be available in future sessions.");
-    }
-
-    private static HttpClient buildHttpClient(boolean skipTlsVerify) {
-        HttpClient.Builder builder = HttpClient.newBuilder()
-                .connectTimeout(Duration.ofSeconds(10));
-        if (skipTlsVerify) {
-            try {
-                TrustManager[] trustAll = {new X509TrustManager() {
-                    public X509Certificate[] getAcceptedIssuers() { return new X509Certificate[0]; }
-                    public void checkClientTrusted(X509Certificate[] c, String a) {}
-                    public void checkServerTrusted(X509Certificate[] c, String a) {}
-                }};
-                SSLContext ctx = SSLContext.getInstance("TLS");
-                ctx.init(null, trustAll, new SecureRandom());
-                builder.sslContext(ctx);
-            } catch (Exception e) {
-                throw new RuntimeException("Failed to build trust-all SSL context", e);
-            }
-        }
-        return builder.build();
     }
 }
