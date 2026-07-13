@@ -169,7 +169,7 @@ public final class AnthropicCodec implements ProviderCodec {
                         addTextMessage(messages, "assistant", msg.content());
                     }
                 }
-                case TOOL -> addToolResult(messages, msg);
+                case TOOL -> AnthropicStyleMessages.addToolResult(messages, msg);
             }
         }
 
@@ -207,16 +207,6 @@ public final class AnthropicCodec implements ProviderCodec {
         toolUse.put("id",   msg.toolCallId());
         toolUse.put("name", toolName);
         toolUse.set("input", mapper.readTree(arguments));
-    }
-
-    private void addToolResult(ArrayNode messages, Message msg) {
-        ObjectNode m = messages.addObject();
-        m.put("role", "user");
-        ArrayNode content = m.putArray("content");
-        ObjectNode result = content.addObject();
-        result.put("type",        "tool_result");
-        result.put("tool_use_id", msg.toolCallId() != null ? msg.toolCallId() : "");
-        result.put("content",     msg.content());
     }
 
     // ── Streaming ──────────────────────────────────────────────────────────────
