@@ -212,7 +212,7 @@ public final class KnowledgeSearchTool implements Tool {
             return "No results found in namespace '" + namespace + "'.";
         }
 
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(items.size() * 256);
         sb.append("Found ").append(total)
           .append(" result(s) in namespace '").append(namespace).append("':\n\n");
 

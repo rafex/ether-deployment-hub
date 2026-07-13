@@ -29,9 +29,15 @@ tests verdes (fase 2). Ver `agents/DECISIONS.md` → DEC-0017.
 
 | # | Hallazgo | Acción propuesta | Riesgo |
 |---|---|---|---|
-| P2 | Recursividad sin guardas en `JsonSchemaUtils` y `AgentRunner.run` (no `ConfigValidator`, ya hecho) | Añadir validación / profundidad máxima | Medio — requiere tests adicionales |
-| P3 | Allocs en loops (`AgentLoop.run`, `formatResults`) | Pre-asignar capacidades | Bajo |
-| P3 | Constructores con 7–9 params (`HttpAgentServer`, `AgentLoop`, `AgentRuntime`) | Builder o record de configuración | Alto — API pública |
+| P2 | Recursividad sin guardas: `JsonSchemaUtils`, `AgentRunner.run` y otros 5 | Verificado 2026-07-13: son falsos positivos (delegan a librería o son interfaces). `ConfigValidator` ya tiene depth guard. ✅ | — |
+| P3 | Allocs en loops: `KnowledgeSearchTool.formatResults` | Pre-dimensionado StringBuilder con `items.size() * 256` (commit a continuación). `AgentLoop.run` es orquestación pura, allocations inherentes. | Bajo |
+| P3 | Constructores con 7–9 params (`HttpAgentServer`, `AgentLoop`, `AgentRuntime`) | `HttpAgentServer` tiene 3 sobrecargas progresivas con defaults — API evolutiva intencional, no duplicación. Refactor a builder sería breaking change sin ganancia de seguridad. | Alto — API pública |
+
+> **Auditoría cerrada.** La deuda estructural identificada por el
+> knowledge graph está eliminada o documentada como trade-off. Los 10
+> refactors eliminaron ~560 líneas duplicadas respaldadas por 125+
+> characterization tests. Las 6 entradas residuales son notas de diseño,
+> no bugs.
 
 > Nota: el `buildHttpClient` de `Main.java` (CLI) se dejó aislado a
 > propósito — migrarlo acoplaría `transport-cli` a `tools-remote`.
