@@ -6,6 +6,7 @@ import dev.rafex.etherbrain.ports.model.ModelClient;
 import dev.rafex.etherbrain.ports.model.ModelRequest;
 import dev.rafex.etherbrain.ports.model.ModelResponse;
 import dev.rafex.etherbrain.ports.model.ToolRequest;
+import dev.rafex.etherbrain.spi.model.MiniJson;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -126,86 +127,13 @@ public final class OpenAiModelClient implements ModelClient {
      * Extracts the first occurrence of {@code "key":"value"} or {@code "key": "value"}.
      */
     static String extractJsonString(String json, String key) {
-        String searchKey = "\"" + key + "\"";
-        int keyIdx = json.indexOf(searchKey);
-        if (keyIdx < 0) return null;
-
-        int colonIdx = json.indexOf(':', keyIdx + searchKey.length());
-        if (colonIdx < 0) return null;
-
-        int startQuote = json.indexOf('"', colonIdx + 1);
-        if (startQuote < 0) return null;
-
-        StringBuilder sb = new StringBuilder();
-        for (int i = startQuote + 1; i < json.length(); i++) {
-            char c = json.charAt(i);
-            if (c == '"' && (i == startQuote + 1 || json.charAt(i - 1) != '\\')) {
-                return sb.toString();
-            }
-            if (c == '\\' && i + 1 < json.length()) {
-                char next = json.charAt(i + 1);
-                sb.append(switch (next) {
-                    case 'n' -> '\n';
-                    case 't' -> '\t';
-                    case '"' -> '"';
-                    case '\\' -> '\\';
-                    default -> next;
-                });
-                i++;
-                continue;
-            }
-            sb.append(c);
-        }
-        return sb.toString();
+        return MiniJson.extractString(json, key);
     }
 
     /**
      * Minimal JSON builder without external library.
      */
     static String toJson(Map<String, Object> map) {
-        StringBuilder sb = new StringBuilder("{");
-        boolean first = true;
-        for (var entry : map.entrySet()) {
-            if (!first) sb.append(",");
-            sb.append("\"").append(entry.getKey()).append("\":");
-            appendJsonValue(sb, entry.getValue());
-            first = false;
-        }
-        sb.append("}");
-        return sb.toString();
-    }
-
-    @SuppressWarnings("unchecked")
-    private static void appendJsonValue(StringBuilder sb, Object value) {
-        switch (value) {
-            case null -> sb.append("null");
-            case String s -> sb.append("\"").append(s.replace("\\", "\\\\")
-                    .replace("\"", "\\\"")
-                    .replace("\n", "\\n")).append("\"");
-            case Number n -> sb.append(n);
-            case Boolean b -> sb.append(b);
-            case Map<?, ?> m -> {
-                sb.append("{");
-                boolean first = true;
-                for (var entry : m.entrySet()) {
-                    if (!first) sb.append(",");
-                    sb.append("\"").append(entry.getKey()).append("\":");
-                    appendJsonValue(sb, entry.getValue());
-                    first = false;
-                }
-                sb.append("}");
-            }
-            case List<?> list -> {
-                sb.append("[");
-                boolean first = true;
-                for (Object item : list) {
-                    if (!first) sb.append(",");
-                    appendJsonValue(sb, item);
-                    first = false;
-                }
-                sb.append("]");
-            }
-            default -> sb.append("\"").append(value).append("\"");
-        }
+        return MiniJson.toJson(map);
     }
 }
