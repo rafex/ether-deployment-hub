@@ -84,15 +84,17 @@
 		<jetty.version>12.1.7</jetty.version>
 		<!--
 			GlowRoot API — decisión de versión (opción B):
-			La última versión estable (0.14.5) tiene soporte para JDK 25 pero NO está publicada
+			La última versión estable (0.14.7) tiene soporte para JDK 25 pero NO está publicada
 			en Maven Central; solo se distribuye como ZIP en GitHub Releases.
 			Se mantiene 0.14.0-beta.3 (la última en Central) como dependencia de COMPILACIÓN únicamente.
 			Esto es seguro porque glowroot-agent-api es compile-only: sus anotaciones e interfaces
 			son binariamente compatibles entre versiones.
-			Para RUNTIME se debe usar el agente glowroot.jar >= 0.14.5 (descargable de GitHub Releases).
+			Para RUNTIME se debe usar el agente glowroot.jar >= 0.14.7 (descargable de GitHub Releases).
 			Nota: con JDK 24+ se requiere la flag -XX:+EnableDynamicAgentLoading al arrancar la JVM
 			cuando se adjunta el agente de GlowRoot dinámicamente.
-			Seguimiento: https://github.com/glowroot/glowroot/releases/tag/v0.14.5
+			Seguimiento: https://github.com/glowroot/glowroot/releases/tag/v0.14.7
+			ZIP: https://github.com/glowroot/glowroot/releases/download/v0.14.7/glowroot-0.14.7-dist.zip
+			SHA256: a4c6231f2c63698f9174ae2928ac65f36a1d2ccc8937f385e3263071474d1ff4
 		-->
 		<glowroot-agent-api.version>0.14.0-beta.3</glowroot-agent-api.version>
 		<versions-maven-plugin.version>2.21.0</versions-maven-plugin.version>

@@ -29,11 +29,13 @@
 
 ### GlowRoot strategy (opción B)
 `glowroot-agent-api` compile dependency stays at **0.14.0-beta.3** (last version on Maven Central).
-The stable release **0.14.5** (with JDK 25 support) is only distributed as a ZIP from GitHub Releases
+The stable release **0.14.7** (with JDK 25 support) is only distributed as a ZIP from GitHub Releases
 and is not published to Maven Central. Since `glowroot-agent-api` is a compile-only dependency,
 binary compatibility between versions is sufficient for building `ether-glowroot-jetty12`.
 
-For **runtime**: use `glowroot.jar >= 0.14.5` from https://github.com/glowroot/glowroot/releases.
+For **runtime**: use `glowroot.jar >= 0.14.7` from https://github.com/glowroot/glowroot/releases.
+- ZIP: https://github.com/glowroot/glowroot/releases/download/v0.14.7/glowroot-0.14.7-dist.zip
+- SHA256: `a4c6231f2c63698f9174ae2928ac65f36a1d2ccc8937f385e3263071474d1ff4`
 
 **Important**: JDK 24+ blocks dynamic agent loading by default. Add the following JVM flag when
 attaching the GlowRoot agent at runtime:
@@ -41,7 +43,7 @@ attaching the GlowRoot agent at runtime:
 -XX:+EnableDynamicAgentLoading
 ```
 
-Reference: https://github.com/glowroot/glowroot/releases/tag/v0.14.5
+Reference: https://github.com/glowroot/glowroot/releases/tag/v0.14.7
 
 ## Publish CI architecture
 
