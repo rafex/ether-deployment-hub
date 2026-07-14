@@ -48,7 +48,7 @@
       "pomPath": "ether-parent/ether-parent/pom.xml",
       "groupId": "dev.rafex.ether.parent",
       "artifactId": "ether-parent",
-      "currentVersion": "9.6.6",
+      "currentVersion": "9.6.7",
       "published": true,
       "usesParent": false,
       "dependencies": [],
@@ -62,7 +62,7 @@
       "pomPath": "ether-config/ether-config/pom.xml",
       "groupId": "dev.rafex.ether.config",
       "artifactId": "ether-config",
-      "currentVersion": "9.5.7",
+      "currentVersion": "9.5.8",
       "published": true,
       "usesParent": true,
       "dependencies": [
@@ -79,7 +79,7 @@
       "pomPath": "ether-crypto/ether-crypto/pom.xml",
       "groupId": "dev.rafex.ether.crypto",
       "artifactId": "ether-crypto",
-      "currentVersion": "9.5.6",
+      "currentVersion": "9.5.7",
       "published": true,
       "usesParent": true,
       "dependencies": [
@@ -95,7 +95,7 @@
       "pomPath": "ether-database-core/ether-database-core/pom.xml",
       "groupId": "dev.rafex.ether.database",
       "artifactId": "ether-database-core",
-      "currentVersion": "9.5.6",
+      "currentVersion": "9.5.7",
       "published": true,
       "usesParent": true,
       "dependencies": [
@@ -111,7 +111,7 @@
       "pomPath": "ether-jdbc/ether-jdbc/pom.xml",
       "groupId": "dev.rafex.ether.jdbc",
       "artifactId": "ether-jdbc",
-      "currentVersion": "9.5.6",
+      "currentVersion": "9.5.7",
       "published": true,
       "usesParent": true,
       "dependencies": [
@@ -130,7 +130,7 @@
       "pomPath": "ether-database-postgres/ether-database-postgres/pom.xml",
       "groupId": "dev.rafex.ether.database",
       "artifactId": "ether-database-postgres",
-      "currentVersion": "9.5.6",
+      "currentVersion": "9.5.7",
       "published": true,
       "usesParent": true,
       "dependencies": [
@@ -149,7 +149,7 @@
       "pomPath": "ether-database-sqlite/ether-database-sqlite/pom.xml",
       "groupId": "dev.rafex.ether.database",
       "artifactId": "ether-database-sqlite",
-      "currentVersion": "9.5.6",
+      "currentVersion": "9.5.7",
       "published": true,
       "usesParent": true,
       "dependencies": [
@@ -170,7 +170,7 @@
       "pomPath": "ether-json/ether-json/pom.xml",
       "groupId": "dev.rafex.ether.json",
       "artifactId": "ether-json",
-      "currentVersion": "9.5.6",
+      "currentVersion": "9.5.7",
       "published": true,
       "usesParent": true,
       "dependencies": [
@@ -186,7 +186,7 @@
       "pomPath": "ether-cron/ether-cron/pom.xml",
       "groupId": "dev.rafex.ether.cron",
       "artifactId": "ether-cron",
-      "currentVersion": "9.5.6",
+      "currentVersion": "9.5.7",
       "published": true,
       "usesParent": true,
       "dependencies": [
@@ -202,7 +202,7 @@
       "pomPath": "ether-di/ether-di/pom.xml",
       "groupId": "dev.rafex.ether.di",
       "artifactId": "ether-di",
-      "currentVersion": "1.0.1",
+      "currentVersion": "1.0.2",
       "published": true,
       "usesParent": true,
       "dependencies": [
@@ -218,7 +218,7 @@
       "pomPath": "ether-jwt/ether-jwt/pom.xml",
       "groupId": "dev.rafex.ether.jwt",
       "artifactId": "ether-jwt",
-      "currentVersion": "9.5.6",
+      "currentVersion": "9.5.7",
       "published": true,
       "usesParent": true,
       "dependencies": [
@@ -237,7 +237,7 @@
       "pomPath": "ether-observability-core/ether-observability-core/pom.xml",
       "groupId": "dev.rafex.ether.observability",
       "artifactId": "ether-observability-core",
-      "currentVersion": "9.5.6",
+      "currentVersion": "9.5.7",
       "published": true,
       "usesParent": true,
       "dependencies": [
@@ -253,7 +253,7 @@
       "pomPath": "ether-http-core/ether-http-core/pom.xml",
       "groupId": "dev.rafex.ether.http",
       "artifactId": "ether-http-core",
-      "currentVersion": "9.5.7",
+      "currentVersion": "9.5.8",
       "published": true,
       "usesParent": true,
       "dependencies": [
@@ -269,7 +269,7 @@
       "pomPath": "ether-http-security/ether-http-security/pom.xml",
       "groupId": "dev.rafex.ether.http",
       "artifactId": "ether-http-security",
-      "currentVersion": "9.5.6",
+      "currentVersion": "9.5.7",
       "published": true,
       "usesParent": true,
       "dependencies": [
@@ -285,7 +285,7 @@
       "pomPath": "ether-http-problem/ether-http-problem/pom.xml",
       "groupId": "dev.rafex.ether.http",
       "artifactId": "ether-http-problem",
-      "currentVersion": "9.5.7",
+      "currentVersion": "9.5.8",
       "published": true,
       "usesParent": true,
       "dependencies": [
@@ -306,7 +306,7 @@
       "pomPath": "ether-http-openapi/ether-http-openapi/pom.xml",
       "groupId": "dev.rafex.ether.http",
       "artifactId": "ether-http-openapi",
-      "currentVersion": "9.5.6",
+      "currentVersion": "9.5.7",
       "published": true,
       "usesParent": true,
       "dependencies": [
@@ -325,7 +325,7 @@
       "pomPath": "ether-http-client/ether-http-client/pom.xml",
       "groupId": "dev.rafex.ether.http",
       "artifactId": "ether-http-client",
-      "currentVersion": "9.5.6",
+      "currentVersion": "9.5.7",
       "published": true,
       "usesParent": true,
       "dependencies": [
@@ -344,7 +344,7 @@
       "pomPath": "ether-logging-core/ether-logging-core/pom.xml",
       "groupId": "dev.rafex.ether.logging",
       "artifactId": "ether-logging-core",
-      "currentVersion": "9.5.6",
+      "currentVersion": "9.5.7",
       "published": true,
       "usesParent": true,
       "dependencies": [
@@ -360,7 +360,7 @@
       "pomPath": "ether-ai-core/ether-ai-core/pom.xml",
       "groupId": "dev.rafex.ether.ai",
       "artifactId": "ether-ai-core",
-      "currentVersion": "9.5.7",
+      "currentVersion": "9.5.8",
       "published": true,
       "usesParent": true,
       "dependencies": [
@@ -376,7 +376,7 @@
       "pomPath": "ether-ai-openai/ether-ai-openai/pom.xml",
       "groupId": "dev.rafex.ether.ai",
       "artifactId": "ether-ai-openai",
-      "currentVersion": "9.5.6",
+      "currentVersion": "9.5.7",
       "published": true,
       "usesParent": true,
       "dependencies": [
@@ -397,7 +397,7 @@
       "pomPath": "ether-ai-deepseek/ether-ai-deepseek/pom.xml",
       "groupId": "dev.rafex.ether.ai",
       "artifactId": "ether-ai-deepseek",
-      "currentVersion": "9.5.6",
+      "currentVersion": "9.5.7",
       "published": true,
       "usesParent": true,
       "dependencies": [
@@ -418,7 +418,7 @@
       "pomPath": "ether-http-jetty12/ether-http-jetty12/pom.xml",
       "groupId": "dev.rafex.ether.http",
       "artifactId": "ether-http-jetty12",
-      "currentVersion": "9.6.0",
+      "currentVersion": "9.6.1",
       "published": true,
       "usesParent": true,
       "dependencies": [
@@ -447,7 +447,7 @@
       "pomPath": "ether-websocket-core/ether-websocket-core/pom.xml",
       "groupId": "dev.rafex.ether.websocket",
       "artifactId": "ether-websocket-core",
-      "currentVersion": "9.5.6",
+      "currentVersion": "9.5.7",
       "published": true,
       "usesParent": true,
       "dependencies": [
@@ -463,7 +463,7 @@
       "pomPath": "ether-websocket-jetty12/ether-websocket-jetty12/pom.xml",
       "groupId": "dev.rafex.ether.websocket",
       "artifactId": "ether-websocket-jetty12",
-      "currentVersion": "9.5.6",
+      "currentVersion": "9.5.7",
       "published": true,
       "usesParent": true,
       "dependencies": [
@@ -482,7 +482,7 @@
       "pomPath": "ether-websocket-proxy-jetty12/ether-websocket-proxy-jetty12/pom.xml",
       "groupId": "dev.rafex.ether.websocket",
       "artifactId": "ether-websocket-proxy-jetty12",
-      "currentVersion": "9.5.5",
+      "currentVersion": "9.5.6",
       "published": true,
       "usesParent": true,
       "dependencies": [
@@ -503,7 +503,7 @@
       "pomPath": "ether-webhook/ether-webhook/pom.xml",
       "groupId": "dev.rafex.ether.webhook",
       "artifactId": "ether-webhook",
-      "currentVersion": "9.5.6",
+      "currentVersion": "9.5.7",
       "published": true,
       "usesParent": true,
       "dependencies": [
@@ -524,7 +524,7 @@
       "pomPath": "ether-glowroot-jetty12/ether-glowroot-jetty12/pom.xml",
       "groupId": "dev.rafex.ether.glowroot",
       "artifactId": "ether-glowroot-jetty12",
-      "currentVersion": "9.5.7",
+      "currentVersion": "9.5.8",
       "published": true,
       "usesParent": true,
       "dependencies": [
@@ -551,7 +551,7 @@
       "pomPath": "ether-archetype/ether-archetype/pom.xml",
       "groupId": "dev.rafex.ether",
       "artifactId": "ether-hexagonal-archetype",
-      "currentVersion": "1.0.2",
+      "currentVersion": "1.0.3",
       "published": true,
       "usesParent": true,
       "dependencies": [
@@ -567,7 +567,7 @@
       "pomPath": "ether-brain/ether-brain/pom.xml",
       "groupId": "dev.rafex.ether.brain",
       "artifactId": "ether-brain-parent",
-      "currentVersion": "0.2.2",
+      "currentVersion": "0.2.3",
       "published": true,
       "usesParent": true,
       "dependencies": [
