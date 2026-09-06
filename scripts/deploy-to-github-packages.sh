@@ -39,6 +39,22 @@ GH_PKG_URL="${3:?GitHub Packages URL required}"
 GH_SETTINGS_FILE="${GH_SETTINGS_FILE:-/tmp/gh-settings.xml}"
 M2_REPO="${HOME}/.m2/repository"
 
+# ── cleanup of temporary files containing secrets ──────────────────────────────
+cleanup_on_exit() {
+  local fifo="${_sem_fifo:-}"
+  local fd="${SEM_FD:-}"
+  if [ -n "$fd" ]; then
+    eval "exec ${fd}>&-" 2>/dev/null || true
+  fi
+  if [ -n "${GH_SETTINGS_FILE:-}" ] && [ -f "$GH_SETTINGS_FILE" ]; then
+    rm -f "$GH_SETTINGS_FILE"
+  fi
+  if [ -n "$fifo" ] && [ -e "$fifo" ]; then
+    rm -f "$fifo"
+  fi
+}
+trap cleanup_on_exit EXIT
+
 # ── prerequisites ────────────────────────────────────────────────────────────
 if [ ! -f "$PLAN_PATH" ]; then
   echo "ERROR: Release plan not found: $PLAN_PATH" >&2; exit 1
@@ -64,8 +80,16 @@ cat > "$GH_SETTINGS_FILE" <<SETTINGS_XML
       <password>${GH_PACKAGES_TOKEN}</password>
     </server>
   </servers>
+  <properties>
+    <!-- Passphrase is read from the MAVEN_GPG_PASSPHRASE environment variable
+         via settings/properties so it never appears on the mvn command line
+         (which would be visible via ps / /proc/*/cmdline). The Maven GPG
+         plugin uses the gpg.passphrase property for signing. -->
+    <gpg.passphrase>${env.MAVEN_GPG_PASSPHRASE}</gpg.passphrase>
+  </properties>
 </settings>
 SETTINGS_XML
+chmod 600 "$GH_SETTINGS_FILE"
 
 # ── find a Maven executable ───────────────────────────────────────────────────
 # Prefer a module's mvnw (always present in the hub checkout); fall back to
@@ -129,14 +153,15 @@ deploy_module() {
 
   # gpg:sign-and-deploy-file signs every artifact with a detached .asc signature
   # and uploads both the artifact and its signature in one step.
-  # The passphrase is read from MAVEN_GPG_PASSPHRASE to avoid pinentry prompts.
+  # The passphrase is supplied through settings.xml (gpg.passphrase property)
+  # referencing the MAVEN_GPG_PASSPHRASE environment variable, so it is never
+  # exposed on the command line.
   if [ -f "$staged_jar" ]; then
     "$MVN" -B -ntp gpg:sign-and-deploy-file \
       -Dfile="$staged_jar"                        \
       -DpomFile="$staged_pom"                     \
       -Durl="$GH_PKG_URL"                         \
       -DrepositoryId=github-ether                 \
-      -Dgpg.passphrase="${MAVEN_GPG_PASSPHRASE}"  \
       "${extra_args[@]}"                          \
       --settings "$GH_SETTINGS_FILE"
   else
@@ -147,7 +172,6 @@ deploy_module() {
       -Dpackaging=pom                             \
       -Durl="$GH_PKG_URL"                         \
       -DrepositoryId=github-ether                 \
-      -Dgpg.passphrase="${MAVEN_GPG_PASSPHRASE}"  \
       --settings "$GH_SETTINGS_FILE"
   fi
 }

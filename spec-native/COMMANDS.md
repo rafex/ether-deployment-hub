@@ -31,6 +31,27 @@ make publish-ci                  # deploy real
 make publish-gh-pkg-ci RUN_ID=<maven-central-run-id>   # re-run manual de GH Packages
 ```
 
+## Release local (just/make — sin GitHub Actions)
+
+```bash
+# Configurar secretos (una vez)
+scripts/secrets.sh --action keygen --log-file /tmp/ether-deployment-hub/secrets.log
+scripts/secrets.sh --action edit   --log-file /tmp/ether-deployment-hub/secrets.log  # rellena OSSRH_* y GPG
+
+# Exportar secretos al entorno
+eval "$(just env maven)"
+
+# Construcción del release (plan + validación de colisiones)
+make release-build BASE_REF=HEAD~1 HEAD_REF=HEAD
+make release-apply                  # aplica el plan a los POMs
+
+# Operativas
+just publish-central HEAD~1 HEAD    # plan + validación + deploy por niveles (Maven Central)
+just publish-central --dry-run HEAD~1 HEAD  # (vía deploy-release.sh --dry-run)
+just verify-published               # espera a que todo esté publicado en Central
+just release                        # env + publish-central + verify-published
+```
+
 ## Observación de CI
 
 ```bash
