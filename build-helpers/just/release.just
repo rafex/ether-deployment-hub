@@ -9,7 +9,7 @@ log-dir:
 
 # env maven: decrypt and export Maven secrets for `eval "$(just env maven)"`.
 env maven: log-dir
-    scripts/secrets.sh --action env --log-file {{LOG_FILE}}
+    scripts/secrets.sh --action env --show-values --log-file {{LOG_FILE}}
 
 # publish-central [base_ref] [head_ref]: plan, validate and deploy to Maven Central.
 publish-central base_ref="" head_ref="": log-dir
@@ -32,8 +32,8 @@ verify-published: log-dir
         artifact_ids=$(printf '%s' "$mod" | jq -r '([.artifactId] + (.subArtifacts // [])) | .[]')
         while IFS= read -r artifact_id; do
             [ -n "$artifact_id" ] || continue
-            echo "Verifying ${group_id}:${artifact_id}:${version} ..."
-            scripts/wait-for-maven-central-artifact.sh --log-file {{LOG_FILE}} "$repo_url" "$group_id" "$artifact_id" "$version"
+            echo "Verifying ${group_id}:${artifact_id}:${version} ..." >> {{LOG_FILE}}
+            scripts/wait-for-maven-central-artifact.sh "$repo_url" "$group_id" "$artifact_id" "$version" >> {{LOG_FILE}} 2>&1
         done <<< "$artifact_ids"
     done
 

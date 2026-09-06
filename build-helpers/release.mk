@@ -14,4 +14,5 @@ release-build: sync-manifest release-plan validate-release-plan
 
 ## release-apply: apply generated release plan to module POMs and update manifest
 release-apply:
-	@./scripts/apply-release-plan.sh release-artifacts/release-plan.json releases/manifest.json --log-file $(LOG_FILE)
+	@mkdir -p "$(dir $(LOG_FILE))"
+	@./scripts/apply-release-plan.sh release-artifacts/release-plan.json releases/manifest.json >> "$(LOG_FILE)" 2>&1
