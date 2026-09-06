@@ -3,7 +3,7 @@
 ```toml
 artifact_type = "spec"
 id            = "SPEC-0002"
-state         = "active"
+state         = "done"
 owner         = "rafex"
 created_at    = "2026-09-06"
 updated_at    = "2026-09-06"

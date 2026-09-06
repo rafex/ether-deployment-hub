@@ -32,3 +32,4 @@ registrada condiciona el diseno o la implementacion.
 | [DEC-0005](./decisions/DEC-0005-estrategia-dual-de-glowroot.md) | accepted | Estrategia dual de GlowRoot | glowroot, apm, jdk25 |
 | [DEC-0006](./decisions/DEC-0006-target-jdk-25-lts.md) | accepted | Target JDK 25 LTS | java, jdk25 |
 | [DEC-0007](./decisions/DEC-0007-versionado-independiente-y-release-policy-por-co.md) | accepted | Versionado independiente y release policy por Conventional Commits | versioning, conventional-commits, release |
+| [DEC-0008](./decisions/DEC-0008-release-local-first-de-componentes.md) | accepted | Release local-first de componentes | release, local-first, cd, makefile, justfile, sops |

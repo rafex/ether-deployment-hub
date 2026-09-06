@@ -548,6 +548,22 @@ FIRST=$(git rev-list --max-parents=0 HEAD)
 make publish-ci BASE_REF=$FIRST
 ```
 
+### Release local (sin GitHub Actions)
+
+Publica a Maven Central directamente desde tu máquina, sin CI:
+
+```bash
+# 1. Configura secretos cifrados (sops + age)
+scripts/secrets.sh --action keygen --log-file /tmp/ether-deployment-hub/secrets.log
+scripts/secrets.sh --action edit   --log-file /tmp/ether-deployment-hub/secrets.log
+
+# 2. Release completo (plan + deploy por niveles + verificación de publicación)
+just release
+```
+
+Los pasos intermedios son `make release-build`, `just publish-central` y
+`just verify-published`. Ver `spec-native/COMMANDS.md` para el detalle.
+
 ---
 
 ## Uso en tu proyecto
