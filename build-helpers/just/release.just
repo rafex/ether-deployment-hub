@@ -5,11 +5,11 @@ LOG_FILE := "/tmp/ether-deployment-hub/release-" + `date +%Y%m%d-%H%M%S` + ".log
 
 [private]
 log-dir:
-    mkdir -p $(dirname {{LOG_FILE}})
+    @mkdir -p $(dirname {{LOG_FILE}})
 
 # env maven: decrypt and export Maven secrets for `eval "$(just env maven)"`.
 env maven: log-dir
-    scripts/secrets.sh --action env --show-values --log-file {{LOG_FILE}}
+    @scripts/secrets.sh --action env --show-values --log-file {{LOG_FILE}}
 
 # publish-central [base_ref] [head_ref]: plan, validate and deploy to Maven Central.
 publish-central base_ref="" head_ref="": log-dir
