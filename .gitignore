@@ -39,3 +39,6 @@ session-ses_*.md
 *.unison.*
 *.backup
 *.backup*
+
+# SpecNative — venv is generated; do not commit
+.specnative/.venv/

@@ -1,5 +1,27 @@
 # AGENTS
 
+## SpecNative context
+
+Este repo usa [SpecNative Development](https://specnative-d.rafex.io/ai/es/). El
+contexto operativo del proyecto vive en `spec-native/` y el contrato del
+framework en `.specnative/`.
+
+**Orden de lectura para agentes:**
+
+1. `AGENTS.md` (este archivo) — contrato operativo, leer primero.
+2. `spec-native/README.md` — índice de navegación del contexto.
+3. `spec-native/ROADMAP.md` — confirma que la iniciativa es coherente.
+4. `spec-native/PRODUCT.md` + contexto técnico (`ARCHITECTURE.md`, `STACK.md`, `CONVENTIONS.md`).
+5. `spec-native/DECISIONS.md` — trade-offs que las próximas iniciativas deben respetar.
+6. `spec-native/specs/<iniciativa>/SPEC.md` y `spec-native/tasks/<iniciativa>/TASKS.md`.
+
+**Comandos nativos** (definidos en `opencode.json`): `spec-backlog`,
+`spec-decision`, `spec-plan`, `spec-implement`, `spec-review`, `spec-close`,
+`spec-context`, `spec-architecture`, `spec-convention`.
+
+El tablero persistente entre sesiones es `TODO.md` (raíz). Solo `@plan` crea o
+reemplaza el bloque `## Active`; el resto de agentes solo marcan ítems.
+
 ## Deployment automation status
 - Release planning is dynamic and module-aware (change detection + semver bumping).
 - Publish pipeline validates Maven Central collisions before deploy and re-validates before publish.
