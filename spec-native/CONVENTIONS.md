@@ -31,3 +31,11 @@ viven en `conventions/CONV-XXXX-<slug>.md`.
 
 - Cada módulo `ether-*` es un subtree con su propio `pom.xml` (`projectDir` en manifest).
 - Separación Makefile (build) vs comandos de operación; documentar solo los reales en `COMMANDS.md`.
+
+## Reglas
+
+| ID | Estado | Regla | Tags |
+| --- | --- | --- | --- |
+| [CONV-0001](./conventions/CONV-0001-scripts-bash-robustos-e-idempotentes.md) | active | Scripts Bash robustos e idempotentes | bash, scripts, pipeline |
+| [CONV-0002](./conventions/CONV-0002-java-interfaces-primero-y-cero-magia.md) | active | Java: interfaces primero y cero magia | java, principios, naming |
+| [CONV-0003](./conventions/CONV-0003-commits-y-versionado-convencional.md) | active | Commits y versionado convencional | commits, versioning, conventional-commits |

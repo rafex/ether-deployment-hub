@@ -8,7 +8,7 @@
 `ether-deployment-hub` es un hub orquestador (no una aplicación) que compila y
 publica los módulos del ecosistema **Ether** en Maven Central y GitHub Packages.
 
-## Componentes
+## Estructura del hub
 
 | Componente | Responsabilidad |
 | --- | --- |
@@ -48,3 +48,13 @@ level chunking" para el desglose L0..L7.
   `internalDependencyProperties`).
 - El hub no decide el contenido de cada módulo; solo el orden y la validación de
   publicación.
+
+## Componentes
+
+| ID | Estado | Componente | Tags |
+| --- | --- | --- | --- |
+| [ARCH-0001](./architecture/ARCH-0001-topolog-a-de-m-dulos-y-orden-de-despliegue.md) | active | Topología de módulos y orden de despliegue | modulos, deploy-order, dependencias |
+| [ARCH-0002](./architecture/ARCH-0002-motor-de-release-planning.md) | active | Motor de release planning | release, planning, scripts |
+| [ARCH-0003](./architecture/ARCH-0003-publish-pipeline-a-maven-central.md) | active | Publish pipeline a Maven Central | ci, maven-central, workflow |
+| [ARCH-0004](./architecture/ARCH-0004-mirror-a-github-packages.md) | active | Mirror a GitHub Packages | ci, github-packages, workflow_run |
+| [ARCH-0005](./architecture/ARCH-0005-an-lisis-est-tico-del-ecosistema.md) | active | Análisis estático del ecosistema | analisis, codebase, clusters |
