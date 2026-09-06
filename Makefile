@@ -1,5 +1,6 @@
 include build-helpers/git.mk
 include build-helpers/compile.mk
+include build-helpers/release.mk
 include build-helpers/gh.mk
 include build-helpers/docs.mk
 
@@ -36,6 +37,8 @@ help:
 	@echo "  make docs-clean           - Clean documentation"
 	@echo ""
 	@echo "Release & Deploy:"
+	@echo "  make release-build        - Sync manifest, generate and validate release plan (no deploy)"
+	@echo "  make release-apply        - Apply release plan to POMs and update manifest"
 	@echo "  make sync-manifest        - Sync manifest versions from Maven Central"
 	@echo "  make verify-central       - Probe Maven Central to confirm published artifacts exist"
 	@echo "  make release-plan         - Generate release plan (BASE_REF/HEAD_REF)"
