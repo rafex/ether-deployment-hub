@@ -35,3 +35,7 @@ session-ses_*.md
 
 # opencode — worktrees (generados, no committear)
 .opencode/worktrees.log
+
+*.unison.*
+*.backup
+*.backup*
