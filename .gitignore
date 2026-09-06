@@ -43,3 +43,12 @@ session-ses_*.md
 # SpecNative — venv is generated; do not commit
 .specnative/.venv/
 .specnative/__pycache__/
+
+# sops+age secrets — keep *.enc.yaml, ignore decrypted/temp artifacts
+.secrets/*.dec*
+.secrets/*.plain*
+.secrets/*.tmp*
+.secrets/*.env*
+.env.maven
+*.plain
+
