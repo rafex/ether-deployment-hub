@@ -1,6 +1,7 @@
 include build-helpers/git.mk
 include build-helpers/compile.mk
 include build-helpers/release.mk
+include build-helpers/container.mk
 include build-helpers/gh.mk
 include build-helpers/docs.mk
 
@@ -46,6 +47,12 @@ help:
 	@echo "  make deploy               - Full pre-deploy sequence (sync+verify+build+plan)"
 	@echo "  make publish-ci           - Trigger GitHub Actions Maven Central publish"
 	@echo "  make publish-plan-ci      - Dry-run publish (no actual deploy)"
+	@echo ""
+	@echo "Containerized CI/CD:"
+	@echo "  make runtime              - Detect the available container runtime (podman or docker)"
+	@echo "  make image                - Build the CI/CD container image"
+	@echo "  make image-pull           - Pull the pre-built CI image from the registry"
+	@echo "  make ci                   - Run the validation build inside the container"
 	@echo ""
 	@echo "For more details on any command, check the corresponding .mk file"
 	@echo "or run: make subtrees-help"

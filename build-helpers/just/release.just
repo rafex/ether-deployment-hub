@@ -3,6 +3,13 @@
 
 LOG_FILE := "/tmp/ether-deployment-hub/release-" + `date +%Y%m%d-%H%M%S` + ".log"
 
+# Container settings for the containerized release path.
+CONTAINER_RUNTIME := ""
+CI_IMAGE := "ghcr.io/rafex/ether-deployment-hub/ci:latest"
+CONTAINERFILE := "containers/ci/Containerfile"
+
+container_runtime_arg := if CONTAINER_RUNTIME != "" { "--container-runtime " + CONTAINER_RUNTIME } else { "" }
+
 [private]
 log-dir:
     @mkdir -p $(dirname {{LOG_FILE}})
@@ -10,6 +17,10 @@ log-dir:
 # env maven: decrypt and export Maven secrets for `eval "$(just env maven)"`.
 env maven: log-dir
     @scripts/secrets.sh --action env --show-values --log-file {{LOG_FILE}}
+
+# ci: run the validation build inside the CI container.
+ci: log-dir
+    make ci
 
 # publish-central [base_ref] [head_ref]: plan, validate and deploy to Maven Central.
 publish-central base_ref="" head_ref="": log-dir
@@ -37,8 +48,23 @@ verify-published: log-dir
         done <<< "$artifact_ids"
     done
 
-# release: full local Maven Central release (env + publish + verify).
-release:
+# release-host: full local Maven Central release directly on the host.
+# Use this as an escape hatch when you cannot or do not want to run inside a container.
+release-host:
     eval "$(just env maven)"
     just publish-central
     just verify-published
+
+# release: canonical containerized Maven Central release.
+# Secrets are decrypted on the host, then the actual release flow runs inside the CI container.
+# The container receives the secrets through the environment automatically.
+release: log-dir
+    eval "$(just env maven)"
+    scripts/container.sh --action run \
+        --project-name ether-deployment-hub \
+        {{container_runtime_arg}} \
+        --ci-image {{CI_IMAGE}} \
+        --containerfile {{CONTAINERFILE}} \
+        --workspace {{invocation_directory()}} \
+        --log-file {{LOG_FILE}} \
+        -- bash -lc 'just release-host'
