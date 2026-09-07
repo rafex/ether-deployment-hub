@@ -1,7 +1,7 @@
 # CI/CD image for ether-deployment-hub.
 # Provides a reproducible toolchain for build, validation, release planning,
 # and Maven Central deployment.
-ARG BASE_IMAGE=eclipse-temurin:25-jdk-noble
+ARG BASE_IMAGE=docker.io/library/eclipse-temurin:25-jdk-noble@sha256:955c8b94714bc2b5dba5f741bb3b65017287c66fe8d5bf0537e65031a16266ff
 ARG JUST_VERSION=1.40.0
 
 FROM ${BASE_IMAGE}

@@ -148,15 +148,6 @@ ensure_host_m2() {
   fi
 }
 
-build_env_args() {
-  local -a env_args=()
-  if [[ -n "${OSSRH_USERNAME:-}" ]]; then env_args+=("-e" "OSSRH_USERNAME"); fi
-  if [[ -n "${OSSRH_PASSWORD:-}" ]]; then env_args+=("-e" "OSSRH_PASSWORD"); fi
-  if [[ -n "${MAVEN_GPG_PASSPHRASE:-}" ]]; then env_args+=("-e" "MAVEN_GPG_PASSPHRASE"); fi
-  if [[ -n "${GPG_PRIVATE_KEY_B64:-}" ]]; then env_args+=("-e" "GPG_PRIVATE_KEY_B64"); fi
-  printf '%s\n' "${env_args[*]}"
-}
-
 do_runtime() {
   local runtime
   runtime="$(resolve_runtime)"
@@ -198,12 +189,20 @@ do_run() {
   local container_home="/var/maven"
   local container_gnupghome="${container_home}/.gnupg"
 
-  local env_args_str
-  env_args_str="$(build_env_args)"
-  local -a env_args=()
-  if [[ -n "$env_args_str" ]]; then
-    read -r -a env_args <<< "$env_args_str"
-  fi
+  local -a run_args=(
+    "$runtime" "run" "--rm"
+    "-u" "${uid_val}:${gid_val}"
+    "-v" "${WORKSPACE}:${container_workspace}"
+    "-w" "${container_workspace}"
+    "-e" "HOME=${container_home}"
+    "-v" "${HOME}/.m2:${container_home}/.m2"
+    "-e" "GNUPGHOME=${container_gnupghome}"
+  )
+
+  if [[ -n "${OSSRH_USERNAME:-}" ]]; then run_args+=("-e" "OSSRH_USERNAME"); fi
+  if [[ -n "${OSSRH_PASSWORD:-}" ]]; then run_args+=("-e" "OSSRH_PASSWORD"); fi
+  if [[ -n "${MAVEN_GPG_PASSPHRASE:-}" ]]; then run_args+=("-e" "MAVEN_GPG_PASSPHRASE"); fi
+  if [[ -n "${GPG_PRIVATE_KEY_B64:-}" ]]; then run_args+=("-e" "GPG_PRIVATE_KEY_B64"); fi
 
   local cmd_str
   cmd_str="$(printf '%q ' "${cmd_args[@]}")"
@@ -211,16 +210,8 @@ do_run() {
 
   log_info "Running command in container: ${cmd_args[*]}"
 
-  "$runtime" run --rm \
-    -u "${uid_val}:${gid_val}" \
-    -v "${WORKSPACE}:${container_workspace}" \
-    -w "${container_workspace}" \
-    -e "HOME=${container_home}" \
-    -v "${HOME}/.m2:${container_home}/.m2" \
-    -e "GNUPGHOME=${container_gnupghome}" \
-    "${env_args[@]}" \
-    "$CI_IMAGE" \
-    bash -lc "$cmd_str"
+  run_args+=("$CI_IMAGE" "bash" "-lc" "$cmd_str")
+  "${run_args[@]}"
 }
 
 do_ci() {

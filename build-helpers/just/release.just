@@ -48,12 +48,17 @@ verify-published: log-dir
         done <<< "$artifact_ids"
     done
 
+# publish-and-verify: release flow assuming secrets are already in the environment.
+# Used inside the container, where secrets are injected via env by container.sh.
+publish-and-verify:
+    just publish-central
+    just verify-published
+
 # release-host: full local Maven Central release directly on the host.
 # Use this as an escape hatch when you cannot or do not want to run inside a container.
 release-host:
     eval "$(just env maven)"
-    just publish-central
-    just verify-published
+    just publish-and-verify
 
 # release: canonical containerized Maven Central release.
 # Secrets are decrypted on the host, then the actual release flow runs inside the CI container.
@@ -65,6 +70,5 @@ release: log-dir
         {{container_runtime_arg}} \
         --ci-image {{CI_IMAGE}} \
         --containerfile {{CONTAINERFILE}} \
-        --workspace {{invocation_directory()}} \
         --log-file {{LOG_FILE}} \
-        -- bash -lc 'just release-host'
+        -- just publish-and-verify
