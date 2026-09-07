@@ -1,0 +1,62 @@
+# CI/CD image for ether-deployment-hub.
+# Provides a reproducible toolchain for build, validation, release planning,
+# and Maven Central deployment.
+ARG BASE_IMAGE=eclipse-temurin:25-jdk-noble
+ARG JUST_VERSION=1.40.0
+
+FROM ${BASE_IMAGE}
+
+ARG JUST_VERSION
+ARG BUILD_DATE
+ARG VCS_REF
+
+LABEL org.opencontainers.image.source="https://github.com/rafex/ether-deployment-hub"
+LABEL org.opencontainers.image.title="ether-deployment-hub/ci"
+LABEL org.opencontainers.image.description="CI/CD toolchain for ether-deployment-hub (JDK 25, Maven, Just, GPG)."
+LABEL org.opencontainers.image.version="${JUST_VERSION}-${VCS_REF:-unknown}"
+LABEL org.opencontainers.image.created="${BUILD_DATE:-unknown}"
+LABEL org.opencontainers.image.revision="${VCS_REF:-unknown}"
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV LANG=C.UTF-8
+ENV LC_ALL=C.UTF-8
+
+# Base toolchain required by the build, release planning, and deploy scripts.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        bash \
+        git \
+        curl \
+        ca-certificates \
+        tzdata \
+        jq \
+        python3 \
+        perl \
+        make \
+        gnupg \
+        maven \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Just from upstream GitHub releases (not available in Ubuntu noble).
+RUN just_arch=$(case "$(uname -m)" in \
+        x86_64) echo "x86_64-unknown-linux-musl" ;; \
+        aarch64|arm64) echo "aarch64-unknown-linux-musl" ;; \
+        *) echo "unsupported arch: $(uname -m)" >&2; exit 1 ;; \
+    esac) \
+    && curl -fsSL \
+        "https://github.com/casey/just/releases/download/${JUST_VERSION}/just-${JUST_VERSION}-${just_arch}.tar.gz" \
+        -o /tmp/just.tar.gz \
+    && tar -xzf /tmp/just.tar.gz -C /usr/local/bin just \
+    && chmod +x /usr/local/bin/just \
+    && rm -f /tmp/just.tar.gz
+
+# Create an unprivileged home directory for Maven cache/GPG when running with
+# host uid:gid mapping.
+RUN mkdir -p /var/maven/.m2 /var/maven/.gnupg \
+    && chmod 700 /var/maven/.gnupg
+
+WORKDIR /workspace
+
+ENTRYPOINT ["/bin/bash", "-lc"]
+CMD ["make validate-main-build"]
